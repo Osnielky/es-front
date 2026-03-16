@@ -1,0 +1,70 @@
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  id            String        @id @default(cuid())
+  slug          String        @unique
+  make          String
+  model         String
+  year          Int
+  trim          String?
+  price         Decimal       @db.Decimal(10, 2)
+  mileage       Int
+  condition     Condition     @default(USED)
+  bodyStyle     String?
+  transmission  String?
+  fuelType      String?
+  engine        String?
+  exteriorColor String?
+  interiorColor String?
+  vin           String?       @unique
+  description   String?
+  features      String[]
+  images        String[]
+  status        VehicleStatus @default(AVAILABLE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([make, model])
+  @@index([status])
+  @@index([price])
+  @@index([year])
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String?
+  vehicleId String?
+  type      LeadType @default(GENERAL)
+  createdAt DateTime @default(now())
+}
+
+enum Condition {
+  NEW
+  USED
+  CERTIFIED
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  SOLD
+  PENDING
+}
+
+enum LeadType {
+  GENERAL
+  VEHICLE
+  FINANCING
+  TRADE_IN
+}
