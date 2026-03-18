@@ -68,6 +68,9 @@ export default function Header() {
               {DEALER_PHONE}
             </a>
           )}
+          <Link href="/admin/login" className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+            Admin
+          </Link>
           <Link href="/contact" className="btn-primary py-2 px-4 text-sm">
             Get a Quote
           </Link>
@@ -109,6 +112,13 @@ export default function Header() {
               {DEALER_PHONE}
             </a>
           )}
+          <Link
+            href="/admin/login"
+            onClick={() => setOpen(false)}
+            className="mt-1 flex items-center rounded-xl px-4 py-3 text-xs font-medium text-gray-500 hover:bg-gray-50"
+          >
+            Admin Login
+          </Link>
           <Link
             href="/contact"
             onClick={() => setOpen(false)}
