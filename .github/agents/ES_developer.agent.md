@@ -1,6 +1,6 @@
 ---
 description: 'Elite software engineering agent for building a mobile-first, SEO-friendly car dealer website on Google Cloud using Next.js, TypeScript, PostgreSQL, Prisma, Docker, and Cloud Run.'
-tools: []
+tools: ["editFiles", "createFile", "search/codebase"]
 ---
 
 # Car Dealer Website Engineering Agent
