@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
-  ChevronLeft, Gauge, Fuel, Calendar, Settings2,
+  ChevronLeft, Gauge, Fuel, Calendar, Settings2, Car,
   Palette, Armchair, Hash, Activity, CheckCircle2,
 } from 'lucide-react'
 import { getVehicleBySlug } from '@/lib/data'
@@ -83,7 +84,48 @@ export default async function VehicleDetailPage({ params }: Props) {
             {/* Left column */}
             <div className="space-y-6">
               {/* Gallery */}
-              <VehicleGallery images={vehicle.images} alt={title} />
+              <div className="card overflow-hidden">
+                {vehicle.images.length > 0 ? (
+                  <div className="space-y-3">
+                    {/* Main image */}
+                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-100">
+                      <Image
+                        src={vehicle.images[0]}
+                        alt={title}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                    </div>
+                    
+                    {/* Thumbnail gallery */}
+                    {vehicle.images.length > 1 && (
+                      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+                        {vehicle.images.map((url, idx) => (
+                          <button
+                            key={idx}
+                            className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 ring-2 ring-transparent hover:ring-brand-300 transition-all"
+                          >
+                            <Image
+                              src={url}
+                              alt={`${title} ${idx + 1}`}
+                              fill
+                              className="object-cover"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                    <div className="text-center">
+                      <Car className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No images available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Title + price */}
               <div className="flex flex-wrap items-start justify-between gap-3">

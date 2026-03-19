@@ -127,6 +127,9 @@ export default function AdminDashboard() {
             <p className="text-sm text-gray-500">Sales & Inventory Overview</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/admin/vehicles" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              View All
+            </Link>
             <Link
               href="/admin/inventory"
               className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
