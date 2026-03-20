@@ -72,7 +72,30 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
   }
 
   const { prisma } = await import('./prisma')
+  
+  if (!slug) {
+    console.error('getVehicleBySlug: slug is required')
+    return null
+  }
+
   const vehicle = await prisma.vehicle.findUnique({ where: { slug } })
+  if (!vehicle) return null
+  return { ...vehicle, price: Number(vehicle.price) }
+}
+
+export async function getVehicleByVin(vin: string): Promise<Vehicle | null> {
+  if (USE_MOCK) {
+    return mockVehicles.find((v) => v.vin === vin) ?? null
+  }
+
+  const { prisma } = await import('./prisma')
+  
+  if (!vin) {
+    console.error('getVehicleByVin: vin is required')
+    return null
+  }
+
+  const vehicle = await prisma.vehicle.findUnique({ where: { vin } })
   if (!vehicle) return null
   return { ...vehicle, price: Number(vehicle.price) }
 }

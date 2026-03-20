@@ -27,7 +27,7 @@ export default function VehicleCard({ vehicle }: Props) {
 
   return (
     <Link
-      href={`/inventory/${slug}`}
+      href={`/inventory/${vehicle.vin}`}
       className="card-hover group flex flex-col overflow-hidden"
     >
       {/* Image */}

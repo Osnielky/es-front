@@ -33,10 +33,19 @@ export async function POST(request: NextRequest) {
     // Initialize Storage with Application Default Credentials (ADC)
     const storage = new Storage({ projectId: process.env.GCS_PROJECT_ID })
 
-    const bucket = storage.bucket(process.env.GCS_BUCKET_NAME!)
+    const bucketName = process.env.GCS_BUCKET_NAME
+    const projectId = process.env.GCS_PROJECT_ID
+
+    if (!bucketName || !projectId) {
+      return NextResponse.json({ error: 'GCS configuration missing' }, { status: 500 })
+    }
+
+    const bucket = storage.bucket(bucketName)
     const timestamp = Date.now()
-    const filename = `vehicles/${vehicleId}/${timestamp}-${file.name}`
-    const file_obj = bucket.file(filename)
+    const ext = file.name.split('.').pop()
+    const filename = `${file.name.split('.')[0]}-${timestamp}.${ext}`
+    const filepath = `vehicles/${vehicleId}/${filename}`
+    const file_obj = bucket.file(filepath)
 
     const buffer = await file.arrayBuffer()
 
@@ -46,12 +55,16 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const publicUrl = `https://storage.googleapis.com/${process.env.GCS_BUCKET_NAME}/${filename}`
+    // Make file publicly readable
+    await file_obj.makePublic()
+
+    // Generate public URL (org policy now allows public access)
+    const publicUrl = `https://storage.googleapis.com/${bucketName}/${filepath}`
 
     return NextResponse.json({
       success: true,
       url: publicUrl,
-      filename,
+      filepath,
     })
   } catch (error) {
     console.error('Upload error:', error)

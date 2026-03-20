@@ -23,17 +23,18 @@ interface Props {
 }
 
 export default async function InventoryPage({ searchParams }: Props) {
-  const page = Number(searchParams.page ?? 1)
+  const params = await searchParams
+  const page = Number(params.page ?? 1)
   const limit = 12
 
   const { vehicles, total } = await getVehicles({
-    make: searchParams.make,
-    model: searchParams.model,
-    condition: searchParams.condition,
-    yearMin: searchParams.yearMin ? Number(searchParams.yearMin) : undefined,
-    yearMax: searchParams.yearMax ? Number(searchParams.yearMax) : undefined,
-    priceMin: searchParams.priceMin ? Number(searchParams.priceMin) : undefined,
-    priceMax: searchParams.priceMax ? Number(searchParams.priceMax) : undefined,
+    make: params.make,
+    model: params.model,
+    condition: params.condition,
+    yearMin: params.yearMin ? Number(params.yearMin) : undefined,
+    yearMax: params.yearMax ? Number(params.yearMax) : undefined,
+    priceMin: params.priceMin ? Number(params.priceMin) : undefined,
+    priceMax: params.priceMax ? Number(params.priceMax) : undefined,
     page,
     limit,
   })

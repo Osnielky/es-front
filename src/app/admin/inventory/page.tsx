@@ -57,7 +57,7 @@ export default function AdminInventoryPage() {
       engine: '2.5L 4-Cylinder',
       exteriorColor: 'Midnight Black',
       interiorColor: 'Black',
-      vin: '4T1BZ1HK5CU123456',
+      vin: '',
       description: 'Excellent condition. One owner, accident-free. Fully loaded with leather, sunroof, backup camera, Apple CarPlay, and lane departure warning.',
     },
   })

@@ -56,7 +56,7 @@ export function buildVehicleJsonLd(vehicle: {
       vehicle.condition === 'NEW'
         ? 'https://schema.org/NewCondition'
         : 'https://schema.org/UsedCondition',
-    url: `${SITE_URL}/inventory/${vehicle.slug}`,
+    url: `${SITE_URL}/inventory/${vehicle.vin}`,
   }
 }
 

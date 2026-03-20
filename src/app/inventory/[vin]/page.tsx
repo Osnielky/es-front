@@ -1,22 +1,21 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import {
-  ChevronLeft, Gauge, Fuel, Calendar, Settings2, Car,
+  ChevronLeft, Gauge, Fuel, Calendar, Settings2,
   Palette, Armchair, Hash, Activity, CheckCircle2,
 } from 'lucide-react'
-import { getVehicleBySlug } from '@/lib/data'
+import { getVehicleByVin } from '@/lib/data'
 import { buildVehicleTitle, buildVehicleDescription, buildVehicleJsonLd } from '@/lib/seo'
-import LeadForm from '@/components/leads/LeadForm'
-import VehicleGallery from '@/components/inventory/VehicleGallery'
+import VehicleDetailGallery from '@/components/inventory/VehicleDetailGallery'
 
 interface Props {
-  params: { slug: string }
+  params: { vin: string }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const vehicle = await getVehicleBySlug(params.slug)
+  const { vin } = await params
+  const vehicle = await getVehicleByVin(vin)
   if (!vehicle) return { title: 'Vehicle Not Found' }
 
   return {
@@ -35,7 +34,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function VehicleDetailPage({ params }: Props) {
-  const vehicle = await getVehicleBySlug(params.slug)
+  const { vin } = await params
+  const vehicle = await getVehicleByVin(vin)
   if (!vehicle || vehicle.status === 'SOLD') notFound()
 
   const jsonLd = buildVehicleJsonLd(vehicle)
@@ -80,52 +80,20 @@ export default async function VehicleDetailPage({ params }: Props) {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-8">
-          <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8">
-            {/* Left column */}
-            <div className="space-y-6">
-              {/* Gallery */}
-              <div className="card overflow-hidden">
-                {vehicle.images.length > 0 ? (
-                  <div className="space-y-3">
-                    {/* Main image */}
-                    <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-gray-100">
-                      <Image
-                        src={vehicle.images[0]}
-                        alt={title}
-                        fill
-                        className="object-cover"
-                        priority
-                      />
-                    </div>
-                    
-                    {/* Thumbnail gallery */}
-                    {vehicle.images.length > 1 && (
-                      <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
-                        {vehicle.images.map((url, idx) => (
-                          <button
-                            key={idx}
-                            className="relative aspect-square overflow-hidden rounded-lg bg-gray-100 ring-2 ring-transparent hover:ring-brand-300 transition-all"
-                          >
-                            <Image
-                              src={url}
-                              alt={`${title} ${idx + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                    <div className="text-center">
-                      <Car className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-sm text-gray-500">No images available</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+          <div className="space-y-6">
+            {/* Gallery */}
+              <VehicleDetailGallery
+                images={vehicle.images}
+                alt={title}
+                vehicleInfo={{
+                  year: vehicle.year,
+                  make: vehicle.make,
+                  model: vehicle.model,
+                  price: vehicle.price,
+                  vin: vehicle.vin || 'N/A',
+                }}
+                whatsappNumber={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '1234567890'}
+              />
 
               {/* Title + price */}
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -193,14 +161,6 @@ export default async function VehicleDetailPage({ params }: Props) {
                   </ul>
                 </div>
               )}
-            </div>
-
-            {/* Sticky sidebar — lead form */}
-            <aside className="mt-8 lg:mt-0">
-              <div className="sticky top-4">
-                <LeadForm vehicleId={vehicle.id} vehicleName={title} />
-              </div>
-            </aside>
           </div>
         </div>
       </div>
