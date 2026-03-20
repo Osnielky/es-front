@@ -3,6 +3,7 @@ import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight
 import { buildDealerJsonLd } from '@/lib/seo'
 import { getVehicles } from '@/lib/data'
 import VehicleCard from '@/components/inventory/VehicleCard'
+import HeroVideoRotator from '@/components/HeroVideoRotator'
 
 export default async function HomePage() {
   const dealerJsonLd = buildDealerJsonLd()
@@ -17,9 +18,11 @@ export default async function HomePage() {
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-hero-gradient px-4 py-20 text-white sm:py-32">
-        {/* Background blobs */}
-        <div className="pointer-events-none absolute -top-32 -right-32 h-[600px] w-[600px] rounded-full bg-brand-500/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 h-[400px] w-[400px] rounded-full bg-accent-500/15 blur-3xl" />
+        {/* Rotating video backgrounds */}
+        <HeroVideoRotator />
+
+        {/* Overlay for text readability */}
+        <div className="absolute inset-0 bg-black/40" />
 
         <div className="relative mx-auto max-w-5xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-200 backdrop-blur-sm mb-6">
