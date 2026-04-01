@@ -84,7 +84,7 @@ export default async function InventoryPage({ searchParams }: Props) {
                 <p className="mt-1 text-sm text-gray-500">Try adjusting your filters to see more results.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {vehicles.map((vehicle) => (
                   <VehicleCard key={vehicle.id} vehicle={vehicle} />
                 ))}

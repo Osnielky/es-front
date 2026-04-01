@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Car, Phone, MapPin, Mail, Instagram, Facebook, Twitter } from 'lucide-react'
+import { Phone, MapPin, Mail, Instagram, Facebook, Twitter } from 'lucide-react'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? ''
@@ -13,10 +13,11 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-600">
-                <Car className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold text-white">{DEALER_NAME}</span>
+              <img
+                src="/logo.jpeg"
+                alt={DEALER_NAME}
+                className="h-10 w-auto brightness-0 invert"
+              />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-brand-200">
               Your trusted local dealership. Quality vehicles, honest pricing, and an experience you'll love.

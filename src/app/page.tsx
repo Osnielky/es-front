@@ -17,7 +17,7 @@ export default async function HomePage() {
       />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-hero-gradient px-4 py-20 text-white sm:py-32">
+      <section className="relative overflow-hidden bg-hero-gradient px-4 pt-36 pb-20 text-white sm:pt-48 sm:pb-32">
         {/* Rotating video backgrounds */}
         <HeroVideoRotator />
 
