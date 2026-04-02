@@ -40,8 +40,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy startup script
-COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
+# Copy startup script from builder
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/start.sh ./start.sh
 RUN chmod +x ./start.sh
 
 USER nextjs
