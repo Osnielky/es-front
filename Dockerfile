@@ -43,10 +43,6 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy startup script from builder
-COPY --from=builder --chown=nextjs:nodejs /app/scripts/start.sh ./start.sh
-RUN chmod +x ./start.sh
-
 USER nextjs
 
 EXPOSE 8080
@@ -54,4 +50,4 @@ EXPOSE 8080
 ENV PORT 8080
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["./start.sh"]
+CMD ["node", "server.js"]

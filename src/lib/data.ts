@@ -1,13 +1,9 @@
 /**
- * Data access layer.
- * When DATABASE_URL is not set (local UI dev), returns mock data.
- * When DATABASE_URL is set, queries the real database via Prisma.
+ * Data access layer - always uses Prisma to query the real database.
  */
 
 import type { Vehicle } from '@/types'
-import { mockVehicles } from './mock-data'
-
-const USE_MOCK = !process.env.DATABASE_URL || process.env.DATABASE_URL === ''
+import { prisma } from './prisma'
 
 export interface GetVehiclesOptions {
   make?: string
@@ -27,21 +23,6 @@ export async function getVehicles(
 ): Promise<{ vehicles: Vehicle[]; total: number }> {
   const { page = 1, limit = 12, ...filters } = opts
 
-  if (USE_MOCK) {
-    let results = mockVehicles.filter((v) => v.status === 'AVAILABLE')
-    if (filters.make) results = results.filter((v) => v.make === filters.make)
-    if (filters.condition) results = results.filter((v) => v.condition === filters.condition)
-    if (filters.bodyStyle) results = results.filter((v) => v.bodyStyle === filters.bodyStyle)
-    if (filters.yearMin) results = results.filter((v) => v.year >= filters.yearMin!)
-    if (filters.yearMax) results = results.filter((v) => v.year <= filters.yearMax!)
-    if (filters.priceMin) results = results.filter((v) => v.price >= filters.priceMin!)
-    if (filters.priceMax) results = results.filter((v) => v.price <= filters.priceMax!)
-    const total = results.length
-    const vehicles = results.slice((page - 1) * limit, page * limit)
-    return { vehicles, total }
-  }
-
-  const { prisma } = await import('./prisma')
   const where = {
     status: 'AVAILABLE' as const,
     ...(filters.make && { make: filters.make }),
@@ -67,12 +48,6 @@ export async function getVehicles(
 }
 
 export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
-  if (USE_MOCK) {
-    return mockVehicles.find((v) => v.slug === slug) ?? null
-  }
-
-  const { prisma } = await import('./prisma')
-  
   if (!slug) {
     console.error('getVehicleBySlug: slug is required')
     return null
@@ -84,12 +59,6 @@ export async function getVehicleBySlug(slug: string): Promise<Vehicle | null> {
 }
 
 export async function getVehicleByVin(vin: string): Promise<Vehicle | null> {
-  if (USE_MOCK) {
-    return mockVehicles.find((v) => v.vin === vin) ?? null
-  }
-
-  const { prisma } = await import('./prisma')
-  
   if (!vin) {
     console.error('getVehicleByVin: vin is required')
     return null
