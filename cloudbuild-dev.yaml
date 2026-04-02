@@ -39,17 +39,19 @@ steps:
       - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE'
 
   # Step 4: Run database migrations
-  - name: 'gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.8.0'
+  - name: 'node:20-slim'
     id: 'migrate'
-    entrypoint: 'sh'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
-        /cloud-sql-proxy $PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE --port 5432 &
+        apt-get update && apt-get install -y curl openssl
+        curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.8.0/cloud-sql-proxy.linux.amd64
+        chmod +x /tmp/cloud-sql-proxy
+        /tmp/cloud-sql-proxy $PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE --port 5432 &
         sleep 5
-        apt-get update && apt-get install -y nodejs npm
-        cd /workspace
         npm ci --legacy-peer-deps
+        npx prisma generate
         npx prisma migrate deploy
     secretEnv: ['DATABASE_URL']
 
