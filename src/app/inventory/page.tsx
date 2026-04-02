@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { SlidersHorizontal, Car } from 'lucide-react'
+import { Car } from 'lucide-react'
 import { getVehicles } from '@/lib/data'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import VehicleFilters from '@/components/inventory/VehicleFilters'
@@ -45,7 +45,7 @@ export default async function InventoryPage({ searchParams }: Props) {
     <div className="min-h-screen bg-gray-50">
       {/* Page header */}
       <div className="bg-white border-b border-gray-100 px-4 py-8">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-screen-2xl">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600">
               <Car className="h-5 w-5 text-white" />
@@ -62,14 +62,10 @@ export default async function InventoryPage({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
-        <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
+      <div className="mx-auto max-w-screen-2xl px-4 py-8">
+        <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
           {/* Filters sidebar */}
           <aside>
-            <div className="flex items-center gap-2 mb-4 lg:hidden">
-              <SlidersHorizontal className="h-4 w-4 text-brand-600" />
-              <span className="text-sm font-semibold text-gray-700">Filters</span>
-            </div>
             <VehicleFilters searchParams={searchParams} />
           </aside>
 
@@ -84,7 +80,7 @@ export default async function InventoryPage({ searchParams }: Props) {
                 <p className="mt-1 text-sm text-gray-500">Try adjusting your filters to see more results.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {vehicles.map((vehicle) => (
                   <VehicleCard key={vehicle.id} vehicle={vehicle} />
                 ))}

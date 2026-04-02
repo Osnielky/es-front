@@ -111,7 +111,7 @@ export default async function HomePage() {
 
       {/* ── Featured Inventory ───────────────────────────────── */}
       <section className="bg-gray-50 px-4 py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-screen-2xl">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <h2 className="section-title">Featured Vehicles</h2>

@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter, usePathname } from 'next/navigation'
-import { useCallback } from 'react'
-import { SlidersHorizontal, X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { SlidersHorizontal, X, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface Props {
   searchParams: Record<string, string | undefined>
@@ -14,6 +14,7 @@ const BODY_STYLES = ['Sedan', 'SUV', 'Truck', 'Van', 'Coupe', 'Convertible', 'Ha
 export default function VehicleFilters({ searchParams }: Props) {
   const router = useRouter()
   const pathname = usePathname()
+  const [isOpen, setIsOpen] = useState(false)
 
   const updateFilter = useCallback(
     (key: string, value: string) => {
@@ -35,8 +36,11 @@ export default function VehicleFilters({ searchParams }: Props) {
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden mb-6 lg:mb-0">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+      {/* Header - clickable on mobile */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex w-full items-center justify-between border-b border-gray-100 px-5 py-4 lg:cursor-default"
+      >
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="h-4 w-4 text-brand-600" />
           <span className="font-bold text-gray-900">Filters</span>
@@ -46,18 +50,25 @@ export default function VehicleFilters({ searchParams }: Props) {
             </span>
           )}
         </div>
-        {activeCount > 0 && (
-          <button
-            onClick={clearFilters}
-            className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors"
-          >
-            <X className="h-3.5 w-3.5" />
-            Clear all
-          </button>
-        )}
-      </div>
+        <div className="flex items-center gap-2">
+          {activeCount > 0 && (
+            <span
+              onClick={(e) => { e.stopPropagation(); clearFilters(); }}
+              className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear all
+            </span>
+          )}
+          <span className="lg:hidden text-gray-400">
+            {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+          </span>
+        </div>
+      </button>
 
-      <div className="space-y-5 px-5 py-5">
+      {/* Filter content - collapsible on mobile, always visible on desktop */}
+      <div className={`${isOpen ? 'block' : 'hidden'} lg:block`}>
+        <div className="space-y-5 px-5 py-5">
         {/* Condition */}
         <div>
           <label className="label">Condition</label>
@@ -144,6 +155,7 @@ export default function VehicleFilters({ searchParams }: Props) {
             />
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
