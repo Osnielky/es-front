@@ -9,7 +9,6 @@ out/
 build/
 
 # Prisma
-prisma/migrations/
 
 # Environment
 .env
