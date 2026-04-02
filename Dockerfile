@@ -26,6 +26,9 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
+# Install OpenSSL 1.1 for Prisma compatibility
+RUN apk add --no-cache openssl1.1-compat
+
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
