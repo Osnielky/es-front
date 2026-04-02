@@ -5,6 +5,9 @@ import { getVehicles } from '@/lib/data'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import HeroVideoRotator from '@/components/HeroVideoRotator'
 
+// Force dynamic rendering - requires database connection
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const dealerJsonLd = buildDealerJsonLd()
   const { vehicles: featured } = await getVehicles({ limit: 3 })

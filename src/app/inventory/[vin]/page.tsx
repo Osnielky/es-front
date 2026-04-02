@@ -9,6 +9,9 @@ import { getVehicleByVin } from '@/lib/data'
 import { buildVehicleTitle, buildVehicleDescription, buildVehicleJsonLd } from '@/lib/seo'
 import VehicleDetailGallery from '@/components/inventory/VehicleDetailGallery'
 
+// Force dynamic rendering - requires database connection
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: { vin: string }
 }

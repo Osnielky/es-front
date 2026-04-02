@@ -4,6 +4,9 @@ import { getVehicles } from '@/lib/data'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import VehicleFilters from '@/components/inventory/VehicleFilters'
 
+// Force dynamic rendering - requires database connection
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Inventory',
   description: 'Browse our full inventory of new and used vehicles. Filter by make, model, year, price and more.',
