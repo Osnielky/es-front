@@ -17,6 +17,8 @@ prisma/migrations/
 .env.development.local
 .env.test.local
 .env.production.local
+dev.env
+prod.env
 
 # Misc
 .DS_Store
