@@ -5,9 +5,6 @@ CREDENTIALS_FILE="/secrets/credentials/credentials.json"
 
 if [ -f "$CREDENTIALS_FILE" ]; then
   echo "Loading credentials from secret..."
-  echo "File contents:"
-  cat "$CREDENTIALS_FILE"
-  echo ""
   
   # Parse JSON using jq and export as environment variables
   export DATABASE_URL=$(jq -r '.DATABASE_URL' "$CREDENTIALS_FILE")
@@ -15,7 +12,7 @@ if [ -f "$CREDENTIALS_FILE" ]; then
   export ADMIN_PASSWORD=$(jq -r '.ADMIN_PASSWORD' "$CREDENTIALS_FILE")
   export ADMIN_SESSION_SECRET=$(jq -r '.ADMIN_SESSION_SECRET' "$CREDENTIALS_FILE")
   
-  echo "DATABASE_URL set: ${DATABASE_URL:0:30}..."
+  echo "DATABASE_URL loaded"
   echo "Credentials loaded successfully"
 else
   echo "No credentials file found at $CREDENTIALS_FILE, using environment variables"
