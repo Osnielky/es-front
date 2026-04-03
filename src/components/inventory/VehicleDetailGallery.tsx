@@ -15,9 +15,10 @@ interface Props {
     vin: string
   }
   whatsappNumber?: string
+  isSold?: boolean
 }
 
-export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsappNumber = '1234567890' }: Props) {
+export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsappNumber = '1234567890', isSold = false }: Props) {
   const [mainIdx, setMainIdx] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
   const [startX, setStartX] = useState(0)
@@ -97,8 +98,8 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
             <Maximize2 className="h-5 w-5" />
           </button>
 
-          {/* WhatsApp button */}
-          {vehicleInfo && (
+          {/* WhatsApp button - hidden when sold */}
+          {vehicleInfo && !isSold && (
             <a
               href={`https://wa.me/${whatsappNumber}?text=Hi! I'm interested in the ${vehicleInfo.year} ${vehicleInfo.make} ${vehicleInfo.model} (VIN: ${vehicleInfo.vin}). Price: $${vehicleInfo.price.toLocaleString()}. Can you tell me more?`}
               target="_blank"

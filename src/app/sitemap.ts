@@ -48,21 +48,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  // Dynamic vehicle pages
+  // Dynamic vehicle pages - include ALL vehicles for SEO (even SOLD ones)
   let vehiclePages: MetadataRoute.Sitemap = []
 
   try {
     const vehicles = await prisma.vehicle.findMany({
-      where: { status: 'AVAILABLE' },
-      select: { vin: true, updatedAt: true },
+      where: { status: { in: ['AVAILABLE', 'PENDING', 'SOLD'] } },
+      select: { vin: true, updatedAt: true, status: true },
       orderBy: { updatedAt: 'desc' },
     })
 
     vehiclePages = vehicles.map((vehicle) => ({
       url: `${SITE_URL}/inventory/${vehicle.vin}`,
       lastModified: vehicle.updatedAt,
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
+      changeFrequency: vehicle.status === 'SOLD' ? 'monthly' as const : 'weekly' as const,
+      priority: vehicle.status === 'AVAILABLE' ? 0.7 : 0.5,
     }))
   } catch (error) {
     // If database is unavailable, return static pages only

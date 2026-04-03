@@ -38,7 +38,7 @@ steps:
       - '--build-arg'
       - 'NEXT_PUBLIC_DEALER_EMAIL=info@eandscars.com'
       - '--build-arg'
-      - 'NEXT_PUBLIC_SITE_URL=https://es-front-dev-124746959305.us-east1.run.app'
+      - 'NEXT_PUBLIC_SITE_URL=https://eandscars.com'
       - '--build-arg'
       - 'NEXT_PUBLIC_WHATSAPP_NUMBER=19414997415'
       - '.'

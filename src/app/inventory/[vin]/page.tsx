@@ -67,9 +67,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     other: {
       'product:price:amount': String(vehicle.price),
       'product:price:currency': 'USD',
-      'product:availability': 'in stock',
+      'product:availability': vehicle.status === 'SOLD' ? 'out of stock' : vehicle.status === 'PENDING' ? 'pending' : 'in stock',
       'product:condition': vehicle.condition === 'NEW' ? 'new' : 'used',
-      'og:availability': 'instock',
+      'og:availability': vehicle.status === 'SOLD' ? 'oos' : vehicle.status === 'PENDING' ? 'pending' : 'instock',
       'og:price:standard_amount': String(vehicle.price),
     },
   }
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function VehicleDetailPage({ params }: Props) {
   const { vin } = await params
   const vehicle = await getVehicleByVin(vin)
-  if (!vehicle || vehicle.status === 'SOLD') notFound()
+  if (!vehicle) notFound()
 
   const jsonLd = buildVehicleJsonLd(vehicle)
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
@@ -141,6 +141,30 @@ export default async function VehicleDetailPage({ params }: Props) {
 
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="space-y-6">
+            {/* SOLD/PENDING Banner */}
+            {vehicle.status === 'SOLD' && (
+              <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-center">
+                <span className="inline-flex items-center gap-2 text-lg font-bold text-red-700">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  This vehicle has been SOLD
+                </span>
+                <p className="mt-1 text-sm text-red-600">Browse our <a href="/inventory" className="underline font-medium hover:text-red-800">current inventory</a> for similar vehicles.</p>
+              </div>
+            )}
+            {vehicle.status === 'PENDING' && (
+              <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 text-center">
+                <span className="inline-flex items-center gap-2 text-lg font-bold text-amber-700">
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Sale Pending
+                </span>
+                <p className="mt-1 text-sm text-amber-600">This vehicle is currently under contract. <a href="/contact" className="underline font-medium hover:text-amber-800">Contact us</a> to be next in line.</p>
+              </div>
+            )}
+
             {/* Gallery */}
               <VehicleDetailGallery
                 images={vehicle.images}
@@ -153,15 +177,26 @@ export default async function VehicleDetailPage({ params }: Props) {
                   vin: vehicle.vin || 'N/A',
                 }}
                 whatsappNumber={process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '1234567890'}
+                isSold={vehicle.status === 'SOLD'}
               />
 
               {/* Title + price */}
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <div className="mb-2">
+                  <div className="mb-2 flex flex-wrap gap-2">
+                    {vehicle.status === 'SOLD' && (
+                      <span className="rounded-full bg-red-600 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
+                        Sold
+                      </span>
+                    )}
+                    {vehicle.status === 'PENDING' && (
+                      <span className="rounded-full bg-amber-500 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">
+                        Pending
+                      </span>
+                    )}
                     <span className={conditionClass}>{vehicle.condition}</span>
                     {vehicle.bodyStyle && (
-                      <span className="ml-2 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
+                      <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">
                         {vehicle.bodyStyle}
                       </span>
                     )}

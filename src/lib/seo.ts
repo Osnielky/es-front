@@ -72,6 +72,7 @@ export function buildVehicleJsonLd(vehicle: {
   vin?: string | null
   mileage: number
   condition: string
+  status?: string
   trim?: string | null
   fuelType?: string | null
   transmission?: string | null
@@ -79,6 +80,12 @@ export function buildVehicleJsonLd(vehicle: {
   bodyStyle?: string | null
   engine?: string | null
 }) {
+  const availability = vehicle.status === 'SOLD' 
+    ? 'https://schema.org/SoldOut' 
+    : vehicle.status === 'PENDING'
+    ? 'https://schema.org/LimitedAvailability'
+    : 'https://schema.org/InStock'
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Car',
@@ -93,7 +100,7 @@ export function buildVehicleJsonLd(vehicle: {
       '@type': 'Offer',
       price: vehicle.price,
       priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
+      availability,
       seller: {
         '@type': 'AutoDealer',
         name: DEALER_NAME,

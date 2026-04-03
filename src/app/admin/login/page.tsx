@@ -41,8 +41,8 @@ export default function AdminLoginPage() {
         return
       }
 
-      // Redirect to admin inventory
-      router.push('/admin/inventory')
+      // Redirect to admin dashboard
+      router.push('/admin')
     } catch (err) {
       setError('Something went wrong. Please try again.')
     }

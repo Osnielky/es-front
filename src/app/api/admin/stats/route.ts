@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [totalVehicles, availableVehicles, soldVehicles, pendingVehicles, totalLeads, recentLeads, recentVehicles] = await Promise.all([
+  const [totalVehicles, availableVehicles, soldVehicles, pendingVehicles, totalLeads, recentLeads, recentVehicles, allVehicles] = await Promise.all([
     prisma.vehicle.count(),
     prisma.vehicle.count({ where: { status: 'AVAILABLE' } }),
     prisma.vehicle.count({ where: { status: 'SOLD' } }),
@@ -34,6 +34,23 @@ export async function GET(request: NextRequest) {
         year: true,
         price: true,
         status: true,
+        createdAt: true,
+      },
+    }),
+    // Get ALL vehicles for the dashboard table
+    prisma.vehicle.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        slug: true,
+        vin: true,
+        make: true,
+        model: true,
+        year: true,
+        price: true,
+        status: true,
+        condition: true,
+        images: true,
         createdAt: true,
       },
     }),
@@ -78,6 +95,10 @@ export async function GET(request: NextRequest) {
       createdAt: lead.createdAt,
     })),
     recentVehicles: recentVehicles.map((v) => ({
+      ...v,
+      price: Number(v.price),
+    })),
+    allVehicles: allVehicles.map((v) => ({
       ...v,
       price: Number(v.price),
     })),
