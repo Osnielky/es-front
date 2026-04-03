@@ -65,7 +65,7 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/admin/stats')
+      const res = await fetch('/api/admin/stats', { credentials: 'include' })
       if (!res.ok) {
         if (res.status === 401) {
           router.push('/admin/login')
@@ -90,10 +90,13 @@ export default function AdminDashboard() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
+        credentials: 'include',
       })
 
       if (!res.ok) {
-        setError('Failed to update status')
+        const errorData = await res.json().catch(() => ({}))
+        console.error('Status update failed:', res.status, errorData)
+        setError(`Failed to update status: ${errorData.error || res.status}`)
         return
       }
 
