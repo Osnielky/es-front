@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Users,
   Edit2,
+  Trash2,
   Search,
   Filter,
   ChevronDown,
@@ -58,6 +59,7 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -126,6 +128,47 @@ export default function AdminDashboard() {
       setError('Error updating status')
     } finally {
       setUpdatingId(null)
+    }
+  }
+
+  const handleDelete = async (vehicleId: string, vehicleName: string) => {
+    if (!confirm(`Are you sure you want to delete "${vehicleName}"? This action cannot be undone.`)) {
+      return
+    }
+
+    setDeletingId(vehicleId)
+    try {
+      const res = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        setError(`Failed to delete: ${errorData.error || res.status}`)
+        return
+      }
+
+      // Remove from local state
+      setData((prev) => {
+        if (!prev) return prev
+        const updatedVehicles = prev.allVehicles.filter((v) => v.id !== vehicleId)
+        return {
+          ...prev,
+          allVehicles: updatedVehicles,
+          statistics: {
+            ...prev.statistics,
+            totalVehicles: updatedVehicles.length,
+            availableVehicles: updatedVehicles.filter((v) => v.status === 'AVAILABLE').length,
+            pendingVehicles: updatedVehicles.filter((v) => v.status === 'PENDING').length,
+            soldVehicles: updatedVehicles.filter((v) => v.status === 'SOLD').length,
+          },
+        }
+      })
+    } catch {
+      setError('Error deleting vehicle')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -401,13 +444,27 @@ export default function AdminDashboard() {
 
                       {/* Actions */}
                       <td className="px-6 py-4">
-                        <Link
-                          href={`/admin/inventory/${vehicle.id}/edit`}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          <Edit2 className="h-3.5 w-3.5" />
-                          Edit
-                        </Link>
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/admin/inventory/${vehicle.id}/edit`}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                            Edit
+                          </Link>
+                          <button
+                            onClick={() =>
+                              handleDelete(vehicle.id, `${vehicle.year} ${vehicle.make} ${vehicle.model}`)
+                            }
+                            disabled={deletingId === vehicle.id}
+                            className={`inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50 transition-colors ${
+                              deletingId === vehicle.id ? 'opacity-50 cursor-wait' : ''
+                            }`}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            {deletingId === vehicle.id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
