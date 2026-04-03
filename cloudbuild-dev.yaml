@@ -16,6 +16,7 @@ steps:
         cat /workspace/version.env
 
   # Step 2: Build the Docker image with version tag
+  # NEXT_PUBLIC_* variables must be passed at build time for client components
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build'
     args:
@@ -28,6 +29,18 @@ steps:
       - '$_REGION-docker.pkg.dev/$PROJECT_ID/$_REPO/$_SERVICE:dev-$BUILD_ID'
       - '--build-arg'
       - 'NODE_ENV=production'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_DEALER_NAME=E&S Car Sales'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_DEALER_PHONE=+1 (941) 499-7415'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_DEALER_ADDRESS=1029 Airport-Pulling Rd unit c 49 Naples FL 34104'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_DEALER_EMAIL=info@eandscars.com'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_SITE_URL=https://es-front-dev-124746959305.us-east1.run.app'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_WHATSAPP_NUMBER=19414997415'
       - '.'
 
   # Step 3: Push all image tags to Artifact Registry
