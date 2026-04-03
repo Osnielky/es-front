@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Car } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { getVehicles } from '@/lib/data'
 import { buildBreadcrumbJsonLd, buildInventoryJsonLd, LOCATION } from '@/lib/seo'
 import VehicleCard from '@/components/inventory/VehicleCard'
@@ -116,20 +116,32 @@ export default async function InventoryPage({ searchParams }: Props) {
       />
       
       <div className="min-h-screen bg-gray-50">
-        {/* Page header */}
-        <div className="bg-white border-b border-gray-100 px-4 py-8">
-          <div className="mx-auto max-w-screen-2xl">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600">
-                <Car className="h-5 w-5 text-white" />
-              </div>
+        {/* Professional Header */}
+        <div className="bg-white border-b border-gray-200">
+          <div className="mx-auto max-w-screen-2xl px-4 py-10 sm:py-14">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
-                  {conditionText} Cars for Sale in Naples, FL
-                </h1>
-                <p className="text-sm text-gray-500">
-                  {total} vehicle{total !== 1 ? 's' : ''} available
+                <p className="text-sm font-semibold text-brand-600 uppercase tracking-wider">
+                  Our Inventory
                 </p>
+                <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                  {conditionText === 'All' ? 'Browse All Vehicles' : `${conditionText} Vehicles`}
+                </h1>
+                <p className="mt-2 text-gray-600 max-w-xl">
+                  Explore our selection of quality vehicles. Each car is thoroughly inspected and competitively priced.
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-6 text-sm">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-gray-900">{total}</p>
+                  <p className="text-gray-500">Available</p>
+                </div>
+                <div className="h-10 w-px bg-gray-200" />
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-brand-600">100%</p>
+                  <p className="text-gray-500">Inspected</p>
+                </div>
               </div>
             </div>
           </div>
@@ -147,7 +159,7 @@ export default async function InventoryPage({ searchParams }: Props) {
               {vehicles.length === 0 ? (
                 <div className="card flex flex-col items-center justify-center py-20 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
-                    <Car className="h-8 w-8 text-gray-400" />
+                    <Search className="h-8 w-8 text-gray-400" />
                   </div>
                   <h2 className="mt-4 text-lg font-bold text-gray-800">No vehicles found</h2>
                   <p className="mt-1 text-sm text-gray-500">Try adjusting your filters to see more results.</p>
