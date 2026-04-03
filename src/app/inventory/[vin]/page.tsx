@@ -6,14 +6,16 @@ import {
   Palette, Armchair, Hash, Activity, CheckCircle2,
 } from 'lucide-react'
 import { getVehicleByVin } from '@/lib/data'
-import { buildVehicleTitle, buildVehicleDescription, buildVehicleJsonLd } from '@/lib/seo'
+import { buildVehicleTitle, buildVehicleDescription, buildVehicleJsonLd, buildBreadcrumbJsonLd, buildVehicleKeywords, LOCATION } from '@/lib/seo'
 import VehicleDetailGallery from '@/components/inventory/VehicleDetailGallery'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
 // Force dynamic rendering - requires database connection
 export const dynamic = 'force-dynamic'
 
 interface Props {
-  params: { vin: string }
+  params: Promise<{ vin: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -21,17 +23,54 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const vehicle = await getVehicleByVin(vin)
   if (!vehicle) return { title: 'Vehicle Not Found' }
 
+  const title = buildVehicleTitle(vehicle.year, vehicle.make, vehicle.model, vehicle.trim)
+  const description = buildVehicleDescription(
+    vehicle.year,
+    vehicle.make,
+    vehicle.model,
+    vehicle.price,
+    vehicle.mileage
+  )
+  const keywords = buildVehicleKeywords(vehicle.year, vehicle.make, vehicle.model, vehicle.condition)
+  const url = `${SITE_URL}/inventory/${vehicle.vin}`
+  const image = vehicle.images[0] ?? `${SITE_URL}/og-image.jpg`
+
   return {
-    title: buildVehicleTitle(vehicle.year, vehicle.make, vehicle.model, vehicle.trim),
-    description: buildVehicleDescription(
-      vehicle.year,
-      vehicle.make,
-      vehicle.model,
-      vehicle.price,
-      vehicle.mileage
-    ),
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: url,
+    },
     openGraph: {
-      images: vehicle.images[0] ? [{ url: vehicle.images[0] }] : [],
+      title,
+      description,
+      url,
+      type: 'website',
+      siteName: process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales',
+      locale: 'en_US',
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: `${vehicle.year} ${vehicle.make} ${vehicle.model} for sale in Naples, FL`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+    other: {
+      'product:price:amount': String(vehicle.price),
+      'product:price:currency': 'USD',
+      'product:availability': 'in stock',
+      'product:condition': vehicle.condition === 'NEW' ? 'new' : 'used',
+      'og:availability': 'instock',
+      'og:price:standard_amount': String(vehicle.price),
     },
   }
 }
@@ -42,6 +81,11 @@ export default async function VehicleDetailPage({ params }: Props) {
   if (!vehicle || vehicle.status === 'SOLD') notFound()
 
   const jsonLd = buildVehicleJsonLd(vehicle)
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: 'Home', url: '/' },
+    { name: 'Inventory', url: '/inventory' },
+    { name: `${vehicle.year} ${vehicle.make} ${vehicle.model}`, url: `/inventory/${vehicle.vin}` },
+  ])
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`
 
   const conditionClass =
@@ -64,23 +108,36 @@ export default async function VehicleDetailPage({ params }: Props) {
 
   return (
     <>
+      {/* Vehicle Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {/* Breadcrumb Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb */}
-        <div className="border-b bg-white px-4 py-3">
-          <div className="mx-auto flex max-w-6xl items-center gap-1.5 text-sm text-gray-500">
-            <Link href="/inventory" className="flex items-center gap-1 hover:text-brand-600 transition-colors">
-              <ChevronLeft className="h-4 w-4" />
-              Inventory
-            </Link>
-            <span>/</span>
-            <span className="font-medium text-gray-900 truncate max-w-[220px]">{title}</span>
-          </div>
-        </div>
+        <nav className="border-b bg-white px-4 py-3" aria-label="Breadcrumb">
+          <ol className="mx-auto flex max-w-6xl items-center gap-1.5 text-sm text-gray-500">
+            <li>
+              <Link href="/" className="hover:text-brand-600 transition-colors">Home</Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link href="/inventory" className="flex items-center gap-1 hover:text-brand-600 transition-colors">
+                Inventory
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <span className="font-medium text-gray-900 truncate max-w-[220px]" aria-current="page">{title}</span>
+            </li>
+          </ol>
+        </nav>
 
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="space-y-6">

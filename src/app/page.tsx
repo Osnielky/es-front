@@ -1,22 +1,81 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight } from 'lucide-react'
-import { buildDealerJsonLd } from '@/lib/seo'
+import { buildDealerJsonLd, buildWebsiteJsonLd, buildLocalBusinessJsonLd, buildFAQJsonLd, LOCATION } from '@/lib/seo'
 import { getVehicles } from '@/lib/data'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import HeroVideoRotator from '@/components/HeroVideoRotator'
 
+const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
+
 // Force dynamic rendering - requires database connection
 export const dynamic = 'force-dynamic'
 
+export const metadata: Metadata = {
+  title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
+  description: `${DEALER_NAME} is your trusted car dealership in Naples, Florida. Browse 500+ new and used vehicles. Competitive pricing, easy financing, and quality service. Serving Marco Island, Bonita Springs, Fort Myers, and Southwest Florida.`,
+  keywords: [
+    'car dealer Naples FL',
+    'Naples car dealership',
+    'used cars Naples Florida',
+    'new cars Naples FL',
+    'buy car Naples',
+    'auto dealer Naples',
+    'E&S Car Sales Naples',
+    'Southwest Florida car dealer',
+    'Collier County auto dealer',
+    ...LOCATION.nearbyAreas.map(area => `cars for sale ${area}`),
+  ].join(', '),
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: {
+    title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
+    description: `Your trusted car dealership in Naples, Florida. Browse 500+ quality vehicles with transparent pricing. Visit us today!`,
+    url: SITE_URL,
+    type: 'website',
+    images: [
+      {
+        url: `${SITE_URL}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: `${DEALER_NAME} - Naples Florida Car Dealer`,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
+    description: `Your trusted car dealership in Naples, Florida. Browse 500+ quality vehicles with transparent pricing.`,
+  },
+}
+
 export default async function HomePage() {
   const dealerJsonLd = buildDealerJsonLd()
+  const websiteJsonLd = buildWebsiteJsonLd()
+  const localBusinessJsonLd = buildLocalBusinessJsonLd()
+  const faqJsonLd = buildFAQJsonLd()
   const { vehicles: featured } = await getVehicles({ limit: 3 })
 
   return (
     <>
+      {/* Structured Data for SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(dealerJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
