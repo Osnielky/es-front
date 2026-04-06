@@ -41,9 +41,9 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <img
-            src="/logo.jpeg"
+            src="/logo.png"
             alt={DEALER_NAME}
-            className="h-10 w-auto"
+            className="h-20 w-auto"
           />
         </Link>
 

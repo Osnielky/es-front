@@ -220,6 +220,9 @@ export default function Footer() {
               <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
             </div>
           </div>
+          <p className="mt-4 text-center text-xs text-gray-600">
+            Website created by OSMIO LLC · <a href="mailto:info@osmioservices.com" className="hover:text-gray-400 transition-colors">info@osmioservices.com</a>
+          </p>
         </div>
       </div>
     </footer>
