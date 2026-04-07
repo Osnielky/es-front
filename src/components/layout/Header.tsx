@@ -34,7 +34,7 @@ export default function Header() {
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         transparent
           ? ''
-          : 'bg-white/10 backdrop-blur-md shadow-sm border-b border-white/10'
+          : 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
@@ -72,13 +72,20 @@ export default function Header() {
           {DEALER_PHONE && (
             <a
               href={`tel:${DEALER_PHONE}`}
-              className="flex items-center gap-1.5 text-sm font-semibold tracking-wide text-white/90 hover:text-white transition-colors"
+              className={`flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors ${
+                transparent ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-700'
+              }`}
             >
               <Phone className="h-4 w-4" />
               {DEALER_PHONE}
             </a>
           )}
-          <Link href="/admin/login" className="text-xs font-medium text-white/50 hover:text-white/70 transition-colors">
+          <Link
+            href="/admin/login"
+            className={`text-xs font-medium transition-colors ${
+              transparent ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
             Admin
           </Link>
           <Link href="/contact" className="btn-primary py-2 px-5 text-xs font-bold uppercase tracking-widest">
@@ -88,7 +95,9 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg sm:hidden text-white hover:bg-white/10 transition-colors"
+          className={`flex h-9 w-9 items-center justify-center rounded-lg sm:hidden transition-colors ${
+            transparent ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+          }`}
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -139,7 +148,7 @@ export default function Header() {
         </div>
       )}
     </header>
-    {!isHome && <div className="h-[68px]" />}
+    {!isHome && <div className="h-[90px] sm:h-[108px]" />}
     </>
   )
 }
