@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { LogOut, AlertCircle, CheckCircle2, ArrowLeft, Upload, X } from 'lucide-react'
 import Image from 'next/image'
+import { VEHICLE_MAKES, VEHICLE_MODELS, VEHICLE_TRIMS } from '@/lib/vehicle-makes-models'
 
 const vehicleSchema = z.object({
   make: z.string().min(1, 'Make is required'),
@@ -41,15 +42,32 @@ export default function EditVehiclePage() {
   const [success, setSuccess] = useState<string | null>(null)
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
+  const [showCustomModel, setShowCustomModel] = useState(false)
+  const [showCustomTrim, setShowCustomTrim] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<VehicleInput>({
     resolver: zodResolver(vehicleSchema),
   })
+
+  const selectedMake = watch('make')
+  const selectedModel = watch('model')
+  const loadedMakeRef = useRef<string>('')
+
+  useEffect(() => {
+    if (selectedMake === loadedMakeRef.current) return
+    loadedMakeRef.current = selectedMake
+    setValue('model', '')
+    setShowCustomModel(false)
+    setValue('trim', '')
+    setShowCustomTrim(false)
+  }, [selectedMake, setValue])
 
   useEffect(() => {
     const fetchVehicle = async () => {
@@ -60,8 +78,17 @@ export default function EditVehiclePage() {
           return
         }
         const data = await res.json()
+        loadedMakeRef.current = data.make as string
         reset(data)
         setImages(data.images || [])
+        const knownModels = VEHICLE_MODELS[data.make as string] ?? []
+        if (data.model && !knownModels.includes(data.model as string)) {
+          setShowCustomModel(true)
+        }
+        const knownTrims = VEHICLE_TRIMS[data.make as string]?.[data.model as string] ?? []
+        if (data.trim && !knownTrims.includes(data.trim as string)) {
+          setShowCustomTrim(true)
+        }
       } catch {
         setError('Failed to load vehicle')
       } finally {
@@ -71,12 +98,22 @@ export default function EditVehiclePage() {
     fetchVehicle()
   }, [id, reset])
 
+  const selectedTrim = watch('trim')
+
+  const prevModelRef = useRef<string>('')
+  useEffect(() => {
+    if (prevModelRef.current === selectedModel) return
+    prevModelRef.current = selectedModel
+    setValue('trim', '')
+    setShowCustomTrim(false)
+  }, [selectedModel, setValue])
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
 
-    if (images.length + files.length > 10) {
-      setError(`Maximum 10 images allowed (you have ${images.length})`)
+    if (images.length + files.length > 15) {
+      setError(`Maximum 15 images allowed (you have ${images.length})`)
       return
     }
 
@@ -241,13 +278,12 @@ export default function EditVehiclePage() {
                 <label htmlFor="make" className="label">
                   Make *
                 </label>
-                <input
-                  id="make"
-                  type="text"
-                  className="input"
-                  placeholder="Toyota"
-                  {...register('make')}
-                />
+                <select id="make" className="input" {...register('make')}>
+                  <option value="">Select make</option>
+                  {VEHICLE_MAKES.map((make) => (
+                    <option key={make} value={make}>{make}</option>
+                  ))}
+                </select>
                 {errors.make && <p className="mt-1 text-xs text-red-500">{errors.make.message}</p>}
               </div>
 
@@ -255,13 +291,47 @@ export default function EditVehiclePage() {
                 <label htmlFor="model" className="label">
                   Model *
                 </label>
-                <input
-                  id="model"
-                  type="text"
-                  className="input"
-                  placeholder="Camry"
-                  {...register('model')}
-                />
+                {VEHICLE_MODELS[selectedMake]?.length > 0 ? (
+                  <>
+                    <select
+                      id="model"
+                      className="input"
+                      value={showCustomModel ? 'OTHER' : (selectedModel || '')}
+                      onChange={(e) => {
+                        if (e.target.value === 'OTHER') {
+                          setShowCustomModel(true)
+                          setValue('model', '', { shouldValidate: false })
+                        } else {
+                          setShowCustomModel(false)
+                          setValue('model', e.target.value, { shouldValidate: true })
+                        }
+                      }}
+                    >
+                      <option value="">Select model</option>
+                      {VEHICLE_MODELS[selectedMake].map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                      <option value="OTHER">Other...</option>
+                    </select>
+                    {showCustomModel && (
+                      <input
+                        id="model-custom"
+                        type="text"
+                        className="input mt-2"
+                        placeholder="Enter model name"
+                        {...register('model')}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <input
+                    id="model"
+                    type="text"
+                    className="input"
+                    placeholder="Camry"
+                    {...register('model')}
+                  />
+                )}
                 {errors.model && <p className="mt-1 text-xs text-red-500">{errors.model.message}</p>}
               </div>
 
@@ -269,13 +339,47 @@ export default function EditVehiclePage() {
                 <label htmlFor="trim" className="label">
                   Trim
                 </label>
-                <input
-                  id="trim"
-                  type="text"
-                  className="input"
-                  placeholder="XSE"
-                  {...register('trim')}
-                />
+                {VEHICLE_TRIMS[selectedMake]?.[selectedModel]?.length > 0 ? (
+                  <>
+                    <select
+                      id="trim"
+                      className="input"
+                      value={showCustomTrim ? 'OTHER' : (selectedTrim || '')}
+                      onChange={(e) => {
+                        if (e.target.value === 'OTHER') {
+                          setShowCustomTrim(true)
+                          setValue('trim', '', { shouldValidate: false })
+                        } else {
+                          setShowCustomTrim(false)
+                          setValue('trim', e.target.value)
+                        }
+                      }}
+                    >
+                      <option value="">Select trim</option>
+                      {VEHICLE_TRIMS[selectedMake][selectedModel].map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                      <option value="OTHER">Other...</option>
+                    </select>
+                    {showCustomTrim && (
+                      <input
+                        id="trim-custom"
+                        type="text"
+                        className="input mt-2"
+                        placeholder="Enter trim name"
+                        {...register('trim')}
+                      />
+                    )}
+                  </>
+                ) : (
+                  <input
+                    id="trim"
+                    type="text"
+                    className="input"
+                    placeholder="XSE"
+                    {...register('trim')}
+                  />
+                )}
               </div>
             </div>
           </div>

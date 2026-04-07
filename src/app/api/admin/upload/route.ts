@@ -32,7 +32,7 @@ function getFriendlyUploadError(error: unknown, maxUploadSizeBytes: number) {
 
   return {
     status: 500,
-    message: 'Upload failed',
+    message: `Upload failed: ${message}`,
   }
 }
 
