@@ -29,6 +29,8 @@ const vehicleSchema = z.object({
 type VehicleInput = z.infer<typeof vehicleSchema>
 
 export default function AdminInventoryPage() {
+  const MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024
+
   const router = useRouter()
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -113,6 +115,16 @@ export default function AdminInventoryPage() {
 
     try {
       for (const file of Array.from(files)) {
+        if (!file.type.startsWith('image/')) {
+          setError(`${file.name} is not an image file`)
+          return
+        }
+
+        if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+          setError(`${file.name} is larger than 5MB. Please compress it and try again.`)
+          return
+        }
+
         const formData = new FormData()
         formData.append('file', file)
         formData.append('vehicleId', 'temp')
@@ -123,7 +135,6 @@ export default function AdminInventoryPage() {
         })
 
         if (!res.ok) {
-          setError('Failed to upload image')
           const errorData = await res.json()
           setError(`Upload failed: ${errorData.error || 'Unknown error'}`)
           return
@@ -150,7 +161,7 @@ export default function AdminInventoryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-40">
+      <div className="bg-white border-b border-gray-100 sticky top-[90px] sm:top-[108px] z-40">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
