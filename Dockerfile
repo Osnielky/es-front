@@ -8,8 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --legacy-peer-deps
 
-# Generate Prisma client
+# Generate Prisma client (skip database validation at build time)
 COPY prisma ./prisma/
+ENV SKIP_ENV_VALIDATION=true
 RUN npx prisma generate
 
 # Rebuild the source code only when needed
