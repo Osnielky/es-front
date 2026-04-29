@@ -65,11 +65,12 @@ steps:
         sleep 5
         npm ci --legacy-peer-deps
         npx prisma generate
-        # Load environment from secret and run migrations
-        echo "$$ENV_DEV" > /tmp/.env
+        # Load environment from ENV_DEV secret and run migrations
+        echo "$ENV_DEV" > /tmp/.env
         set -a
         source /tmp/.env
         set +a
+        echo "Database URL: $DATABASE_URL"
         npx prisma migrate deploy
     secretEnv: ['ENV_DEV']
 
@@ -80,8 +81,8 @@ steps:
     args:
       - '-c'
       - |
-        # Load environment from secret
-        echo "$$ENV_DEV" > /tmp/.env
+        # Load environment from ENV_DEV secret
+        echo "$ENV_DEV" > /tmp/.env
         set -a
         source /tmp/.env
         set +a
