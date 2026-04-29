@@ -78,6 +78,7 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
+
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-hero-gradient px-4 pt-36 pb-20 text-white sm:pt-48 sm:pb-32">
         {/* Rotating video backgrounds */}
