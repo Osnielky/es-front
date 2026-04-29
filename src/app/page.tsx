@@ -56,7 +56,16 @@ export default async function HomePage() {
   const websiteJsonLd = buildWebsiteJsonLd()
   const localBusinessJsonLd = buildLocalBusinessJsonLd()
   const faqJsonLd = buildFAQJsonLd()
-  const { vehicles: featured } = await getVehicles({ limit: 3 })
+  
+  // Gracefully handle database connection errors
+  let featured: typeof getVehicles extends Promise<infer T> ? T['vehicles'] : never = []
+  try {
+    const result = await getVehicles({ limit: 3 })
+    featured = result.vehicles
+  } catch (error) {
+    console.error('Failed to fetch featured vehicles:', error)
+    // Continue with empty featured list if database is unavailable
+  }
 
   return (
     <>
