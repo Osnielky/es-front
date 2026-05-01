@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight } from 'lucide-react'
 import { buildDealerJsonLd, buildWebsiteJsonLd, buildLocalBusinessJsonLd, buildFAQJsonLd, LOCATION } from '@/lib/seo'
 import { getVehicles } from '@/lib/data'
+import type { Vehicle } from '@/types'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import HeroVideoRotator from '@/components/HeroVideoRotator'
 
@@ -58,7 +59,7 @@ export default async function HomePage() {
   const faqJsonLd = buildFAQJsonLd()
   
   // Gracefully handle database connection errors
-  let featured: typeof getVehicles extends Promise<infer T> ? T['vehicles'] : never = []
+  let featured: Vehicle[] = []
   try {
     const result = await getVehicles({ limit: 3 })
     featured = result.vehicles
