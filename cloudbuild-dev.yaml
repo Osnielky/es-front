@@ -65,7 +65,7 @@ steps:
         sleep 5
         npm ci --legacy-peer-deps
         npx prisma generate
-        export DATABASE_URL="postgresql://postgres:Admin123@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db"
+        export DATABASE_URL="postgresql://postgres:Admin123@localhost:5432/esfront_dev"
         npx prisma migrate deploy
 
   # Step 5: Deploy to Cloud Run (DEV)
