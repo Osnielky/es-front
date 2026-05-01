@@ -52,6 +52,7 @@ RUN groupadd --system --gid 1001 nodejs
 RUN useradd --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
+COPY .env.dev ./.env.production.local
 
 RUN mkdir .next
 RUN chown nextjs:nodejs .next

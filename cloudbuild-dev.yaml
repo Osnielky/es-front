@@ -65,8 +65,8 @@ steps:
         sleep 5
         npm ci --legacy-peer-deps
         npx prisma generate
+        export DATABASE_URL="postgresql://postgres:Admin123@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db"
         npx prisma migrate deploy
-    secretEnv: ['DATABASE_URL']
 
   # Step 5: Deploy to Cloud Run (DEV)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -87,8 +87,6 @@ steps:
       - '${PROJECT_ID}:${_REGION}:${_CLOUD_SQL_INSTANCE}'
       - '--set-env-vars'
       - 'NODE_ENV=production,NEXT_PUBLIC_DEALER_NAME=E&S Car Sales (DEV),NEXT_PUBLIC_DEALER_PHONE=+1 (941) 499-7415,NEXT_PUBLIC_DEALER_ADDRESS=1029 Airport-Pulling Rd unit c 49 Naples FL 34104,NEXT_PUBLIC_DEALER_EMAIL=info@eandscars.com,NEXT_PUBLIC_WHATSAPP_NUMBER=19414997415,GCS_BUCKET_NAME=${_GCS_BUCKET},GCS_PROJECT_ID=${PROJECT_ID},BUILD_VERSION=${SHORT_SHA}'
-      - '--set-secrets'
-      - 'DATABASE_URL=DATABASE_URL_DEV:latest,ADMIN_EMAIL=ADMIN_EMAIL_DEV:latest,ADMIN_PASSWORD=ADMIN_PASSWORD_DEV:latest,ADMIN_SESSION_SECRET=ADMIN_SESSION_SECRET_DEV:latest'
       - '--revision-suffix'
       - 'v-${SHORT_SHA}'
       - '--tag'
