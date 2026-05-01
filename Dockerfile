@@ -52,10 +52,24 @@ RUN groupadd --system --gid 1001 nodejs
 RUN useradd --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
-COPY .env.dev ./.env.production.local
 
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
+
+# Set environment variables for production
+ENV DATABASE_URL="postgresql://postgres:Admin123@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db"
+ENV ADMIN_EMAIL="admin@eandscars.com"
+ENV ADMIN_PASSWORD="your-admin-password-here"
+ENV ADMIN_SESSION_SECRET="your-32-char-minimum-secret-key-here"
+ENV NEXT_PUBLIC_DEALER_NAME="E&S Car Sales"
+ENV NEXT_PUBLIC_DEALER_PHONE="+1 (941) 499-7415"
+ENV NEXT_PUBLIC_DEALER_ADDRESS="1029 Airport-Pulling Rd unit c 49 Naples FL 34104"
+ENV NEXT_PUBLIC_DEALER_EMAIL="info@eandscars.com"
+ENV NEXT_PUBLIC_SITE_URL="https://eandscars.com"
+ENV NEXT_PUBLIC_WHATSAPP_NUMBER="19414997415"
+ENV GCS_BUCKET_NAME="es-cars-dev-images"
+ENV GCS_PROJECT_ID="es-cars-dev"
+ENV MAX_UPLOAD_SIZE_MB="5"
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
