@@ -23,6 +23,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: '/logo.png',
+  },
   title: {
     default: `${DEALER_NAME} | New & Used Cars in Naples, FL`,
     template: `%s | ${DEALER_NAME}`,
