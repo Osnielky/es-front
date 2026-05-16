@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { Camera, Keyboard, Search, CheckCircle2, AlertCircle, Loader2, X, Car } from 'lucide-react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { Camera, Keyboard, Search, CheckCircle2, AlertCircle, Loader2, X, Car, ScanLine } from 'lucide-react'
 import Image from 'next/image'
 
 export interface DecodedVehicle {
@@ -20,7 +20,7 @@ interface Props {
   onApply: (data: DecodedVehicle) => void
 }
 
-type Mode = 'idle' | 'camera' | 'type'
+type Mode = 'idle' | 'barcode' | 'camera' | 'type'
 type Status = 'idle' | 'scanning' | 'decoding' | 'done' | 'error'
 
 function cleanVin(raw: string): string {
@@ -34,19 +34,13 @@ function cleanVin(raw: string): string {
 
 function extractVinFromText(text: string): string | null {
   const upper = text.toUpperCase()
-
-  // Strategy 1: look for explicit "V.I.N." or "VIN:" label and grab what follows
   const labelMatch = upper.match(/V[\s.]*I[\s.]*N[\s.:]+\s*([A-Z0-9]{17})/)
   if (labelMatch) return cleanVin(labelMatch[1])
-
-  // Strategy 2: split into alphanumeric tokens, find a 17-char candidate
   const tokens = upper.split(/[^A-Z0-9]+/)
   for (const token of tokens) {
     const clean = cleanVin(token)
     if (clean.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/.test(clean)) return clean
   }
-
-  // Strategy 3: scan each line to avoid cross-line prefix contamination
   for (const line of upper.split('\n')) {
     const lineTokens = line.split(/[^A-Z0-9]+/)
     for (const token of lineTokens) {
@@ -57,9 +51,10 @@ function extractVinFromText(text: string): string | null {
       }
     }
   }
-
   return null
 }
+
+const BARCODE_FORMATS = ['code_39', 'code_128', 'pdf417', 'qr_code', 'data_matrix']
 
 const ALWAYS_MANUAL = ['Price', 'Mileage', 'Exterior Color', 'Interior Color', 'Description', 'Photos']
 
@@ -72,9 +67,28 @@ export default function VinScanner({ onApply }: Props) {
   const [filled, setFilled] = useState<string[]>([])
   const [missing, setMissing] = useState<string[]>([])
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [barcodeSupported, setBarcodeSupported] = useState<boolean | null>(null)
+  const [scanHint, setScanHint] = useState('Point camera at the VIN barcode')
 
-  const reset = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const rafRef = useRef<number>(0)
+  const detectedRef = useRef(false)
+
+  useEffect(() => {
+    setBarcodeSupported('BarcodeDetector' in window)
+  }, [])
+
+  const stopCamera = useCallback(() => {
+    cancelAnimationFrame(rafRef.current)
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+    detectedRef.current = false
+  }, [])
+
+  const reset = useCallback(() => {
+    stopCamera()
     setMode('idle')
     setStatus('idle')
     setVin('')
@@ -83,45 +97,34 @@ export default function VinScanner({ onApply }: Props) {
     setFilled([])
     setMissing([])
     setErrorMsg(null)
+    setScanHint('Point camera at the VIN barcode')
     if (fileInputRef.current) fileInputRef.current.value = ''
-  }
+  }, [stopCamera])
 
-  const decodeVin = async (vinStr: string) => {
+  useEffect(() => () => stopCamera(), [stopCamera])
+
+  const decodeVin = useCallback(async (vinStr: string) => {
     const clean = cleanVin(vinStr)
-    if (clean.length !== 17) {
-      setErrorMsg('VIN must be exactly 17 characters.')
-      return
-    }
+    if (clean.length !== 17) { setErrorMsg('VIN must be exactly 17 characters.'); return }
     setVin(clean)
     setStatus('decoding')
     setErrorMsg(null)
     setDecoded(null)
-
     try {
       const res = await fetch(`/api/admin/decode-vin?vin=${clean}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Decode failed')
 
-      // Build filled / missing lists from what NHTSA returned
       const filledFields: string[] = []
       const missingFromVin: string[] = []
-
-      if (data.year) filledFields.push(`Year: ${data.year}`)
-      else missingFromVin.push('Year')
-      if (data.make) filledFields.push(`Make: ${data.make}`)
-      else missingFromVin.push('Make')
-      if (data.model) filledFields.push(`Model: ${data.model}`)
-      else missingFromVin.push('Model')
-      if (data.trim) filledFields.push(`Trim: ${data.trim}`)
-      else missingFromVin.push('Trim')
-      if (data.bodyStyle) filledFields.push(`Body Style: ${data.bodyStyle}`)
-      else missingFromVin.push('Body Style')
-      if (data.engine) filledFields.push(`Engine: ${data.engine}`)
-      else missingFromVin.push('Engine')
-      if (data.fuelType) filledFields.push(`Fuel Type: ${data.fuelType}`)
-      else missingFromVin.push('Fuel Type')
-      if (data.transmission) filledFields.push(`Transmission: ${data.transmission}`)
-      else missingFromVin.push('Transmission')
+      if (data.year) filledFields.push(`Year: ${data.year}`); else missingFromVin.push('Year')
+      if (data.make) filledFields.push(`Make: ${data.make}`); else missingFromVin.push('Make')
+      if (data.model) filledFields.push(`Model: ${data.model}`); else missingFromVin.push('Model')
+      if (data.trim) filledFields.push(`Trim: ${data.trim}`); else missingFromVin.push('Trim')
+      if (data.bodyStyle) filledFields.push(`Body Style: ${data.bodyStyle}`); else missingFromVin.push('Body Style')
+      if (data.engine) filledFields.push(`Engine: ${data.engine}`); else missingFromVin.push('Engine')
+      if (data.fuelType) filledFields.push(`Fuel Type: ${data.fuelType}`); else missingFromVin.push('Fuel Type')
+      if (data.transmission) filledFields.push(`Transmission: ${data.transmission}`); else missingFromVin.push('Transmission')
 
       setFilled(filledFields)
       setMissing([...missingFromVin, ...ALWAYS_MANUAL])
@@ -132,7 +135,55 @@ export default function VinScanner({ onApply }: Props) {
       setStatus('error')
       setErrorMsg(e instanceof Error ? e.message : 'Failed to decode VIN')
     }
-  }
+  }, [onApply])
+
+  // Live barcode scanning loop
+  const startBarcodeScanner = useCallback(async () => {
+    setErrorMsg(null)
+    setMode('barcode')
+    setStatus('scanning')
+    detectedRef.current = false
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+      })
+      streamRef.current = stream
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        await videoRef.current.play()
+      }
+
+      // @ts-expect-error BarcodeDetector not yet in all TS libs
+      const detector = new BarcodeDetector({ formats: BARCODE_FORMATS })
+
+      const scan = async () => {
+        if (detectedRef.current || !videoRef.current) return
+        try {
+          const barcodes = await detector.detect(videoRef.current)
+          for (const bc of barcodes) {
+            const found = extractVinFromText(bc.rawValue)
+            if (found) {
+              detectedRef.current = true
+              stopCamera()
+              setScanHint('VIN detected!')
+              setStatus('decoding')
+              await decodeVin(found)
+              return
+            }
+          }
+          setScanHint(barcodes.length > 0 ? 'Barcode found — looking for VIN…' : 'Point camera at the VIN barcode')
+        } catch { /* continue scanning */ }
+        rafRef.current = requestAnimationFrame(scan)
+      }
+
+      rafRef.current = requestAnimationFrame(scan)
+    } catch (e) {
+      setMode('idle')
+      setStatus('idle')
+      setErrorMsg('Camera access denied. Use "Scan Photo" or type the VIN instead.')
+    }
+  }, [decodeVin, stopCamera])
 
   const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -183,14 +234,24 @@ export default function VinScanner({ onApply }: Props) {
       <div className="p-5 space-y-4">
         {/* Mode selector */}
         {mode === 'idle' && (
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {barcodeSupported && (
+              <button
+                type="button"
+                onClick={startBarcodeScanner}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-brand-400 bg-brand-600 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
+              >
+                <ScanLine className="h-5 w-5" />
+                Scan Barcode
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setMode('camera')}
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-brand-300 bg-white px-4 py-3 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
             >
               <Camera className="h-5 w-5" />
-              Scan VIN with Camera
+              Scan Photo
             </button>
             <button
               type="button"
@@ -198,12 +259,41 @@ export default function VinScanner({ onApply }: Props) {
               className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <Keyboard className="h-5 w-5" />
-              Type VIN Manually
+              Type VIN
             </button>
           </div>
         )}
 
-        {/* Camera mode */}
+        {/* Live barcode scanner */}
+        {mode === 'barcode' && status !== 'done' && (
+          <div className="space-y-3">
+            <div className="relative overflow-hidden rounded-xl bg-black aspect-video">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                playsInline
+                muted
+              />
+              {/* Scanning overlay */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <div className="relative w-64 h-24 border-2 border-brand-400 rounded-lg">
+                  <div className="absolute inset-x-0 top-0 h-0.5 bg-brand-400 animate-[scan_2s_ease-in-out_infinite]" />
+                  <span className="absolute -top-6 left-0 right-0 text-center text-xs text-white font-medium drop-shadow">
+                    {scanHint}
+                  </span>
+                </div>
+              </div>
+            </div>
+            {status === 'decoding' && (
+              <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+                VIN detected — looking up vehicle data…
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* OCR photo mode */}
         {mode === 'camera' && status !== 'done' && (
           <div className="space-y-4">
             {!imagePreview ? (
@@ -218,8 +308,8 @@ export default function VinScanner({ onApply }: Props) {
                 />
                 <div className="rounded-xl border-2 border-dashed border-brand-300 bg-white px-6 py-10 text-center hover:border-brand-500 transition-colors">
                   <Camera className="h-10 w-10 text-brand-400 mx-auto mb-3" />
-                  <p className="font-semibold text-gray-900">Tap to open camera</p>
-                  <p className="text-xs text-gray-500 mt-1">Point at the VIN sticker on the dashboard or door jamb</p>
+                  <p className="font-semibold text-gray-900">Tap to photograph the VIN sticker</p>
+                  <p className="text-xs text-gray-500 mt-1">Point at the VIN label on the door jamb or dashboard</p>
                 </div>
               </label>
             ) : (
@@ -227,21 +317,16 @@ export default function VinScanner({ onApply }: Props) {
                 <Image src={imagePreview} alt="VIN capture" fill className="object-contain" />
               </div>
             )}
-
             {status === 'scanning' && (
               <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
-                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-                Reading VIN from image…
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" />Reading VIN from image…
               </div>
             )}
-
             {status === 'decoding' && (
               <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
-                <Loader2 className="h-4 w-4 animate-spin shrink-0" />
-                Looking up vehicle data…
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" />Looking up vehicle data…
               </div>
             )}
-
             {(status === 'idle' || status === 'error') && imagePreview && (
               <div className="space-y-3">
                 <div>
@@ -255,14 +340,8 @@ export default function VinScanner({ onApply }: Props) {
                     placeholder="17-character VIN"
                   />
                 </div>
-                <button
-                  type="button"
-                  onClick={() => decodeVin(vin)}
-                  disabled={vin.length !== 17}
-                  className="btn-primary disabled:opacity-50"
-                >
-                  <Search className="h-4 w-4" />
-                  Decode VIN
+                <button type="button" onClick={() => decodeVin(vin)} disabled={vin.length !== 17} className="btn-primary disabled:opacity-50">
+                  <Search className="h-4 w-4" />Decode VIN
                 </button>
               </div>
             )}
@@ -292,9 +371,8 @@ export default function VinScanner({ onApply }: Props) {
               className="btn-primary disabled:opacity-50"
             >
               {status === 'decoding'
-                ? <><Loader2 className="h-4 w-4 animate-spin" /> Decoding…</>
-                : <><Search className="h-4 w-4" /> Decode VIN</>
-              }
+                ? <><Loader2 className="h-4 w-4 animate-spin" />Decoding…</>
+                : <><Search className="h-4 w-4" />Decode VIN</>}
             </button>
           </div>
         )}
@@ -321,15 +399,13 @@ export default function VinScanner({ onApply }: Props) {
                 <X className="h-4 w-4" />
               </button>
             </div>
-
             <div className="p-4 grid sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">Filled automatically</p>
                 <ul className="space-y-1">
                   {filled.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                      {f}
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />{f}
                     </li>
                   ))}
                 </ul>
@@ -339,8 +415,7 @@ export default function VinScanner({ onApply }: Props) {
                 <ul className="space-y-1">
                   {missing.map((m) => (
                     <li key={m} className="flex items-center gap-2 text-sm text-gray-500">
-                      <span className="h-3.5 w-3.5 rounded-full border-2 border-amber-400 shrink-0" />
-                      {m}
+                      <span className="h-3.5 w-3.5 rounded-full border-2 border-amber-400 shrink-0" />{m}
                     </li>
                   ))}
                 </ul>

@@ -43,6 +43,7 @@ const config: Config = {
       animation: {
         'fade-up': 'fadeUp 0.5s ease-out forwards',
         'shimmer': 'shimmer 2s infinite linear',
+        'scan': 'scan 2s ease-in-out infinite',
       },
       keyframes: {
         fadeUp: {
@@ -52,6 +53,10 @@ const config: Config = {
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
           '100%': { backgroundPosition: '200% 0' },
+        },
+        scan: {
+          '0%, 100%': { top: '0%' },
+          '50%': { top: '100%' },
         },
       },
     },
