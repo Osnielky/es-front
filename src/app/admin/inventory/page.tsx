@@ -36,6 +36,7 @@ export default function AdminInventoryPage() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [noPhotoWarning, setNoPhotoWarning] = useState(false)
+  const [vinDecoded, setVinDecoded] = useState(false)
   const [createdVehicle, setCreatedVehicle] = useState<{ year: number; make: string; model: string; slug: string; vin: string | null } | null>(null)
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
@@ -69,6 +70,12 @@ export default function AdminInventoryPage() {
       description: '',
     },
   })
+
+  const [wPrice, wMileage, wExteriorColor, wInteriorColor, wDescription, wTransmission, wFuelType, wEngine, wBodyStyle, wTrim, wModel] =
+    watch(['price', 'mileage', 'exteriorColor', 'interiorColor', 'description', 'transmission', 'fuelType', 'engine', 'bodyStyle', 'trim', 'model'])
+  const warn = (val: unknown) => vinDecoded && (val === undefined || val === '' || val === null)
+  const Hint = ({ show, text }: { show: boolean; text: string }) =>
+    show ? <p className="mt-1 text-xs text-amber-500 flex items-center gap-1"><span>⚠</span>{text}</p> : null
 
   const selectedMake = watch('make')
   const selectedModel = watch('model')
@@ -126,6 +133,7 @@ export default function AdminInventoryPage() {
       })
       reset()
       setImages([])
+      setVinDecoded(false)
     } catch (err) {
       setError('Something went wrong. Please try again.')
     }
@@ -193,6 +201,7 @@ export default function AdminInventoryPage() {
   }
 
   const handleVinApply = (data: DecodedVehicle) => {
+    setVinDecoded(true)
     if (data.vin) setValue('vin', data.vin)
     if (data.year) setValue('year', data.year)
     if (data.engine) setValue('engine', data.engine)
@@ -355,6 +364,7 @@ export default function AdminInventoryPage() {
                     />
                   )}
                   {errors.model && <p className="mt-1 text-xs text-red-500">{errors.model.message}</p>}
+                  <Hint show={warn(wModel)} text="Model not detected — enter manually" />
                 </div>
 
                 <div>
@@ -402,6 +412,7 @@ export default function AdminInventoryPage() {
                       {...register('trim')}
                     />
                   )}
+                  <Hint show={warn(wTrim)} text="Trim not detected — enter manually" />
                 </div>
               </div>
             </div>
@@ -423,6 +434,7 @@ export default function AdminInventoryPage() {
                     {...register('price')}
                   />
                   {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price.message}</p>}
+                  <Hint show={warn(wPrice)} text="Enter the asking price" />
                 </div>
 
                 <div>
@@ -439,6 +451,7 @@ export default function AdminInventoryPage() {
                   {errors.mileage && (
                     <p className="mt-1 text-xs text-red-500">{errors.mileage.message}</p>
                   )}
+                  <Hint show={warn(wMileage)} text="Enter the current mileage" />
                 </div>
 
                 <div className="col-span-2">
@@ -475,6 +488,7 @@ export default function AdminInventoryPage() {
                     <option value="Van">Van</option>
                     <option value="Minivan">Minivan</option>
                   </select>
+                  <Hint show={warn(wBodyStyle)} text="Body style not detected — select manually" />
                 </div>
 
                 <div>
@@ -488,6 +502,7 @@ export default function AdminInventoryPage() {
                     <option value="CVT">CVT</option>
                     <option value="Electric">Electric</option>
                   </select>
+                  <Hint show={warn(wTransmission)} text="Transmission not detected — select manually" />
                 </div>
 
                 <div>
@@ -502,6 +517,7 @@ export default function AdminInventoryPage() {
                     <option value="Electric">Electric</option>
                     <option value="Plug-in Hybrid">Plug-in Hybrid</option>
                   </select>
+                  <Hint show={warn(wFuelType)} text="Fuel type not detected — select manually" />
                 </div>
 
                 <div>
@@ -515,6 +531,7 @@ export default function AdminInventoryPage() {
                     placeholder="2.5L 4-Cylinder"
                     {...register('engine')}
                   />
+                  <Hint show={warn(wEngine)} text="Engine not detected — enter manually" />
                 </div>
 
                 <div>
@@ -535,6 +552,7 @@ export default function AdminInventoryPage() {
                     <option value="Beige">Beige</option>
                     <option value="Orange">Orange</option>
                   </select>
+                  <Hint show={warn(wExteriorColor)} text="Not in VIN — select the actual color" />
                 </div>
 
                 <div>
@@ -551,6 +569,7 @@ export default function AdminInventoryPage() {
                     <option value="Red">Red</option>
                     <option value="Cognac">Cognac</option>
                   </select>
+                  <Hint show={warn(wInteriorColor)} text="Not in VIN — select the actual color" />
                 </div>
 
                 <div className="col-span-2">
@@ -638,6 +657,7 @@ export default function AdminInventoryPage() {
                   placeholder="Describe the vehicle, its features, and condition..."
                   {...register('description')}
                 />
+                <Hint show={warn(wDescription)} text="Add a description to improve SEO and buyer interest" />
               </div>
             </div>
 
