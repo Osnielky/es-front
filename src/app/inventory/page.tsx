@@ -79,17 +79,25 @@ export default async function InventoryPage({ searchParams }: Props) {
   const page = Number(params.page ?? 1)
   const limit = 12
 
-  const { vehicles, total } = await getVehicles({
-    make: params.make,
-    model: params.model,
-    condition: params.condition,
-    yearMin: params.yearMin ? Number(params.yearMin) : undefined,
-    yearMax: params.yearMax ? Number(params.yearMax) : undefined,
-    priceMin: params.priceMin ? Number(params.priceMin) : undefined,
-    priceMax: params.priceMax ? Number(params.priceMax) : undefined,
-    page,
-    limit,
-  })
+  let vehicles: Awaited<ReturnType<typeof getVehicles>>['vehicles'] = []
+  let total = 0
+  try {
+    const result = await getVehicles({
+      make: params.make,
+      model: params.model,
+      condition: params.condition,
+      yearMin: params.yearMin ? Number(params.yearMin) : undefined,
+      yearMax: params.yearMax ? Number(params.yearMax) : undefined,
+      priceMin: params.priceMin ? Number(params.priceMin) : undefined,
+      priceMax: params.priceMax ? Number(params.priceMax) : undefined,
+      page,
+      limit,
+    })
+    vehicles = result.vehicles
+    total = result.total
+  } catch (error) {
+    console.error('Inventory: failed to fetch vehicles', error)
+  }
 
   const totalPages = Math.ceil(total / limit)
   
