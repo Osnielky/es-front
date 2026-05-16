@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  try {
   const now = new Date()
   const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
   const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
@@ -100,4 +101,9 @@ export async function GET(request: NextRequest) {
     })),
     allVehicles: allVehicles.map((v) => ({ ...v, price: Number(v.price) })),
   })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('Stats API error:', msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
