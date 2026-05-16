@@ -9,11 +9,14 @@ import { leadSchema, type LeadInput } from '@/lib/validations/lead'
 interface Props {
   vehicleId?: string
   vehicleName?: string
+  leadType?: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN'
 }
 
-export default function LeadForm({ vehicleId, vehicleName }: Props) {
+export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const defaultType = leadType ?? (vehicleId ? 'VEHICLE' : 'GENERAL')
 
   const {
     register,
@@ -22,7 +25,7 @@ export default function LeadForm({ vehicleId, vehicleName }: Props) {
   } = useForm<LeadInput>({
     resolver: zodResolver(leadSchema),
     defaultValues: {
-      type: vehicleId ? 'VEHICLE' : 'GENERAL',
+      type: defaultType,
       vehicleId,
     },
   })

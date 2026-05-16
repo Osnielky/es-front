@@ -148,13 +148,13 @@ export default function Footer() {
                 <ul className="mt-4 space-y-3">
                   {[
                     { href: '/contact', label: 'Contact Us' },
-                    { href: '/contact', label: 'Financing Options' },
-                    { href: '/contact', label: 'Trade-In' },
-                    { href: '/contact', label: 'About Us' },
+                    { href: '/financing', label: 'Financing Options' },
+                    { href: '/trade-in', label: 'Trade-In' },
+                    { href: '/about', label: 'About Us' },
                   ].map(({ href, label }) => (
                     <li key={label}>
-                      <Link 
-                        href={href} 
+                      <Link
+                        href={href}
                         className="group flex items-center text-gray-400 transition-colors hover:text-white"
                       >
                         <ChevronRight className="mr-1 h-4 w-4 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
@@ -170,8 +170,13 @@ export default function Footer() {
                 <h3 className="text-sm font-semibold uppercase tracking-wider text-white">Service Areas</h3>
                 <ul className="mt-4 space-y-3">
                   {['Naples', 'Marco Island', 'Bonita Springs', 'Fort Myers', 'Estero', 'Golden Gate'].map((area) => (
-                    <li key={area} className="text-gray-400">
-                      {area}, FL
+                    <li key={area}>
+                      <Link
+                        href="/inventory"
+                        className="text-gray-400 hover:text-white transition-colors"
+                      >
+                        {area}, FL
+                      </Link>
                     </li>
                   ))}
                 </ul>

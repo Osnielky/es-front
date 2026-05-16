@@ -182,8 +182,16 @@ export function buildDealerJsonLd() {
     priceRange: '$$',
     currenciesAccepted: 'USD',
     paymentAccepted: 'Cash, Credit Card, Financing',
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.9',
+      reviewCount: '127',
+      bestRating: '5',
+      worstRating: '1',
+    },
     sameAs: [
-      // Add social media URLs when available
+      'https://www.instagram.com/eands_car_sales_llc',
+      'https://www.tiktok.com/@gomez_car_sales',
     ],
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
@@ -354,6 +362,44 @@ export function buildWebsiteJsonLd() {
       },
       'query-input': 'required name=search_term_string',
     },
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Service Page JSON-LD Helpers
+// ═══════════════════════════════════════════════════════════════════
+
+export function buildFinancingJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FinancialService',
+    name: `Auto Financing at ${DEALER_NAME}`,
+    description: 'Car financing for all credit situations in Naples, FL. Get pre-approved in minutes with competitive rates.',
+    provider: {
+      '@type': 'AutoDealer',
+      name: DEALER_NAME,
+      address: buildPostalAddress(),
+      telephone: DEALER_PHONE,
+    },
+    areaServed: { '@type': 'City', name: 'Naples', containedInPlace: { '@type': 'State', name: 'Florida' } },
+    url: `${SITE_URL}/financing`,
+  }
+}
+
+export function buildTradeInJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `Vehicle Trade-In at ${DEALER_NAME}`,
+    description: 'Get a competitive trade-in offer for your vehicle in Naples, FL. Instant value, applied directly to your next purchase.',
+    provider: {
+      '@type': 'AutoDealer',
+      name: DEALER_NAME,
+      address: buildPostalAddress(),
+      telephone: DEALER_PHONE,
+    },
+    areaServed: { '@type': 'City', name: 'Naples', containedInPlace: { '@type': 'State', name: 'Florida' } },
+    url: `${SITE_URL}/trade-in`,
   }
 }
 

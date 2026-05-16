@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight } from 'lucide-react'
+import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight, MapPin } from 'lucide-react'
 import { buildDealerJsonLd, buildWebsiteJsonLd, buildLocalBusinessJsonLd, buildFAQJsonLd, LOCATION } from '@/lib/seo'
 import { getVehicles } from '@/lib/data'
 import type { Vehicle } from '@/types'
@@ -227,6 +227,74 @@ export default async function HomePage() {
                 <p className="mt-2 text-sm leading-relaxed text-gray-500">{desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Services Bar ─────────────────────────────────────── */}
+      <section className="border-y border-gray-100 bg-white px-4 py-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 text-center">
+            {[
+              { href: '/financing', icon: Zap, color: 'text-amber-600 bg-amber-50', title: 'Easy Financing', desc: 'All credit welcome. Get pre-approved in minutes.' },
+              { href: '/trade-in', icon: ArrowRight, color: 'text-emerald-600 bg-emerald-50', title: 'Trade-In', desc: 'Get top dollar for your current vehicle.' },
+              { href: '/about', icon: Star, color: 'text-brand-600 bg-brand-50', title: 'About Us', desc: 'Naples\' trusted dealer for over 15 years.' },
+            ].map(({ href, icon: Icon, color, title, desc }) => (
+              <Link key={title} href={href} className="group card p-6 flex flex-col items-center hover:-translate-y-1 transition-all duration-200">
+                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${color} mb-3`}>
+                  <Icon className="h-6 w-6" />
+                </div>
+                <p className="font-bold text-gray-900 group-hover:text-brand-600 transition-colors">{title}</p>
+                <p className="mt-1 text-sm text-gray-500">{desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Serving Naples FL ─────────────────────────────────── */}
+      <section className="px-4 py-16 sm:py-20 bg-gray-50">
+        <div className="mx-auto max-w-5xl">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-center">
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-5 w-5 text-brand-600" />
+                <span className="text-sm font-semibold uppercase tracking-wider text-brand-600">Local Dealership</span>
+              </div>
+              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                Proudly Serving Naples & Southwest Florida
+              </h2>
+              <p className="mt-4 text-gray-500 leading-relaxed">
+                We are a <strong>Naples, Florida</strong> dealership focused on one thing: helping our neighbors find a reliable vehicle at a fair price. No high-pressure tactics, no hidden fees. Just honest deals and real customer care.
+              </p>
+              <p className="mt-3 text-gray-500 leading-relaxed">
+                From our lot on Airport-Pulling Road, we serve buyers across <strong>Collier County</strong> — including Marco Island, Bonita Springs, Fort Myers, Estero, Golden Gate, and Immokalee. Whether you are commuting on I-75, heading to the beach, or need a dependable truck for work, we have the right vehicle for your Florida lifestyle.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {['Naples', ...LOCATION.nearbyAreas].map(area => (
+                  <span key={area} className="rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600">
+                    {area}, FL
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-4">
+              {[
+                { href: '/inventory?condition=USED', label: 'Used Cars in Naples, FL', sub: 'Inspected, affordable, ready to drive' },
+                { href: '/inventory?condition=NEW', label: 'New Cars in Naples, FL', sub: 'Latest models with full manufacturer warranty' },
+                { href: '/inventory?condition=CERTIFIED', label: 'Certified Pre-Owned in Naples', sub: 'Extended warranty and low mileage' },
+                { href: '/financing', label: 'Auto Financing Naples FL', sub: 'All credit welcome — fast approval' },
+                { href: '/trade-in', label: 'Trade In Your Car — Naples', sub: 'Competitive offers, instant credit' },
+              ].map(({ href, label, sub }) => (
+                <Link key={href} href={href} className="group flex items-center justify-between card px-5 py-4 hover:border-brand-300 transition-all">
+                  <div>
+                    <p className="font-semibold text-gray-900 group-hover:text-brand-700 text-sm">{label}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{sub}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand-600 transition-colors flex-shrink-0" />
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
