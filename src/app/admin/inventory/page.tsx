@@ -35,6 +35,7 @@ export default function AdminInventoryPage() {
 
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
+  const [noPhotoWarning, setNoPhotoWarning] = useState(false)
   const [createdVehicle, setCreatedVehicle] = useState<{ year: number; make: string; model: string; slug: string; vin: string | null } | null>(null)
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
@@ -92,6 +93,11 @@ export default function AdminInventoryPage() {
 
   const onSubmit = async (data: VehicleInput) => {
     setError(null)
+    if (images.length === 0 && !noPhotoWarning) {
+      setNoPhotoWarning(true)
+      return
+    }
+    setNoPhotoWarning(false)
 
     try {
       const res = await fetch('/api/admin/vehicles', {
@@ -628,6 +634,33 @@ export default function AdminInventoryPage() {
                 />
               </div>
             </div>
+
+            {noPhotoWarning && (
+              <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-800">No photos added</p>
+                    <p className="text-sm text-amber-700 mt-0.5">Listings without photos get significantly less interest. Are you sure you want to continue?</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 transition-colors"
+                  >
+                    Submit anyway
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNoPhotoWarning(false)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-50 transition-colors"
+                  >
+                    Add photos first
+                  </button>
+                </div>
+              </div>
+            )}
 
             <button
               type="submit"
