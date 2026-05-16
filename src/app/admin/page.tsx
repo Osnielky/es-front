@@ -99,12 +99,13 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/stats', { credentials: 'include' })
       if (!res.ok) {
         if (res.status === 401) { router.push('/admin/login'); return }
-        setError('Failed to load dashboard data')
+        const body = await res.text().catch(() => '')
+        setError(`Stats API error ${res.status}: ${body.slice(0, 200)}`)
         return
       }
       setData(await res.json())
-    } catch {
-      setError('Error connecting to server')
+    } catch (e) {
+      setError(`Network error: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
       setLoading(false)
     }
