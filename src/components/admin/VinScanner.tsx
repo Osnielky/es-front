@@ -33,9 +33,32 @@ function cleanVin(raw: string): string {
 }
 
 function extractVinFromText(text: string): string | null {
-  const cleaned = cleanVin(text)
-  const match = cleaned.match(/[A-HJ-NPR-Z0-9]{17}/)
-  return match ? match[0] : null
+  const upper = text.toUpperCase()
+
+  // Strategy 1: look for explicit "V.I.N." or "VIN:" label and grab what follows
+  const labelMatch = upper.match(/V[\s.]*I[\s.]*N[\s.:]+\s*([A-Z0-9]{17})/)
+  if (labelMatch) return cleanVin(labelMatch[1])
+
+  // Strategy 2: split into alphanumeric tokens, find a 17-char candidate
+  const tokens = upper.split(/[^A-Z0-9]+/)
+  for (const token of tokens) {
+    const clean = cleanVin(token)
+    if (clean.length === 17 && /^[A-HJ-NPR-Z0-9]{17}$/.test(clean)) return clean
+  }
+
+  // Strategy 3: scan each line to avoid cross-line prefix contamination
+  for (const line of upper.split('\n')) {
+    const lineTokens = line.split(/[^A-Z0-9]+/)
+    for (const token of lineTokens) {
+      const clean = cleanVin(token)
+      if (clean.length >= 15 && clean.length <= 20) {
+        const match = clean.match(/[A-HJ-NPR-Z0-9]{17}/)
+        if (match) return match[0]
+      }
+    }
+  }
+
+  return null
 }
 
 const ALWAYS_MANUAL = ['Price', 'Mileage', 'Exterior Color', 'Interior Color', 'Description', 'Photos']
