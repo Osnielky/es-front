@@ -181,7 +181,7 @@ export default function VehicleCard({ vehicle }: Props) {
         {/* Action Buttons */}
         <div className="mt-5 grid grid-cols-3 gap-2">
           <Link
-            href={`/inventory/${vin}`}
+            href={`/inventory/${vehicle.slug}`}
             className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-3 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
           >
             <Info className="h-4 w-4" />

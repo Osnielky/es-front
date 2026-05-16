@@ -5,7 +5,7 @@ import {
   ChevronLeft, Gauge, Fuel, Calendar, Settings2,
   Palette, Armchair, Hash, Activity, CheckCircle2,
 } from 'lucide-react'
-import { getVehicleByVin } from '@/lib/data'
+import { getVehicleBySlug, getVehicleByVin } from '@/lib/data'
 import { buildVehicleTitle, buildVehicleDescription, buildVehicleJsonLd, buildBreadcrumbJsonLd, buildVehicleKeywords, LOCATION } from '@/lib/seo'
 import VehicleDetailGallery from '@/components/inventory/VehicleDetailGallery'
 
@@ -18,9 +18,13 @@ interface Props {
   params: Promise<{ vin: string }>
 }
 
+async function getVehicle(slugOrVin: string) {
+  return (await getVehicleBySlug(slugOrVin)) ?? (await getVehicleByVin(slugOrVin))
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { vin } = await params
-  const vehicle = await getVehicleByVin(vin)
+  const vehicle = await getVehicle(vin)
   if (!vehicle) return { title: 'Vehicle Not Found' }
 
   const title = buildVehicleTitle(vehicle.year, vehicle.make, vehicle.model, vehicle.trim)
@@ -77,7 +81,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VehicleDetailPage({ params }: Props) {
   const { vin } = await params
-  const vehicle = await getVehicleByVin(vin)
+  const vehicle = await getVehicle(vin)
   if (!vehicle) notFound()
 
   const jsonLd = buildVehicleJsonLd(vehicle)
