@@ -51,27 +51,27 @@ export default function AdminInventoryPage() {
   } = useForm<VehicleInput>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
-      make: 'Toyota',
-      model: 'Camry',
-      year: 2023,
-      trim: 'XSE',
-      price: 28995,
-      mileage: 15000,
+      make: '',
+      model: '',
+      year: new Date().getFullYear(),
+      trim: '',
+      price: undefined,
+      mileage: undefined,
       condition: 'USED',
-      bodyStyle: 'Sedan',
-      transmission: 'Automatic',
-      fuelType: 'Gasoline',
-      engine: '2.5L 4-Cylinder',
-      exteriorColor: 'Midnight Black',
-      interiorColor: 'Black',
+      bodyStyle: '',
+      transmission: '',
+      fuelType: '',
+      engine: '',
+      exteriorColor: '',
+      interiorColor: '',
       vin: '',
-      description: 'Excellent condition. One owner, accident-free. Fully loaded with leather, sunroof, backup camera, Apple CarPlay, and lane departure warning.',
+      description: '',
     },
   })
 
   const selectedMake = watch('make')
   const selectedModel = watch('model')
-  const prevMakeRef = useRef<string>('Toyota')
+  const prevMakeRef = useRef<string>('')
 
   useEffect(() => {
     if (prevMakeRef.current === selectedMake) return
