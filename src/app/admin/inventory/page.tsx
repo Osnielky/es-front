@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { Plus, LogOut, AlertCircle, CheckCircle2, X, Upload, Car, LayoutDashboard } from 'lucide-react'
 import Image from 'next/image'
 import { VEHICLE_MAKES, VEHICLE_MODELS, VEHICLE_TRIMS } from '@/lib/vehicle-makes-models'
+import VinScanner, { type DecodedVehicle } from '@/components/admin/VinScanner'
 
 const vehicleSchema = z.object({
   make: z.string().min(1, 'Make is required'),
@@ -185,6 +186,18 @@ export default function AdminInventoryPage() {
     setImages((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const handleVinApply = (data: DecodedVehicle) => {
+    if (data.year) setValue('year', data.year)
+    if (data.make) setValue('make', data.make)
+    if (data.model) setValue('model', data.model)
+    if (data.trim) setValue('trim', data.trim)
+    if (data.bodyStyle) setValue('bodyStyle', data.bodyStyle as VehicleInput['bodyStyle'])
+    if (data.fuelType) setValue('fuelType', data.fuelType as VehicleInput['fuelType'])
+    if (data.engine) setValue('engine', data.engine)
+    if (data.transmission) setValue('transmission', data.transmission as VehicleInput['transmission'])
+    if (data.vin) setValue('vin', data.vin)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -208,6 +221,8 @@ export default function AdminInventoryPage() {
         <div className="lg:grid lg:grid-cols-[1fr_350px] lg:gap-8">
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+            <VinScanner onApply={handleVinApply} />
+
             {error && (
               <div className="flex gap-3 rounded-lg bg-red-50 p-4 text-sm text-red-600">
                 <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
