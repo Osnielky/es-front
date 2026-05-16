@@ -200,6 +200,33 @@ export default function AdminInventoryPage() {
     setImages((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const generateDescription = () => {
+    const v = watch()
+    const parts: string[] = []
+
+    const title = [v.year, v.make, v.model, v.trim].filter(Boolean).join(' ')
+    if (title) parts.push(`${title} for sale in Naples, Florida.`)
+
+    const conditionLabel = v.condition === 'NEW' ? 'Brand new' : v.condition === 'CERTIFIED' ? 'Certified Pre-Owned' : 'Pre-owned'
+    const specs: string[] = []
+    if (v.mileage) specs.push(`${Number(v.mileage).toLocaleString()} miles`)
+    if (v.engine) specs.push(v.engine)
+    if (v.transmission) specs.push(`${v.transmission} transmission`)
+    if (v.fuelType) specs.push(v.fuelType)
+    if (specs.length) parts.push(`${conditionLabel} vehicle with ${specs.join(', ')}.`)
+
+    const colors: string[] = []
+    if (v.exteriorColor) colors.push(`${v.exteriorColor} exterior`)
+    if (v.interiorColor) colors.push(`${v.interiorColor} interior`)
+    if (colors.length) parts.push(`Features ${colors.join(' and ')}.`)
+
+    if (v.price) parts.push(`Priced at $${Number(v.price).toLocaleString()}.`)
+
+    parts.push('Financing available. Visit us in Naples, FL or contact us today to schedule a test drive!')
+
+    setValue('description', parts.join(' '))
+  }
+
   const handleVinApply = (data: DecodedVehicle) => {
     setVinDecoded(true)
     if (data.vin) setValue('vin', data.vin)
@@ -647,9 +674,18 @@ export default function AdminInventoryPage() {
             <div className="card p-6">
 
               <div>
-                <label htmlFor="description" className="label">
-                  Vehicle Description
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label htmlFor="description" className="label !mb-0">
+                    Vehicle Description
+                  </label>
+                  <button
+                    type="button"
+                    onClick={generateDescription}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-brand-50 border border-brand-200 px-3 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100 transition-colors"
+                  >
+                    ✨ Auto-generate
+                  </button>
+                </div>
                 <textarea
                   id="description"
                   rows={4}
