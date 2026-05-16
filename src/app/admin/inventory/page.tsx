@@ -207,35 +207,41 @@ export default function AdminInventoryPage() {
       ) ?? data.make
       setValue('make', matchedMake)
 
-      // Wait for the make→model reset useEffect to fire, then set model + trim
+      // Wait for make→model reset useEffect, then set model
       setTimeout(() => {
+        let resolvedModel = data.model
+
         if (data.model) {
           const modelsForMake = VEHICLE_MODELS[matchedMake] ?? []
           const matchedModel = modelsForMake.find(
             (m) => m.toLowerCase() === data.model.toLowerCase()
           )
+          resolvedModel = matchedModel ?? data.model
           if (matchedModel) {
             setShowCustomModel(false)
             setValue('model', matchedModel)
-          } else if (data.model) {
+          } else {
             setShowCustomModel(true)
             setValue('model', data.model)
           }
         }
 
-        if (data.trim) {
-          const trimsForModel = VEHICLE_TRIMS[data.make]?.[data.model] ?? []
-          const matchedTrim = trimsForModel.find(
-            (t) => t.toLowerCase() === data.trim.toLowerCase()
-          )
-          if (matchedTrim) {
-            setShowCustomTrim(false)
-            setValue('trim', matchedTrim)
-          } else {
-            setShowCustomTrim(true)
-            setValue('trim', data.trim)
+        // Wait for model→trim reset useEffect, then set trim
+        setTimeout(() => {
+          if (data.trim) {
+            const trimsForModel = VEHICLE_TRIMS[matchedMake]?.[resolvedModel] ?? []
+            const matchedTrim = trimsForModel.find(
+              (t) => t.toLowerCase() === data.trim.toLowerCase()
+            )
+            if (matchedTrim) {
+              setShowCustomTrim(false)
+              setValue('trim', matchedTrim)
+            } else {
+              setShowCustomTrim(true)
+              setValue('trim', data.trim)
+            }
           }
-        }
+        }, 100)
       }, 100)
     }
   }
