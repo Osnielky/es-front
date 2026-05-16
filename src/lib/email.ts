@@ -1,7 +1,5 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://eandscars.com'
 const NOTIFY_TO = process.env.LEAD_NOTIFY_EMAIL ?? process.env.ADMIN_EMAIL ?? ''
@@ -25,6 +23,7 @@ interface LeadData {
 
 export async function sendLeadNotification(lead: LeadData): Promise<void> {
   if (!process.env.RESEND_API_KEY || !NOTIFY_TO) return
+  const resend = new Resend(process.env.RESEND_API_KEY)
 
   const isWhatsApp = lead.type === 'WHATSAPP'
   const subject = isWhatsApp
