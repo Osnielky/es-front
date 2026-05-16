@@ -187,15 +187,51 @@ export default function AdminInventoryPage() {
   }
 
   const handleVinApply = (data: DecodedVehicle) => {
-    if (data.year) setValue('year', data.year)
-    if (data.make) setValue('make', data.make)
-    if (data.model) setValue('model', data.model)
-    if (data.trim) setValue('trim', data.trim)
-    if (data.bodyStyle) setValue('bodyStyle', data.bodyStyle as VehicleInput['bodyStyle'])
-    if (data.fuelType) setValue('fuelType', data.fuelType as VehicleInput['fuelType'])
-    if (data.engine) setValue('engine', data.engine)
-    if (data.transmission) setValue('transmission', data.transmission as VehicleInput['transmission'])
     if (data.vin) setValue('vin', data.vin)
+    if (data.year) setValue('year', data.year)
+    if (data.engine) setValue('engine', data.engine)
+    if (data.fuelType) setValue('fuelType', data.fuelType as VehicleInput['fuelType'])
+    if (data.transmission) setValue('transmission', data.transmission as VehicleInput['transmission'])
+    if (data.bodyStyle) setValue('bodyStyle', data.bodyStyle as VehicleInput['bodyStyle'])
+
+    if (data.make) {
+      // Match NHTSA uppercase make (e.g. "TOYOTA") to the exact casing in VEHICLE_MAKES
+      const matchedMake = VEHICLE_MAKES.find(
+        (m) => m.toUpperCase() === data.make.toUpperCase()
+      ) ?? data.make
+      setValue('make', matchedMake)
+
+      // Wait for the make→model reset useEffect to fire, then set model + trim
+      setTimeout(() => {
+        if (data.model) {
+          const modelsForMake = VEHICLE_MODELS[matchedMake] ?? []
+          const matchedModel = modelsForMake.find(
+            (m) => m.toLowerCase() === data.model.toLowerCase()
+          )
+          if (matchedModel) {
+            setShowCustomModel(false)
+            setValue('model', matchedModel)
+          } else if (data.model) {
+            setShowCustomModel(true)
+            setValue('model', data.model)
+          }
+        }
+
+        if (data.trim) {
+          const trimsForModel = VEHICLE_TRIMS[data.make]?.[data.model] ?? []
+          const matchedTrim = trimsForModel.find(
+            (t) => t.toLowerCase() === data.trim.toLowerCase()
+          )
+          if (matchedTrim) {
+            setShowCustomTrim(false)
+            setValue('trim', matchedTrim)
+          } else {
+            setShowCustomTrim(true)
+            setValue('trim', data.trim)
+          }
+        }
+      }, 100)
+    }
   }
 
   return (

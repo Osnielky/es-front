@@ -275,6 +275,7 @@ export default function VinScanner({ onApply }: Props) {
                 {decoded.bodyStyle && <p><span className="font-medium">Body:</span> {decoded.bodyStyle}</p>}
               </div>
               <p className="text-xs text-gray-400 mt-2 font-mono">{decoded.vin}</p>
+              <p className="text-xs text-amber-600 mt-2">Colors, price and mileage must be entered manually — they are not stored in the VIN.</p>
             </div>
             <div className="border-t border-emerald-200 p-3">
               <button
