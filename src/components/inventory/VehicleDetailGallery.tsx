@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react'
 
+// Tiny gray SVG used as blur placeholder while images load
+const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjMiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjMiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4='
+
 interface Props {
   images: string[]
   alt: string
@@ -69,9 +72,35 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
             src={images[mainIdx]}
             alt={alt}
             fill
+            sizes="(max-width: 1200px) 100vw, 1152px"
+            quality={85}
             className="object-cover"
+            placeholder="blur"
+            blurDataURL={BLUR_PLACEHOLDER}
             priority
           />
+
+          {/* Preload prev + next images so navigation feels instant */}
+          {[-1, 1].map((offset) => {
+            const idx = mainIdx + offset
+            if (idx < 0 || idx >= images.length) return null
+            return (
+              <div
+                key={images[idx]}
+                aria-hidden
+                style={{ position: 'absolute', inset: 0, opacity: 0, pointerEvents: 'none' }}
+              >
+                <Image
+                  src={images[idx]}
+                  alt=""
+                  fill
+                  sizes="(max-width: 1200px) 100vw, 1152px"
+                  quality={85}
+                  priority
+                />
+              </div>
+            )
+          })}
           
           {/* Navigation arrows */}
           <button
@@ -137,6 +166,7 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
                     src={img}
                     alt={`${alt} ${idx + 1}`}
                     fill
+                    sizes="80px"
                     className="object-cover"
                   />
                 </button>
@@ -169,6 +199,8 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
               src={images[mainIdx]}
               alt={alt}
               fill
+              sizes="100vw"
+              quality={90}
               className="object-contain"
               priority
             />
