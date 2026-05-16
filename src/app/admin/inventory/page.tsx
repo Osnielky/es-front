@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
-import { Plus, LogOut, AlertCircle, CheckCircle2, X, Upload } from 'lucide-react'
+import { Plus, LogOut, AlertCircle, CheckCircle2, X, Upload, Car, LayoutDashboard } from 'lucide-react'
 import Image from 'next/image'
 import { VEHICLE_MAKES, VEHICLE_MODELS, VEHICLE_TRIMS } from '@/lib/vehicle-makes-models'
 
@@ -33,9 +33,8 @@ export default function AdminInventoryPage() {
   const MAX_UPLOAD_SIZE_BYTES = 5 * 1024 * 1024
 
   const router = useRouter()
-  const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
+  const [createdVehicle, setCreatedVehicle] = useState<{ year: number; make: string; model: string; slug: string; vin: string | null } | null>(null)
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
   const [showCustomModel, setShowCustomModel] = useState(false)
@@ -92,7 +91,6 @@ export default function AdminInventoryPage() {
 
   const onSubmit = async (data: VehicleInput) => {
     setError(null)
-    setSuccess(null)
 
     try {
       const res = await fetch('/api/admin/vehicles', {
@@ -112,11 +110,15 @@ export default function AdminInventoryPage() {
       }
 
       const result = await res.json()
-      setSuccess(`Vehicle created successfully! Slug: ${result.slug}`)
+      setCreatedVehicle({
+        year: data.year,
+        make: data.make,
+        model: data.model,
+        slug: result.slug,
+        vin: result.vin ?? null,
+      })
       reset()
-      setTimeout(() => {
-        setSuccess(null)
-      }, 4000)
+      setImages([])
     } catch (err) {
       setError('Something went wrong. Please try again.')
     }
@@ -170,8 +172,7 @@ export default function AdminInventoryPage() {
         setImages((prev) => [...prev, data.url])
       }
 
-      setSuccess('Images uploaded successfully!')
-      setTimeout(() => setSuccess(null), 3000)
+      setError(null)
     } catch {
       setError('Error uploading images')
     } finally {
@@ -214,12 +215,6 @@ export default function AdminInventoryPage() {
               </div>
             )}
 
-            {success && (
-              <div className="flex gap-3 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-600">
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0 mt-0.5" />
-                <span>{success}</span>
-              </div>
-            )}
 
             <div className="card p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4">Basic Information</h2>
@@ -644,6 +639,48 @@ export default function AdminInventoryPage() {
           </aside>
         </div>
       </div>
+
+      {/* Success Modal */}
+      {createdVehicle && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="bg-emerald-50 p-6 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
+                <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">Vehicle Added!</h2>
+              <p className="mt-1 text-sm text-gray-600">
+                {createdVehicle.year} {createdVehicle.make} {createdVehicle.model} is now live in your inventory.
+              </p>
+            </div>
+            <div className="p-6 space-y-3">
+              <button
+                onClick={() => {
+                  setCreatedVehicle(null)
+                }}
+                className="btn-primary w-full justify-center py-3"
+              >
+                <Plus className="h-4 w-4" />
+                Add Another Vehicle
+              </button>
+              <button
+                onClick={() => router.push('/admin')}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Go to Dashboard
+              </button>
+              <button
+                onClick={() => router.push('/inventory')}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                <Car className="h-4 w-4" />
+                View Public Inventory
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
