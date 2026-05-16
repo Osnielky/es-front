@@ -13,66 +13,64 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const [totalVehicles, availableVehicles, soldVehicles, pendingVehicles, totalLeads, recentLeads, recentVehicles, allVehicles] = await Promise.all([
+  const now = new Date()
+  const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+  const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+
+  const [
+    totalVehicles,
+    availableVehicles,
+    soldVehicles,
+    pendingVehicles,
+    totalLeads,
+    leadsThisMonth,
+    leadsLastMonth,
+    leadsThisWeek,
+    whatsappTotal,
+    whatsappThisMonth,
+    leadsByType,
+    avgPriceResult,
+    vehiclesThisMonth,
+    recentLeads,
+    allVehicles,
+  ] = await Promise.all([
     prisma.vehicle.count(),
     prisma.vehicle.count({ where: { status: 'AVAILABLE' } }),
     prisma.vehicle.count({ where: { status: 'SOLD' } }),
     prisma.vehicle.count({ where: { status: 'PENDING' } }),
     prisma.lead.count(),
+    prisma.lead.count({ where: { createdAt: { gte: startOfThisMonth } } }),
+    prisma.lead.count({ where: { createdAt: { gte: startOfLastMonth, lt: startOfThisMonth } } }),
+    prisma.lead.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+    prisma.lead.count({ where: { type: 'WHATSAPP' } }),
+    prisma.lead.count({ where: { type: 'WHATSAPP', createdAt: { gte: startOfThisMonth } } }),
+    prisma.lead.groupBy({ by: ['type'], _count: true }),
+    prisma.vehicle.aggregate({ _avg: { price: true } }),
+    prisma.vehicle.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
     prisma.lead.findMany({
       orderBy: { createdAt: 'desc' },
-      take: 5,
-    }),
-    prisma.vehicle.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      select: {
-        id: true,
-        slug: true,
-        make: true,
-        model: true,
-        year: true,
-        price: true,
-        status: true,
-        createdAt: true,
+      take: 20,
+      where: {
+        // Exclude internal WhatsApp tracking records without real contact info
+        NOT: { email: 'whatsapp@tracked.internal' },
       },
     }),
-    // Get ALL vehicles for the dashboard table
     prisma.vehicle.findMany({
       orderBy: { createdAt: 'desc' },
       select: {
-        id: true,
-        slug: true,
-        vin: true,
-        make: true,
-        model: true,
-        year: true,
-        price: true,
-        status: true,
-        condition: true,
-        images: true,
-        createdAt: true,
+        id: true, slug: true, vin: true, make: true, model: true,
+        year: true, price: true, status: true, condition: true,
+        images: true, createdAt: true,
       },
     }),
   ])
 
-  // Calculate average price
-  const avgPriceResult = await prisma.vehicle.aggregate({
-    _avg: { price: true },
-  })
   const avgPrice = avgPriceResult._avg.price ? Number(avgPriceResult._avg.price) : 0
-
-  // Count leads by type
-  const leadsByType = await prisma.lead.groupBy({
-    by: ['type'],
-    _count: true,
-  })
-
-  // Vehicles added this month
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-  const vehiclesThisMonth = await prisma.vehicle.count({
-    where: { createdAt: { gte: thirtyDaysAgo } },
-  })
+  const leadGrowth = leadsLastMonth > 0
+    ? Math.round(((leadsThisMonth - leadsLastMonth) / leadsLastMonth) * 100)
+    : leadsThisMonth > 0 ? 100 : 0
 
   return NextResponse.json({
     statistics: {
@@ -81,26 +79,25 @@ export async function GET(request: NextRequest) {
       soldVehicles,
       pendingVehicles,
       totalLeads,
+      leadsThisMonth,
+      leadsThisWeek,
+      leadGrowth,
+      whatsappTotal,
+      whatsappThisMonth,
       avgPrice,
       vehiclesThisMonth,
     },
-    leadsByType: Object.fromEntries(
-      leadsByType.map((item) => [item.type, item._count])
-    ),
+    leadsByType: Object.fromEntries(leadsByType.map((item) => [item.type, item._count])),
     recentLeads: recentLeads.map((lead) => ({
       id: lead.id,
       name: lead.name,
       email: lead.email,
+      phone: lead.phone,
+      message: lead.message,
       type: lead.type,
+      vehicleId: lead.vehicleId,
       createdAt: lead.createdAt,
     })),
-    recentVehicles: recentVehicles.map((v) => ({
-      ...v,
-      price: Number(v.price),
-    })),
-    allVehicles: allVehicles.map((v) => ({
-      ...v,
-      price: Number(v.price),
-    })),
+    allVehicles: allVehicles.map((v) => ({ ...v, price: Number(v.price) })),
   })
 }

@@ -68,4 +68,5 @@ enum LeadType {
   VEHICLE
   FINANCING
   TRADE_IN
+  WHATSAPP
 }
