@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
-import { Plus, LogOut, AlertCircle, CheckCircle2, X, Upload, Car, LayoutDashboard } from 'lucide-react'
+import { Plus, LogOut, AlertCircle, CheckCircle2, X, Upload, Car, LayoutDashboard, Camera } from 'lucide-react'
 import Image from 'next/image'
 import { VEHICLE_MAKES, VEHICLE_MODELS, VEHICLE_TRIMS } from '@/lib/vehicle-makes-models'
 import VinScanner, { type DecodedVehicle } from '@/components/admin/VinScanner'
@@ -619,30 +619,56 @@ export default function AdminInventoryPage() {
               <p className="text-sm text-gray-500 mb-4">Upload up to 10 photos ({images.length}/10)</p>
 
               {/* Upload Area */}
-              <div className="mb-6">
-                <label className="relative block cursor-pointer">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    disabled={uploading || images.length >= 10}
-                    className="hidden"
-                  />
-                  <div
-                    className={`rounded-xl border-2 border-dashed px-6 py-8 text-center transition-colors ${
-                      uploading || images.length >= 10
-                        ? 'border-gray-200 bg-gray-50 opacity-50'
-                        : 'border-brand-300 bg-brand-50 hover:border-brand-500'
-                    }`}
-                  >
-                    <Upload className="h-8 w-8 text-brand-600 mx-auto mb-2" />
-                    <p className="text-sm font-semibold text-gray-900">
-                      {uploading ? 'Uploading...' : 'Drag images or click to upload'}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 5MB each</p>
+              <div className="mb-6 space-y-3">
+                {uploading && (
+                  <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-700">
+                    <svg className="h-4 w-4 animate-spin shrink-0" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    </svg>
+                    Uploading…
                   </div>
-                </label>
+                )}
+
+                <div className={`grid grid-cols-2 gap-3 ${uploading || images.length >= 10 ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {/* Take Photo — opens rear camera on mobile */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleImageUpload}
+                      disabled={uploading || images.length >= 10}
+                      className="hidden"
+                    />
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-brand-300 bg-brand-50 px-4 py-6 text-center hover:border-brand-500 hover:bg-brand-100 transition-colors">
+                      <Camera className="h-7 w-7 text-brand-600" />
+                      <p className="text-sm font-semibold text-gray-900">Take Photo</p>
+                      <p className="text-xs text-gray-500">Use your camera</p>
+                    </div>
+                  </label>
+
+                  {/* Upload from gallery / file picker */}
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={uploading || images.length >= 10}
+                      className="hidden"
+                    />
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-gray-400 hover:bg-gray-100 transition-colors">
+                      <Upload className="h-7 w-7 text-gray-500" />
+                      <p className="text-sm font-semibold text-gray-900">Upload Files</p>
+                      <p className="text-xs text-gray-500">Gallery or drag & drop</p>
+                    </div>
+                  </label>
+                </div>
+
+                <p className="text-xs text-gray-400 text-center">
+                  {images.length}/10 photos · PNG, JPG up to 5MB each
+                </p>
               </div>
 
               {/* Image Gallery */}
