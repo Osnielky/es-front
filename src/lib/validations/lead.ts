@@ -6,7 +6,7 @@ export const leadSchema = z.object({
   phone: z.string().optional(),
   message: z.string().optional(),
   vehicleId: z.string().optional(),
-  type: z.enum(['GENERAL', 'VEHICLE', 'FINANCING', 'TRADE_IN']).default('GENERAL'),
+  type: z.enum(['GENERAL', 'VEHICLE', 'FINANCING', 'TRADE_IN', 'WHATSAPP']).default('GENERAL'),
 })
 
 export type LeadInput = z.infer<typeof leadSchema>

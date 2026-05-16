@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { leadSchema } from '@/lib/validations/lead'
+import { sendLeadNotification } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   let body: unknown
@@ -16,6 +17,8 @@ export async function POST(request: NextRequest) {
   }
 
   const lead = await prisma.lead.create({ data: result.data })
+
+  sendLeadNotification(lead).catch(() => {})
 
   return NextResponse.json({ success: true, id: lead.id }, { status: 201 })
 }
