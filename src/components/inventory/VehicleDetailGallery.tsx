@@ -1,11 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight, X, Maximize2 } from 'lucide-react'
-
-// Tiny gray SVG used as blur placeholder while images load
-const BLUR_PLACEHOLDER = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjMiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjMiIGZpbGw9IiNlMmU4ZjAiLz48L3N2Zz4='
+import { whatsappHref } from '@/lib/contact'
 
 interface Props {
   images: string[]
@@ -17,19 +15,32 @@ interface Props {
     price: number
     vin: string
   }
-  whatsappNumber?: string
   isSold?: boolean
 }
 
-export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsappNumber = '1234567890', isSold = false }: Props) {
+export default function VehicleDetailGallery({ images, alt, vehicleInfo, isSold = false }: Props) {
   const [mainIdx, setMainIdx] = useState(0)
   const [fullscreen, setFullscreen] = useState(false)
   const [startX, setStartX] = useState(0)
+  // Neighbor photos are only prefetched once the shopper engages or the page goes idle,
+  // so a first visit on mobile downloads just the hero photo
+  const [warm, setWarm] = useState(false)
 
-  const handlePrev = () => setMainIdx((i) => (i === 0 ? images.length - 1 : i - 1))
-  const handleNext = () => setMainIdx((i) => (i === images.length - 1 ? 0 : i + 1))
+  useEffect(() => {
+    const warmUp = () => setWarm(true)
+    const scheduleIdle = () =>
+      // Safari has no requestIdleCallback
+      typeof window.requestIdleCallback === 'function' ? window.requestIdleCallback(warmUp, { timeout: 4000 }) : window.setTimeout(warmUp, 2500)
+    if (document.readyState === 'complete') scheduleIdle()
+    else window.addEventListener('load', scheduleIdle, { once: true })
+    return () => window.removeEventListener('load', scheduleIdle)
+  }, [])
+
+  const handlePrev = useCallback(() => setMainIdx((i) => (i === 0 ? images.length - 1 : i - 1)), [images.length])
+  const handleNext = useCallback(() => setMainIdx((i) => (i === images.length - 1 ? 0 : i + 1)), [images.length])
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    setWarm(true)
     setStartX(e.touches[0].clientX)
   }
 
@@ -48,7 +59,7 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [fullscreen])
+  }, [fullscreen, handlePrev, handleNext])
 
   if (images.length === 0) {
     return (
@@ -64,7 +75,7 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
       <div className="card overflow-hidden">
         {/* Main image */}
         <div
-          className="relative aspect-[4/3] overflow-hidden bg-gray-100 group cursor-pointer"
+          className="relative aspect-[4/3] overflow-hidden bg-sand group cursor-pointer"
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -72,16 +83,15 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
             src={images[mainIdx]}
             alt={alt}
             fill
-            sizes="(max-width: 1200px) 100vw, 1152px"
+            sizes="(max-width: 1024px) 100vw, 768px"
             quality={85}
             className="object-cover"
-            placeholder="blur"
-            blurDataURL={BLUR_PLACEHOLDER}
             priority
+            fetchPriority="high"
           />
 
-          {/* Preload prev + next images so navigation feels instant */}
-          {[-1, 1].map((offset) => {
+          {/* Prefetch prev + next images so navigation feels instant (after idle/interaction only) */}
+          {warm && [-1, 1].map((offset) => {
             const idx = mainIdx + offset
             if (idx < 0 || idx >= images.length) return null
             return (
@@ -94,9 +104,10 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
                   src={images[idx]}
                   alt=""
                   fill
-                  sizes="(max-width: 1200px) 100vw, 1152px"
+                  sizes="(max-width: 1024px) 100vw, 768px"
                   quality={85}
-                  priority
+                  loading="eager"
+                  fetchPriority="low"
                 />
               </div>
             )
@@ -130,7 +141,7 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
           {/* WhatsApp button - hidden when sold */}
           {vehicleInfo && !isSold && (
             <a
-              href={`https://wa.me/${whatsappNumber}?text=Hi! I'm interested in the ${vehicleInfo.year} ${vehicleInfo.make} ${vehicleInfo.model} (VIN: ${vehicleInfo.vin}). Price: $${vehicleInfo.price.toLocaleString()}. Can you tell me more?`}
+              href={whatsappHref(`Hi! I'm interested in the ${vehicleInfo.year} ${vehicleInfo.make} ${vehicleInfo.model} (VIN: ${vehicleInfo.vin}). Price: $${vehicleInfo.price.toLocaleString()}. Can you tell me more?`)}
               target="_blank"
               rel="noopener noreferrer"
               className="absolute top-3 right-14 z-10 rounded-lg bg-green-500 hover:bg-green-600 p-2.5 text-white transition-colors shadow-lg"
@@ -150,24 +161,30 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
 
         {/* Thumbnails */}
         {images.length > 1 && (
-          <div className="p-3 bg-gray-50 border-t border-gray-200">
+          <div className="p-3 bg-sand border-t border-sand-200">
             <div className="flex gap-2 overflow-x-auto pb-1">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setMainIdx(idx)}
+                  onPointerEnter={() => setWarm(true)}
+                  aria-label={`Show photo ${idx + 1} of ${images.length}`}
+                  aria-current={idx === mainIdx ? 'true' : undefined}
                   className={`relative h-16 w-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
                     idx === mainIdx
-                      ? 'border-brand-600 ring-2 ring-brand-300'
-                      : 'border-gray-200 hover:border-brand-400'
+                      ? 'border-navy ring-2 ring-navy-200'
+                      : 'border-sand-200 hover:border-navy-200'
                   }`}
                 >
+                  {/* Explicit dimensions: the box never resizes, and 3x screens get a 256px variant, not 384px */}
                   <Image
                     src={img}
                     alt={`${alt} ${idx + 1}`}
-                    fill
+                    width={80}
+                    height={64}
                     sizes="80px"
-                    className="object-cover"
+                    loading="lazy"
+                    className="h-full w-full object-cover"
                   />
                 </button>
               ))}
@@ -202,7 +219,6 @@ export default function VehicleDetailGallery({ images, alt, vehicleInfo, whatsap
               sizes="100vw"
               quality={90}
               className="object-contain"
-              priority
             />
 
             {/* Navigation arrows */}

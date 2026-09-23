@@ -10,9 +10,10 @@ interface Props {
   vehicleId?: string
   vehicleName?: string
   leadType?: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN'
+  defaultMessage?: string
 }
 
-export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
+export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMessage }: Props) {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -27,6 +28,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
     defaultValues: {
       type: defaultType,
       vehicleId,
+      message: defaultMessage,
     },
   })
 
@@ -63,7 +65,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
   return (
     <div className="card overflow-hidden">
       {/* Card header */}
-      <div className="bg-brand-600 px-6 py-5">
+      <div className="lead-form-header bg-brand-600 px-6 py-5">
         <h3 className="text-base font-bold text-white">
           {vehicleName ? `Interested in the ${vehicleName}?` : 'Get in Touch'}
         </h3>
@@ -81,6 +83,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
             <input
               id="name"
               type="text"
+              autoComplete="name"
               className="input pl-10"
               placeholder="Jane Smith"
               {...register('name')}
@@ -96,6 +99,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
             <input
               id="email"
               type="email"
+              autoComplete="email"
               className="input pl-10"
               placeholder="jane@example.com"
               {...register('email')}
@@ -111,6 +115,8 @@ export default function LeadForm({ vehicleId, vehicleName, leadType }: Props) {
             <input
               id="phone"
               type="tel"
+              autoComplete="tel"
+              inputMode="tel"
               className="input pl-10"
               placeholder="(555) 000-0000"
               {...register('phone')}

@@ -22,6 +22,20 @@ const config: Config = {
           900: '#1a2a80',
           950: '#111a50',
         },
+        // Sand + Navy inventory theme (listing, VDP, landing pages)
+        sand: {
+          DEFAULT: '#F3EBDD', // page background
+          200: '#E8DCC5',     // borders/dividers on sand + ivory
+          300: '#D9C7A6',
+        },
+        ivory: '#FFFDF8',     // cards and raised surfaces
+        navy: {
+          50:  '#EEF2F7',
+          100: '#DCE4EE',
+          200: '#B7C6D8',
+          DEFAULT: '#16324F', // primary buttons, links, accents
+          800: '#0F2439',     // hover
+        },
         accent: {
           400: '#fb923c',
           500: '#f97316',

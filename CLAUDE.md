@@ -1,229 +1,94 @@
-﻿# CLAUDE.md
+# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-**es-front** is a mobile-first, SEO-friendly car dealership website built on Google Cloud Platform. It showcases vehicle inventory, captures customer leads, and runs on Next.js with a PostgreSQL backend.
+**es-front** is the mobile-first, SEO-focused website for E&S Car Sales (Naples, FL): public vehicle inventory, lead capture, and a small admin panel for managing inventory. Next.js 15 (App Router) + TypeScript + Tailwind, PostgreSQL via Prisma, deployed to Google Cloud Run with images in Google Cloud Storage.
 
-**Stack:**
-- Frontend: Next.js 15 (App Router), TypeScript, Tailwind CSS
-- Backend: Next.js API routes, Prisma ORM
-- Database: PostgreSQL with Prisma migrations
-- Cloud: Google Cloud Run (via Docker + Cloud Build)
-- Media: Google Cloud Storage for vehicle images
-- Forms: React Hook Form + Zod validation
-- Auth: Custom session-based admin authentication (JWT tokens in cookies)
-
-**Core Data Models:**
-- `Vehicle` — inventory with images, pricing, specs, status tracking
-- `Lead` — customer inquiries (general, vehicle-specific, financing, trade-in)
-- Enums: `Condition` (NEW/USED/CERTIFIED), `VehicleStatus` (AVAILABLE/SOLD/PENDING), `LeadType`
-
-## Development Commands
+## Commands
 
 ```bash
-npm run dev              # Start dev server on localhost:3000
-npm run build            # Produce standalone Next.js bundle for Cloud Run
-npm run start            # Run production build locally
-npm run lint             # Run ESLint
+npm run dev              # Dev server on localhost:3000
+npm run build            # Standalone Next.js build (used by the Docker image)
+npm run lint             # next lint
+npx tsc --noEmit         # Type check — the main automated correctness check
+npm run db:migrate       # prisma migrate dev (create + apply a migration)
+npm run db:push          # Push schema without a migration
+npm run db:seed          # tsx prisma/seed.ts — sample vehicles
+npm run db:studio        # Prisma Studio
 npm run db:generate      # Regenerate Prisma client
-npm run db:migrate       # Create and run new migration
-npm run db:push          # Push schema changes without migrations
-npm run db:seed          # Populate database with sample vehicles
-npm run db:studio        # Open interactive Prisma Studio GUI
-npx tsc --noEmit         # Type check without emitting JS
 ```
 
-**First-time setup:**
-```bash
-# Copy .env and fill in DATABASE_URL and other required vars
-npm install
-npm run db:migrate
-npm run db:seed           # Optional: load sample inventory
-npm run dev
-```
+There is no test suite. `next dev` and `next build` share `.next/`, so don't run a production build while a dev server is running; it breaks the dev server's assets. Verify changes with `npx tsc --noEmit`, `npm run lint`, and manual QA in the browser.
+
+Local env vars live in `.env` (see `dev.env.example` for the list). Required: `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` (≥32 chars, or auth throws). Optional: `GCS_BUCKET_NAME`/`GCS_PROJECT_ID` (uploads), `RESEND_API_KEY` + `LEAD_NOTIFY_EMAIL` (lead emails; silently skipped if unset), `MAX_UPLOAD_SIZE_MB`, and `NEXT_PUBLIC_DEALER_*`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`.
 
 ## Architecture
 
-### Directory Structure
+### Data access & caching
 
-```
-src/
-  app/                    # Next.js App Router
-    api/
-      vehicles/           # GET paginated/filtered inventory (public)
-      leads/              # POST lead capture (public)
-      admin/              # Protected: login, logout, stats, vehicle CRUD
-    admin/                # Protected: dashboard, vehicle management UI
-    inventory/            # Public: list and detail pages (server components)
-    contact/              # Contact form page
-    layout.tsx            # Root layout with Header, Footer, SEO metadata
-    globals.css           # Shared component classes (btn-primary, card, input, etc.)
-    robots.ts             # robots.txt generation
-    sitemap.ts            # XML sitemap generation
-  components/
-    layout/               # Header (client, with mobile nav), Footer
-    inventory/            # VehicleCard, VehicleFilters (client), VehicleDetailGallery
-    leads/                # LeadForm (client, react-hook-form + zod)
-  lib/
-    prisma.ts             # Singleton Prisma client with HMR caching
-    seo.ts                # JSON-LD builders, title/description helpers, LOCATION config
-    admin-auth.ts         # JWT token generation/verification, session management
-    data.ts               # Data fetching utilities
-    validations/
-      lead.ts             # Zod schema for lead form
-      vehicle.ts          # Zod schema for vehicle filters
-    vehicle-makes-models.ts  # Master list of vehicle makes/models
-  types/index.ts          # Domain type interfaces (Vehicle, Lead, VehicleFilters)
-  middleware.ts           # Auth guard for /admin/* and /api/admin/* routes
-prisma/
-  schema.prisma           # Source of truth for database schema
-  migrations/             # Migration files (tracked in git)
-  seed.ts                 # Sample data loader
-public/                   # Static assets (og-image.jpg, etc.)
-```
+- **Public pages read through `src/lib/data.ts`**, not Prisma directly. Reads are wrapped in `unstable_cache` (tag `vehicles`, 300s). Admin create/update/delete routes call `revalidateTag(VEHICLES_TAG)`. Any new write path must do the same, or public pages stay stale for up to 5 minutes. The cache is per Cloud Run instance, so other instances catch up on the 300s timer.
+- `data.ts` only returns `AVAILABLE` vehicles, converts `Decimal` price to `number`, and rehydrates Dates (the cache JSON-serializes them). Domain types in `src/types/index.ts` use `number`.
+- **Inventory filtering is URL-driven.** `VehicleFilters` pushes query params, and `/inventory` re-renders on the server. `GET /api/vehicles` is only used by `/admin/vehicles`.
+- `getInventoryFacets()` returns makes, models and body styles with counts. It powers the landing pages, the sitemap and the "Shop by" links.
 
-### Data Flow & Key Patterns
+### URLs, canonicals & landing pages
 
-**Public Inventory (Browsing):**
-1. Client requests `/inventory` → server component fetches via `prisma.vehicle.findMany()`
-2. Filters applied client-side by `VehicleFilters` component → calls `/api/vehicles` with query params
-3. `/api/vehicles` validates with `vehicleFilterSchema` (Zod) → queries Prisma → returns paginated results
-4. Server converts Prisma `Decimal` prices to `number` before passing to components
+- **Always build vehicle links with `vehiclePath()`/`vehicleUrl()`** from `lib/seo.ts`. They use the VIN, falling back to the slug when the VIN is null or empty. `/inventory/[vin]` accepts a slug or VIN and 308-redirects to the canonical URL.
+- SEO landing pages: `/cars-for-sale/[make]`, `/cars-for-sale/[make]/[model]`, `/cars-for-sale/type/[bodyStyle]`. Build their paths with `makePath`/`modelPath`/`bodyStylePath` (which use `slugify`). They 404 when nothing matching is in stock. Shared UI is in `components/inventory/InventoryLanding.tsx`, and copy and metadata in `lib/landing.ts`.
+- VDPs and landing pages use ISR (`revalidate = 300`, `generateStaticParams` returns `[]`, so the Docker build needs no DB). `sitemap.ts` is `force-dynamic` for the same reason.
+- `/inventory` canonical rules: `?make=` points to the make landing page, price/year/model filters get `noindex,follow`, and paginated pages canonicalize to themselves.
 
-**Lead Capture:**
-1. User fills LeadForm → validates with `leadSchema` (Zod)
-2. POST to `/api/leads` with form data
-3. Route validates + creates Lead record in database
-4. Response includes confirmation or error
+### Single sources of truth (keep NAP consistent)
 
-**Admin Operations:**
-1. User navigates to `/admin/login` or `/admin` → middleware checks cookie token
-2. `/api/admin/login` verifies email/password (ADMIN_EMAIL/ADMIN_PASSWORD env vars) → issues JWT in secure cookie
-3. Middleware verifies token on each admin request
-4. Admin CRUD routes (`/api/admin/vehicles`) handle vehicle management
-5. Image uploads go to Google Cloud Storage via `/api/admin/upload`
+- `lib/seo.ts`: `LOCATION` (structured address, `geo`), `DEALER_ADDRESS`, `BUSINESS_HOURS` (feeds the schema, FAQ, footer, contact and about pages), `stockNumber()`, `serializeJsonLd()`. **Always** inject JSON-LD with `serializeJsonLd`, because it escapes `<`.
+- `lib/contact.ts`: `DEALER_PHONE`, `TEL_HREF`, `whatsappHref()`. It normalizes to E.164; never hand-build `tel:`/`wa.me` links.
+- `lib/finance.ts`: `estimateMonthlyPayment()` and `FINANCE_DISCLAIMER`. Every "Est. $X/mo" must show the disclaimer on the same page.
+- Structured data: one `AutoDealer` entity (`@id` `/#organization`), and VDPs use `["Product","Car"]`. Don't add review or rating markup unless it comes from real, visible reviews.
 
-### Critical Conventions & Gotchas
+### Inventory listing UI
 
-**Prisma Decimal Handling:**
-- Prisma stores `price` as `Decimal(10, 2)` in schema
-- **Must convert to `number` at page/route boundary** before passing to React components
-- Example: `const price = Number(vehicle.price)` before rendering
-- Domain types (`types/index.ts`) use `number` for consistency
+- `/inventory` query params: `q` (keyword search across make/model/trim/body/color), `make`, `bodyStyle`, `priceMin`/`priceMax`, `yearMin`/`yearMax`, `mileageMax`, `sort` (keys of `VEHICLE_SORTS` in `data.ts`), `view=list`, `page`. The search box is a plain GET form, and the view toggle and pagination are links, so they work without JS.
+- **Saved cars and compare** live in `localStorage` via `lib/shortlist.ts` (`useSavedCars`, `useCompare`, max `MAX_COMPARE` = 3, defined in `lib/vehicle-display.ts` so server code can import it). UI islands are in `components/inventory/ShortlistControls.tsx`. `/inventory/compare?ids=` is a `noindex` server page.
+- Never import values from a `'use client'` module into server code; put shared constants in a plain module.
+- `Vehicle.cleanTitle` is set by an admin checkbox after verifying title history. The "Clean title" badge renders **only** when it's true. Never hardcode trust badges.
 
-**Component Location Matters:**
-- Server components: fetch directly via `prisma.*` (no `'use client'`)
-- Client components: must have `'use client'` directive at top and fetch via `/api/*` routes
-- Hooks (useState, useCallback, etc.) **require** `'use client'`
+### Leads
 
-**Shared Classes in globals.css:**
-- Always use predefined utility classes: `.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.label`, `.badge-*`
-- Do not repeat inline Tailwind classes; define them in globals.css instead for consistency
+`POST /api/leads` validates with `leadSchema` (`lib/validations/lead.ts`), creates a `Lead`, then fires `sendLeadNotification` (`lib/email.ts`, Resend) without awaiting it. Lead sources: `LeadForm` (contact, financing, trade-in, and the VDP sidebar/`#inquire`) and `WhatsAppButton` (cards, the VDP sticky mobile CTA bar), which logs a `WHATSAPP` lead on click before opening WhatsApp. Adding a `LeadType` requires a Prisma migration plus updates to the Zod schema and `TYPE_LABEL` in `email.ts`.
 
-**SEO Metadata:**
-- Dynamic titles/descriptions built with helpers in `lib/seo.ts`
-- JSON-LD injected inline in page components as `<script>` tags
-- Naples, FL location details centralized in `LOCATION` export from `seo.ts`
-- Root layout sets global defaults; individual pages override as needed
+### Admin
 
-**Environment Variables:**
-- `NEXT_PUBLIC_*` vars must be set at **build time** for client components (see Dockerfile ARG section)
-- Database secrets (DATABASE_URL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET) are server-only
-- Cloud Run secrets passed as env vars in cloud.google.com console
+- Auth: `lib/admin-auth.ts` signs HS256 JWTs with `jose` (12h TTL) and stores them in the `admin_session` HTTP-only cookie. Credentials are compared against the `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars (single admin, no user table).
+- `src/middleware.ts` guards `/admin/*` (redirects to `/admin/login`) and `/api/admin/*` (returns 401). Admin API routes (`upload`, `decode-vin`, etc.) **also** re-check the cookie themselves with a local `isAdmin()` helper. Keep that pattern for new admin routes.
+- Admin pages are client components that call `/api/admin/*`.
+- `POST /api/admin/upload` writes to the GCS bucket and returns public `storage.googleapis.com` URLs, which get stored in `Vehicle.images[]`. It enforces `MAX_UPLOAD_SIZE_MB` and returns 413 for oversized files.
+- VIN entry: `components/admin/VinScanner.tsx` scans barcodes with `html5-qrcode`. `GET /api/admin/decode-vin?vin=` calls NHTSA vPIC and maps body class and fuel type to the site's vocabulary.
 
-**Admin Auth:**
-- JWT tokens issued by `/api/admin/login` and stored in secure HTTP-only cookies
-- Tokens verified by middleware; session secret in `ADMIN_SESSION_SECRET`
-- Login credentials: `ADMIN_EMAIL` and `ADMIN_PASSWORD` from environment
+### SEO
 
-**Image Handling:**
-- Vehicles can have multiple images (array in schema)
-- New images uploaded to Google Cloud Storage bucket (name in `GCS_BUCKET_NAME` env var)
-- Uploaded URLs returned and stored in vehicle.images array
-- Next.js `remotePatterns` in `next.config.ts` allow loading from `storage.googleapis.com` and `images.unsplash.com`
+`src/lib/seo.ts` holds all metadata/JSON-LD builders (`buildVehicleJsonLd`, `buildLocalBusinessJsonLd`, `buildPageMetadata`, FAQ/financing/trade-in schemas, etc.) and the `LOCATION` constant for the dealership. Pages inject JSON-LD as inline `<script type="application/ld+json">`. `robots.ts` and `sitemap.ts` are generated. Vehicle pages use `dynamic = 'force-dynamic'`.
 
-### Page Components & Routing
+### Styling
 
-**Public Pages (Server Rendered):**
-- `/` — Home page with hero, featured inventory, CTAs
-- `/inventory` — Filtered vehicle list with client-side filters
-- `/inventory/[vin]` — Dynamic vehicle detail page
-- `/contact` — Contact form page
-- `/robots.txt` and `/sitemap.xml` — Generated dynamically
+Shared component classes (`.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.label`, `.badge-*`) are defined in `src/app/globals.css`. Reuse them instead of repeating long inline Tailwind strings. Layouts are mobile-first. On the vehicle detail page, mobile order is: images → price → title → specs → lead CTA → financing → description.
 
-**Admin Pages (Protected):**
-- `/admin/login` — Email/password login
-- `/admin` — Dashboard (stats, vehicle list)
-- `/admin/inventory` — Manage vehicles (list, create, edit)
-- `/admin/inventory/[id]/edit` — Edit vehicle details + upload images
+**Sand + Navy inventory theme:** `/inventory`, VDPs and `/cars-for-sale/*` wrap their content in `.theme-sand`. Tokens live in `tailwind.config.ts`: `sand` #F3EBDD (page background), `ivory` #FFFDF8 (cards), `navy` #16324F (buttons and links; hover `navy-800`). Inside the scope, `globals.css` restyles `.card`, `.btn-primary`, `.btn-secondary`, `.input`, `.badge-used` and the `LeadForm` header, and maps `text-gray-400/500` to warm stone tones for contrast on sand. Vehicle lists use the `.vehicle-grid` class (auto-fit columns with a 20rem minimum, 22rem from `xl`), so cards stretch into free space instead of leaving empty columns. Don't hardcode `grid-cols-*` for card grids. In inventory components use `bg-navy`/`text-navy`/`border-sand-200`, not `brand-*`. The rest of the site still uses `brand-*` blue.
 
-**API Routes:**
-- `GET /api/vehicles` — Returns paginated, filtered inventory
-- `POST /api/leads` — Capture lead inquiries
-- `POST /api/admin/login` — Authenticate and issue session token
-- `POST /api/admin/logout` — Clear session
-- `GET /api/admin/stats` — Inventory stats for dashboard
-- `GET/POST/PATCH /api/admin/vehicles` — Manage inventory
-- `POST /api/admin/upload` — Upload images to GCS
+Remote images must match `remotePatterns` in `next.config.ts` (`storage.googleapis.com`, `images.unsplash.com`).
+
+### Performance rules
+
+- **Images:** always use `next/image`. Pass `priority` + `fetchPriority="high"` only for the LCP image (VDP hero, first 2 cards in a list); everything else is `loading="lazy"`. Use either explicit `width`/`height` or `fill` inside a fixed `aspect-*` box, so nothing shifts layout. `imageSizes` includes 256 for 80px thumbnails on 3x screens, and `minimumCacheTTL` is 30 days because uploads have unique filenames.
+- **VDP gallery:** only the hero photo loads up front. Neighbor photos prefetch after `requestIdleCallback` or on first interaction.
+- **Third-party embeds and scripts** (maps, chat, CRM, analytics) must never load during initial render. Use the facade pattern in `components/layout/LazyMapEmbed.tsx` (render when visible + idle, desktop only), or `next/script` with `strategy="lazyOnload"` for widgets. Never add a raw `<script src>` to the layout.
+- The hero videos (`HeroVideoRotator`) mount only after `load`, on desktop, when neither Save-Data nor reduced motion is set.
 
 ## Deployment
 
-**Docker & Cloud Run:**
-- `Dockerfile` uses multi-stage build: deps → builder → production runtime
-- `output: 'standalone'` in `next.config.ts` required; do not remove
-- Cloud Run service reads env vars from secrets: `DATABASE_URL`, `ADMIN_*`, `GCS_*`, `NEXT_PUBLIC_*`
-- Migrations run automatically as a pre-deployment step (see cloudbuild.yaml)
-
-**Cloud Build CI/CD:**
-- `cloudbuild.yaml` — Production pipeline
-- `cloudbuild-dev.yaml` — Development builds
-- Pushes image to Artifact Registry, then deploys to Cloud Run
-
-## Testing & Type Safety
-
-- Run `npx tsc --noEmit` to check TypeScript without emitting code
-- Zod schemas validate all form inputs and API query params
-- No dedicated test suite in place; focus on type safety and manual QA
-
-## Important File Reference
-
-| File | Purpose |
-|------|---------|
-| `prisma/schema.prisma` | Database schema definition and enums |
-| `src/lib/seo.ts` | SEO helpers, JSON-LD builders, location config |
-| `src/lib/validations/` | Zod schemas for forms and API inputs |
-| `src/app/globals.css` | Component utility classes |
-| `src/middleware.ts` | Admin auth guard |
-| `src/lib/admin-auth.ts` | JWT token utilities |
-| `.env` | Local environment variables (not committed) |
-| `Dockerfile` | Container image definition |
-| `cloudbuild.yaml` | GCP deployment pipeline |
-
-## Coding Guidelines
-
-**When Adding Features:**
-1. Define Zod schema for validation first (in `lib/validations/`)
-2. Create API route(s) with validation middleware
-3. Build UI components (server or client as appropriate)
-4. Update SEO metadata if user-facing
-5. Test types with `npx tsc --noEmit`
-6. Ensure images and secrets are not committed
-
-**Database Changes:**
-1. Update `prisma/schema.prisma`
-2. Run `npm run db:migrate` and name the migration descriptively
-3. Migrations are tracked in git for reproducible deployments
-4. Test locally before pushing
-
-**Mobile-First Mindset:**
-- Start layouts from phone screens (use Tailwind breakpoints: default = mobile, sm/md/lg = larger screens)
-- Vehicle detail priority on mobile: images → price → title → specs → lead CTA → financing → description
-- Ensure form fields, buttons, and galleries are touch-friendly
-
-**SEO and Content:**
-- Use dynamic metadata helpers from `lib/seo.ts` for all pages
-- Include JSON-LD structured data for vehicles and local business schema
-- Clean, SEO-friendly slugs (vehicles use VIN as slug)
-- Internal linking between inventory and detail pages for crawlability
+- `Dockerfile`: multi-stage node:20-slim build, serves `.next/standalone` on port 8080. `output: 'standalone'` in `next.config.ts` is required. `prisma/schema.prisma` has `binaryTargets` for Debian OpenSSL. Keep them when changing the generator.
+- Runtime secrets (`DATABASE_URL`, `ADMIN_*`) are attached by `gcloud run deploy --update-secrets` from Secret Manager (`*_DEV` secrets). The migrate step reads `DATABASE_URL_MIGRATE` via `availableSecrets` and connects through the Cloud SQL proxy's Unix socket. Never hardcode credentials in the Dockerfile or Cloud Build config.
+- `NEXT_PUBLIC_*` values are inlined at **build time**, so they are passed as Docker `--build-arg`s. Changing them requires a rebuild, not just a Cloud Run env change.
+- `cloudbuild-dev.yaml` (the only pipeline in the repo) triggers on the `dev` branch. It builds and pushes to Artifact Registry, runs `prisma migrate deploy` through the Cloud SQL proxy, and deploys the `es-front-dev` Cloud Run service (project `es-cars-dev`, region `us-east1`). Migrations must therefore be committed under `prisma/migrations/`.
+- GCP setup (Secret Manager, IAM, Cloud SQL) is documented in `CLOUD_SETUP.md`, with helper scripts in `scripts/`.

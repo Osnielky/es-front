@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import { Phone, MapPin, Mail, Clock } from 'lucide-react'
 import LeadForm from '@/components/leads/LeadForm'
-import { buildLocalBusinessJsonLd, buildFAQJsonLd, buildBreadcrumbJsonLd, LOCATION } from '@/lib/seo'
+import { buildLocalBusinessJsonLd, buildFAQJsonLd, buildBreadcrumbJsonLd, LOCATION, DEFAULT_OG_IMAGE, DEALER_ADDRESS, serializeJsonLd, BUSINESS_HOURS } from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '(239) 555-0123'
-const DEALER_ADDRESS = process.env.NEXT_PUBLIC_DEALER_ADDRESS ?? '1234 Tamiami Trail N, Naples, FL 34102'
 
 export const metadata: Metadata = {
   title: 'Contact Us | Car Dealership in Naples, FL',
@@ -28,7 +27,7 @@ export const metadata: Metadata = {
     description: `Get in touch with ${DEALER_NAME} in Naples, Florida. We're here to help you find your perfect vehicle.`,
     url: `${SITE_URL}/contact`,
     type: 'website',
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: `Contact ${DEALER_NAME}` }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: `Contact ${DEALER_NAME}` }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -50,15 +49,15 @@ export default function ContactPage() {
       {/* Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(localBusinessJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
 
       <div className="min-h-screen bg-gray-50">
@@ -87,7 +86,7 @@ export default function ContactPage() {
                 color: 'bg-emerald-50 text-emerald-600',
                 title: 'Call Us',
                 content: DEALER_PHONE,
-                href: `tel:${DEALER_PHONE.replace(/[^0-9]/g, '')}`,
+                href: TEL_HREF,
               },
               {
                 icon: Mail,
@@ -100,7 +99,7 @@ export default function ContactPage() {
                 icon: Clock,
                 color: 'bg-amber-50 text-amber-600',
                 title: 'Hours',
-                content: 'Mon–Sat: 9am – 7pm\nSun: 11am – 5pm',
+                content: BUSINESS_HOURS.map((h) => `${h.label}: ${h.display}`).join('\n'),
               },
             ].map(({ icon: Icon, color, title, content, href }) => (
               <div key={title} className="card flex items-start gap-4 p-5">

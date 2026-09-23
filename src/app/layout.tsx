@@ -2,14 +2,14 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
-import { LOCATION } from '@/lib/seo'
+import { LOCATION, DEFAULT_OG_IMAGE } from '@/lib/seo'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '(239) 555-0123'
+const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '+1 (941) 499-7415'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -23,9 +23,6 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  icons: {
-    icon: '/logo.png',
-  },
   title: {
     default: `${DEALER_NAME} | New & Used Cars in Naples, FL`,
     template: `%s | ${DEALER_NAME}`,
@@ -63,7 +60,7 @@ export const metadata: Metadata = {
     description: `Your trusted car dealership in Naples, Florida. Quality vehicles, transparent pricing, and exceptional service. Serving Southwest Florida.`,
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: `${DEALER_NAME} - Car Dealer in Naples, FL`,
@@ -74,7 +71,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${DEALER_NAME} | New & Used Cars in Naples, FL`,
     description: `Your trusted car dealership in Naples, Florida. Quality vehicles, transparent pricing, and exceptional service.`,
-    images: [`${SITE_URL}/og-image.jpg`],
+    images: [DEFAULT_OG_IMAGE],
   },
   robots: {
     index: true,
@@ -99,9 +96,11 @@ export const metadata: Metadata = {
   other: {
     'geo.region': 'US-FL',
     'geo.placename': 'Naples',
-    'geo.position': `${LOCATION.latitude};${LOCATION.longitude}`,
-    'ICBM': `${LOCATION.latitude}, ${LOCATION.longitude}`,
-    'business:contact_data:street_address': process.env.NEXT_PUBLIC_DEALER_ADDRESS ?? '',
+    ...(LOCATION.geo && {
+      'geo.position': `${LOCATION.geo.latitude};${LOCATION.geo.longitude}`,
+      'ICBM': `${LOCATION.geo.latitude}, ${LOCATION.geo.longitude}`,
+    }),
+    'business:contact_data:street_address': LOCATION.streetAddress,
     'business:contact_data:locality': LOCATION.city,
     'business:contact_data:region': LOCATION.stateCode,
     'business:contact_data:postal_code': LOCATION.zipCode,

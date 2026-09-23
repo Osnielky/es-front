@@ -8,30 +8,49 @@ const VIDEOS = [
   '/videos/14228182-hd_1920_1080_60fps.mp4',
 ]
 
+// Videos are 2.5–7.7 MB each. They never block first paint (the hero gradient + text are the LCP),
+// and are skipped entirely on phones, Data Saver, and prefers-reduced-motion.
+function shouldPlayVideo() {
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection
+  return (
+    window.matchMedia('(min-width: 768px)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+    !connection?.saveData
+  )
+}
+
 export default function HeroVideoRotator() {
+  const [enabled, setEnabled] = useState(false)
   const [currentVideo, setCurrentVideo] = useState(0)
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
 
+  // Mount videos only after the page has loaded so they don't compete with critical resources
   useEffect(() => {
-    // Play current video, pause others
-    videoRefs.current.forEach((video, idx) => {
-      if (video) {
-        if (idx === currentVideo) {
-          video.play().catch(() => {}) // Play, ignore errors
-        } else {
-          video.pause()
-        }
-      }
-    })
-  }, [currentVideo])
+    if (!shouldPlayVideo()) return
+    const start = () => setEnabled(true)
+    if (document.readyState === 'complete') start()
+    else window.addEventListener('load', start, { once: true })
+    return () => window.removeEventListener('load', start)
+  }, [])
 
   useEffect(() => {
+    if (!enabled) return
+    videoRefs.current.forEach((video, idx) => {
+      if (!video) return
+      if (idx === currentVideo) video.play().catch(() => {})
+      else video.pause()
+    })
+  }, [currentVideo, enabled])
+
+  useEffect(() => {
+    if (!enabled) return
     const interval = setInterval(() => {
       setCurrentVideo((prev) => (prev + 1) % VIDEOS.length)
-    }, 10000) // Change video every 10 seconds
-
+    }, 10000)
     return () => clearInterval(interval)
-  }, [])
+  }, [enabled])
+
+  if (!enabled) return null
 
   return (
     <>
@@ -47,12 +66,14 @@ export default function HeroVideoRotator() {
           muted
           loop
           playsInline
+          aria-hidden="true"
+          // Only the visible video downloads up front; others fetch when first played
+          preload={idx === currentVideo ? 'auto' : 'none'}
         >
           <source src={src} type="video/mp4" />
         </video>
       ))}
 
-      {/* Video indicators */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {VIDEOS.map((_, idx) => (
           <button

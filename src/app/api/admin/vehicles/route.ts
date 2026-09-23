@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyAdminToken, getAdminCookieName } from '@/lib/admin-auth'
 import { z } from 'zod'
+import { revalidateTag } from 'next/cache'
+import { VEHICLES_TAG } from '@/lib/data'
 
 const createVehicleSchema = z.object({
   make: z.string().min(1),
@@ -11,6 +13,7 @@ const createVehicleSchema = z.object({
   price: z.number().positive(),
   mileage: z.number().int().nonnegative(),
   condition: z.enum(['NEW', 'USED', 'CERTIFIED']),
+  cleanTitle: z.boolean().default(false),
   bodyStyle: z.string().optional().nullable(),
   transmission: z.string().optional().nullable(),
   fuelType: z.string().optional().nullable(),
@@ -72,6 +75,7 @@ export async function POST(request: NextRequest) {
       price: parsed.data.price,
       mileage: parsed.data.mileage,
       condition: parsed.data.condition,
+      cleanTitle: parsed.data.cleanTitle,
       bodyStyle: parsed.data.bodyStyle,
       transmission: parsed.data.transmission,
       fuelType: parsed.data.fuelType,
@@ -85,6 +89,8 @@ export async function POST(request: NextRequest) {
       status: 'AVAILABLE',
     },
   })
+
+  revalidateTag(VEHICLES_TAG)
 
   return NextResponse.json(
     { success: true, id: vehicle.id, slug: vehicle.slug },

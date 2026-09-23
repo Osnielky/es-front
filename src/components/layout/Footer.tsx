@@ -1,15 +1,15 @@
 import Link from 'next/link'
 import { Phone, MapPin, Mail, Clock, ExternalLink, ChevronRight } from 'lucide-react'
+import { DEALER_ADDRESS, BUSINESS_HOURS } from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF, whatsappHref } from '@/lib/contact'
+import LazyMapEmbed from './LazyMapEmbed'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? ''
-const DEALER_ADDRESS = process.env.NEXT_PUBLIC_DEALER_ADDRESS ?? ''
 
 export default function Footer() {
-  const encodedAddress = encodeURIComponent(DEALER_ADDRESS || 'Naples, FL')
+  const encodedAddress = encodeURIComponent(DEALER_ADDRESS)
   const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`
-  const whatsappNumber = DEALER_PHONE.replace(/\D/g, '')
 
   return (
     <footer className="bg-gray-900">
@@ -34,14 +34,14 @@ export default function Footer() {
             <div className="mt-8 space-y-3">
               {DEALER_PHONE && (
                 <a
-                  href={`tel:${DEALER_PHONE}`}
+                  href={TEL_HREF}
                   className="flex items-center gap-4 rounded-xl bg-gray-800/50 p-4 transition-colors hover:bg-gray-800"
                 >
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-600">
                     <Phone className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-500">Call or Text</p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Call or Text</p>
                     <p className="text-lg font-bold text-white">{DEALER_PHONE}</p>
                   </div>
                 </a>
@@ -52,9 +52,12 @@ export default function Footer() {
                   <Clock className="h-5 w-5 text-gray-300" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-gray-500">Business Hours</p>
-                  <p className="font-semibold text-white">Mon – Sat: 9am – 7pm</p>
-                  <p className="text-sm text-gray-400">Sunday: By Appointment</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Business Hours</p>
+                  {BUSINESS_HOURS.map((h, i) => (
+                    <p key={h.label} className={i === 0 ? 'font-semibold text-white' : 'text-sm text-gray-400'}>
+                      {h.label}: {h.display}
+                    </p>
+                  ))}
                 </div>
               </div>
 
@@ -68,7 +71,7 @@ export default function Footer() {
                   <MapPin className="h-5 w-5 text-gray-300" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs font-medium uppercase tracking-wider text-gray-500">Visit Us</p>
+                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Visit Us</p>
                   <p className="text-sm font-medium text-white">{DEALER_ADDRESS}</p>
                 </div>
                 <ExternalLink className="h-4 w-4 text-gray-500" />
@@ -77,7 +80,7 @@ export default function Footer() {
 
             {/* Social Links */}
             <div className="mt-8 flex items-center gap-3">
-              <span className="text-sm text-gray-500">Follow us:</span>
+              <span className="text-sm text-gray-400">Follow us:</span>
               <a
                 href="https://www.instagram.com/eands_car_sales_llc"
                 target="_blank"
@@ -100,9 +103,9 @@ export default function Footer() {
                   <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
                 </svg>
               </a>
-              {whatsappNumber && (
+              {(
                 <a
-                  href={`https://wa.me/1${whatsappNumber}?text=Hi!%20I'm%20interested%20in%20your%20vehicles.`}
+                  href={whatsappHref("Hi! I'm interested in your vehicles.")}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-all hover:bg-green-600 hover:text-white"
@@ -191,15 +194,11 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="group relative block overflow-hidden rounded-xl bg-gray-800"
               >
-                <div className="aspect-[3/1] w-full">
-                  <iframe
-                    src={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
-                    className="h-full w-full grayscale opacity-60 transition-all group-hover:grayscale-0 group-hover:opacity-100"
-                    style={{ border: 0, pointerEvents: 'none' }}
-                    loading="lazy"
-                    title="Location Map"
-                  />
-                </div>
+                <LazyMapEmbed
+                  embedUrl={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
+                  title={`Map to ${DEALER_NAME}`}
+                  address={DEALER_ADDRESS}
+                />
                 <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
                   <span className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-900">
                     <MapPin className="h-4 w-4" />
@@ -216,17 +215,15 @@ export default function Footer() {
       <div className="border-t border-gray-800">
         <div className="mx-auto max-w-7xl px-4 py-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               © {new Date().getFullYear()} {DEALER_NAME}. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
-              <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-white transition-colors">Terms of Service</Link>
+            <div className="flex items-center gap-6 text-sm text-gray-400">
               <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
             </div>
           </div>
-          <p className="mt-4 text-center text-xs text-gray-600">
-            Website created by OSMIO LLC · <a href="mailto:info@osmioservices.com" className="hover:text-gray-400 transition-colors">info@osmioservices.com</a>
+          <p className="mt-4 text-center text-xs text-gray-400">
+            Website created by OSMIO LLC · <a href="mailto:info@osmioservices.com" className="hover:text-white transition-colors">info@osmioservices.com</a>
           </p>
         </div>
       </div>

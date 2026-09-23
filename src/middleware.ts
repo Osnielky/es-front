@@ -20,7 +20,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (pathname.startsWith('/admin/') && !isAdminLogin) {
+    if ((pathname === '/admin' || pathname.startsWith('/admin/')) && !isAdminLogin) {
       const loginUrl = new URL('/admin/login', req.url)
       return NextResponse.redirect(loginUrl)
     }

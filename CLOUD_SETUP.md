@@ -149,7 +149,7 @@ postgresql://postgres:PASSWORD@/esfront_dev?host=/cloudsql/PROJECT_ID:REGION:INS
 
 Example:
 ```
-postgresql://postgres:admin1234@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db
+postgresql://postgres:YOUR_PASSWORD@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db
 ```
 
 ## Manual Checks

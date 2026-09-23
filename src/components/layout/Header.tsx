@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? ''
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -23,6 +24,8 @@ export default function Header() {
   const pathname = usePathname()
 
   const isHome = pathname === '/'
+  // Section stays highlighted on child pages (e.g. Inventory on a vehicle detail page)
+  const isActive = (href: string) => (href === '/' ? isHome : pathname === href || pathname.startsWith(`${href}/`))
   const transparent = isHome && !scrolled && !open
 
   useEffect(() => {
@@ -37,15 +40,19 @@ export default function Header() {
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         transparent
           ? ''
-          : 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
+          : 'bg-ivory/95 backdrop-blur-md shadow-sm border-b border-sand-200'
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3.5">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <img
+          <Image
             src="/logo.png"
             alt={DEALER_NAME}
+            width={81}
+            height={80}
+            sizes="81px"
+            priority
             className="h-20 w-auto"
           />
         </Link>
@@ -56,14 +63,14 @@ export default function Header() {
             <Link
               key={href}
               href={href}
-              className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors ${
+              className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors ${
                 transparent
-                  ? pathname === href
+                  ? isActive(href)
                     ? 'bg-white/20 text-white'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  : pathname === href
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  : isActive(href)
+                    ? 'bg-sand text-navy'
+                    : 'text-navy/80 hover:bg-sand hover:text-navy'
               }`}
             >
               {label}
@@ -74,9 +81,9 @@ export default function Header() {
         <div className="hidden items-center gap-3 sm:flex">
           {DEALER_PHONE && (
             <a
-              href={`tel:${DEALER_PHONE}`}
+              href={TEL_HREF}
               className={`flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors ${
-                transparent ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-700'
+                transparent ? 'text-white/90 hover:text-white' : 'text-navy hover:text-navy-800'
               }`}
             >
               <Phone className="h-4 w-4" />
@@ -84,22 +91,19 @@ export default function Header() {
             </a>
           )}
           <Link
-            href="/admin/login"
-            className={`text-xs font-medium transition-colors ${
-              transparent ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+            href="/contact"
+            className={`rounded-xl border-2 px-5 py-2 text-sm font-semibold transition-colors ${
+              transparent ? 'border-white/80 text-white hover:bg-white hover:text-navy' : 'border-navy text-navy hover:bg-navy hover:text-white'
             }`}
           >
-            Admin
-          </Link>
-          <Link href="/contact" className="btn-primary py-2 px-5 text-xs font-bold uppercase tracking-widest">
-            Get a Quote
+            Get in touch
           </Link>
         </div>
 
         {/* Mobile toggle */}
         <button
           className={`flex h-9 w-9 items-center justify-center rounded-lg sm:hidden transition-colors ${
-            transparent ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
+            transparent ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-sand'
           }`}
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
@@ -110,16 +114,16 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="border-t border-gray-100 bg-white px-4 pb-5 pt-3 sm:hidden rounded-b-2xl shadow-lg">
+        <div className="border-t border-sand-200 bg-ivory px-4 pb-5 pt-3 sm:hidden rounded-b-2xl shadow-lg">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               onClick={() => setOpen(false)}
               className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                pathname === href
-                  ? 'bg-brand-50 text-brand-700'
-                  : 'text-gray-700 hover:bg-gray-50'
+                isActive(href)
+                  ? 'bg-sand text-navy'
+                  : 'text-navy/80 hover:bg-sand'
               }`}
             >
               {label}
@@ -127,31 +131,25 @@ export default function Header() {
           ))}
           {DEALER_PHONE && (
             <a
-              href={`tel:${DEALER_PHONE}`}
-              className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              href={TEL_HREF}
+              className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-navy hover:bg-sand"
             >
-              <Phone className="h-4 w-4 text-brand-600" />
+              <Phone className="h-4 w-4" />
               {DEALER_PHONE}
             </a>
           )}
           <Link
-            href="/admin/login"
-            onClick={() => setOpen(false)}
-            className="mt-1 flex items-center rounded-xl px-4 py-3 text-xs font-medium text-gray-500 hover:bg-gray-50"
-          >
-            Admin Login
-          </Link>
-          <Link
             href="/contact"
             onClick={() => setOpen(false)}
-            className="btn-primary mt-3 w-full justify-center"
+            className="mt-3 flex w-full items-center justify-center rounded-xl border-2 border-navy px-5 py-3 text-sm font-semibold text-navy hover:bg-navy hover:text-white"
           >
-            Get a Quote
+            Get in touch
           </Link>
         </div>
       )}
     </header>
-    {!isHome && <div className="h-[90px] sm:h-[108px]" />}
+    {/* Spacer = fixed header height (80px logo + py-3.5) so content never starts underneath it */}
+    {!isHome && <div className="h-[108px]" aria-hidden="true" />}
     </>
   )
 }

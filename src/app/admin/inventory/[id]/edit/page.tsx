@@ -17,6 +17,7 @@ const vehicleSchema = z.object({
   price: z.coerce.number().positive('Price must be greater than 0'),
   mileage: z.coerce.number().int().nonnegative('Mileage cannot be negative'),
   condition: z.enum(['NEW', 'USED', 'CERTIFIED']),
+  cleanTitle: z.boolean().default(false),
   bodyStyle: z.string().optional(),
   transmission: z.string().optional(),
   fuelType: z.string().optional(),
@@ -438,6 +439,15 @@ export default function EditVehiclePage() {
                   <option value="SOLD">Sold</option>
                 </select>
               </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="cleanTitle" className="flex items-start gap-3 rounded-xl border border-gray-200 p-3">
+                    <input id="cleanTitle" type="checkbox" className="mt-0.5 h-4 w-4" {...register('cleanTitle')} />
+                    <span>
+                      <span className="block text-sm font-semibold text-gray-700">Clean title</span>
+                      <span className="block text-xs text-gray-500">Only check after verifying the title history (Carfax/AutoCheck). Shows a &ldquo;Clean title&rdquo; badge on the site.</span>
+                    </span>
+                  </label>
+                </div>
             </div>
           </div>
 

@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, BadgeDollarSign, CheckCircle2, Clock, Phone, ShieldCheck, TrendingUp } from 'lucide-react'
 import LeadForm from '@/components/leads/LeadForm'
-import { buildBreadcrumbJsonLd, buildTradeInJsonLd, LOCATION } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildTradeInJsonLd, LOCATION, DEFAULT_OG_IMAGE, DEALER_ADDRESS, serializeJsonLd } from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '(239) 555-0123'
 
 export const metadata: Metadata = {
   title: 'Trade In Your Car in Naples, FL | Get Top Dollar',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     description: `Get a fast, fair trade-in appraisal at ${DEALER_NAME} in Naples, FL. Top market value guaranteed.`,
     url: `${SITE_URL}/trade-in`,
     type: 'website',
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: 'Trade In Your Car Naples FL' }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: 'Trade In Your Car Naples FL' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -70,8 +70,8 @@ export default function TradeInPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(tradeInJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(tradeInJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
       {/* Hero */}
       <div className="bg-hero-gradient px-4 py-14 text-white text-center">
@@ -84,7 +84,7 @@ export default function TradeInPage() {
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="#appraise" className="btn-primary px-8 py-3.5 shadow-glow">Get My Trade-In Value</a>
-          <a href={`tel:${DEALER_PHONE.replace(/[^0-9]/g, '')}`} className="btn-ghost-white px-8 py-3.5">
+          <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5">
             <Phone className="h-4 w-4" /> Call {DEALER_PHONE}
           </a>
         </div>
@@ -182,7 +182,7 @@ export default function TradeInPage() {
             {DEALER_NAME} accepts trade-ins from customers throughout{' '}
             <strong>Naples, FL</strong> and the surrounding areas including{' '}
             {LOCATION.nearbyAreas.join(', ')}, and all of <strong>Collier County</strong>.{' '}
-            Visit our dealership at {process.env.NEXT_PUBLIC_DEALER_ADDRESS ?? '1029 Airport-Pulling Rd, Naples, FL 34104'} or submit your vehicle details online.
+            Visit our dealership at {DEALER_ADDRESS} or submit your vehicle details online.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/financing" className="btn-secondary text-sm">Explore Financing</Link>

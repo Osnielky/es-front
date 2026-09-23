@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight, MapPin } from 'lucide-react'
-import { buildDealerJsonLd, buildWebsiteJsonLd, buildLocalBusinessJsonLd, buildFAQJsonLd, LOCATION } from '@/lib/seo'
+import { buildDealerJsonLd, buildWebsiteJsonLd, buildFAQJsonLd, LOCATION, DEFAULT_OG_IMAGE, serializeJsonLd } from '@/lib/seo'
 import { getVehicles } from '@/lib/data'
 import type { Vehicle } from '@/types'
 import VehicleCard from '@/components/inventory/VehicleCard'
@@ -14,8 +14,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
-  description: `${DEALER_NAME} is your trusted car dealership in Naples, Florida. Browse 500+ new and used vehicles. Competitive pricing, easy financing, and quality service. Serving Marco Island, Bonita Springs, Fort Myers, and Southwest Florida.`,
+  title: `${DEALER_NAME} | Used Car Dealer in Naples, FL`,
+  description: `${DEALER_NAME} is your trusted car dealership in Naples, Florida. Browse our current inventory of quality used vehicles. Competitive pricing, easy financing, and quality service. Serving Marco Island, Bonita Springs, Fort Myers, and Southwest Florida.`,
   keywords: [
     'car dealer Naples FL',
     'Naples car dealership',
@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     canonical: SITE_URL,
   },
   openGraph: {
-    title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
-    description: `Your trusted car dealership in Naples, Florida. Browse 500+ quality vehicles with transparent pricing. Visit us today!`,
+    title: `${DEALER_NAME} | Used Car Dealer in Naples, FL`,
+    description: `Your trusted car dealership in Naples, Florida. Quality used cars with transparent pricing. Visit us today!`,
     url: SITE_URL,
     type: 'website',
     images: [
       {
-        url: `${SITE_URL}/og-image.jpg`,
+        url: DEFAULT_OG_IMAGE,
         width: 1200,
         height: 630,
         alt: `${DEALER_NAME} - Naples Florida Car Dealer`,
@@ -47,22 +47,23 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${DEALER_NAME} | #1 Car Dealer in Naples, FL`,
-    description: `Your trusted car dealership in Naples, Florida. Browse 500+ quality vehicles with transparent pricing.`,
+    title: `${DEALER_NAME} | Used Car Dealer in Naples, FL`,
+    description: `Your trusted car dealership in Naples, Florida. Quality used cars with transparent pricing.`,
   },
 }
 
 export default async function HomePage() {
   const dealerJsonLd = buildDealerJsonLd()
   const websiteJsonLd = buildWebsiteJsonLd()
-  const localBusinessJsonLd = buildLocalBusinessJsonLd()
   const faqJsonLd = buildFAQJsonLd()
   
   // Gracefully handle database connection errors
   let featured: Vehicle[] = []
+  let total = 0
   try {
     const result = await getVehicles({ limit: 3 })
     featured = result.vehicles
+    total = result.total
   } catch (error) {
     console.error('Failed to fetch featured vehicles:', error)
     // Continue with empty featured list if database is unavailable
@@ -73,19 +74,15 @@ export default async function HomePage() {
       {/* Structured Data for SEO */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(dealerJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(dealerJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
       />
 
 
@@ -99,8 +96,8 @@ export default async function HomePage() {
 
         <div className="relative mx-auto max-w-5xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-200 backdrop-blur-sm mb-6">
-            <Star className="h-3.5 w-3.5 fill-accent-400 text-accent-400" />
-            #1 Rated Dealer in the Area
+            <MapPin className="h-3.5 w-3.5 text-accent-400" />
+            Naples, FL · Serving Southwest Florida
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
@@ -112,7 +109,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg text-brand-200 sm:text-xl">
-            Hundreds of quality vehicles. Transparent pricing. Zero pressure. Your perfect ride is one click away.
+            Quality pre-owned vehicles. Transparent pricing. Zero pressure. Your perfect ride is one click away.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -128,7 +125,7 @@ export default async function HomePage() {
           {/* Stats bar */}
           <div className="mt-14 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
             {[
-              { value: '500+', label: 'Vehicles in Stock' },
+              { value: total > 0 ? String(total) : '—', label: 'Vehicles in Stock' },
               { value: '4.9★', label: 'Customer Rating' },
               { value: '15yr', label: 'Serving the Community' },
             ].map((s) => (

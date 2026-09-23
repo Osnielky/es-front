@@ -19,6 +19,7 @@ export interface Vehicle {
   features: string[]
   images: string[]
   status: 'AVAILABLE' | 'SOLD' | 'PENDING'
+  cleanTitle: boolean
   createdAt: Date
   updatedAt: Date
 }

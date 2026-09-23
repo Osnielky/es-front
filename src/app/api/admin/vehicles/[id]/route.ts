@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyAdminToken, getAdminCookieName } from '@/lib/admin-auth'
 import { z } from 'zod'
+import { revalidateTag } from 'next/cache'
+import { VEHICLES_TAG } from '@/lib/data'
 
 const updateVehicleSchema = z.object({
+  cleanTitle: z.boolean().optional(),
   make: z.string().min(1).optional(),
   model: z.string().min(1).optional(),
   year: z.number().int().min(1900).max(2100).optional(),
@@ -79,6 +82,8 @@ export async function PATCH(
     data: parsed.data,
   })
 
+  revalidateTag(VEHICLES_TAG)
+
   return NextResponse.json({
     success: true,
     id: vehicle.id,
@@ -99,6 +104,8 @@ export async function DELETE(
   await prisma.vehicle.delete({
     where: { id },
   })
+
+  revalidateTag(VEHICLES_TAG)
 
   return NextResponse.json({ success: true })
 }

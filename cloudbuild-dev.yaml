@@ -55,17 +55,20 @@ steps:
   - name: 'node:20-slim'
     id: 'migrate'
     entrypoint: 'bash'
+    # DATABASE_URL comes from Secret Manager and uses the Unix-socket form
+    # (?host=/cloudsql/PROJECT:REGION:INSTANCE), so the proxy listens on /cloudsql
+    secretEnv: ['DATABASE_URL']
     args:
       - '-c'
       - |
         apt-get update && apt-get install -y curl openssl
         curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.8.0/cloud-sql-proxy.linux.amd64
         chmod +x /tmp/cloud-sql-proxy
-        /tmp/cloud-sql-proxy $PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE --port 5432 &
+        mkdir -p /cloudsql
+        /tmp/cloud-sql-proxy $PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE --unix-socket /cloudsql &
         sleep 5
         npm ci --legacy-peer-deps
         npx prisma generate
-        export DATABASE_URL="postgresql://postgres:Admin-123@localhost:5432/esfront_dev"
         npx prisma migrate deploy
 
   # Step 5: Deploy to Cloud Run (DEV)
@@ -87,6 +90,8 @@ steps:
       - '${PROJECT_ID}:${_REGION}:${_CLOUD_SQL_INSTANCE}'
       - '--set-env-vars'
       - 'NODE_ENV=production,NEXT_PUBLIC_DEALER_NAME=E&S Car Sales (DEV),NEXT_PUBLIC_DEALER_PHONE=+1 (941) 499-7415,NEXT_PUBLIC_DEALER_ADDRESS=1029 Airport-Pulling Rd unit c 49 Naples FL 34104,NEXT_PUBLIC_DEALER_EMAIL=info@eandscars.com,NEXT_PUBLIC_WHATSAPP_NUMBER=19414997415,GCS_BUCKET_NAME=${_GCS_BUCKET},GCS_PROJECT_ID=${PROJECT_ID},BUILD_VERSION=${SHORT_SHA}'
+      - '--update-secrets'
+      - 'DATABASE_URL=DATABASE_URL_DEV:latest,ADMIN_EMAIL=ADMIN_EMAIL_DEV:latest,ADMIN_PASSWORD=ADMIN_PASSWORD_DEV:latest,ADMIN_SESSION_SECRET=ADMIN_SESSION_SECRET_DEV:latest'
       - '--revision-suffix'
       - 'v-${SHORT_SHA}'
       - '--tag'
@@ -121,6 +126,12 @@ substitutions:
   _SERVICE: es-front
   _CLOUD_SQL_INSTANCE: es-cars-dev-db
   _GCS_BUCKET: es-cars-dev-images
+
+# Secrets exposed to build steps via secretEnv (created by scripts/setup-gcp-secrets.sh)
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/DATABASE_URL_MIGRATE/versions/latest
+      env: 'DATABASE_URL'
 
 # Build options
 options:

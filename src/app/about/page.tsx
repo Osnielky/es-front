@@ -1,12 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, HeartHandshake, MapPin, Phone, Shield, Star, Users } from 'lucide-react'
-import { buildBreadcrumbJsonLd, buildLocalBusinessJsonLd, LOCATION } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildLocalBusinessJsonLd, LOCATION, DEFAULT_OG_IMAGE, DEALER_ADDRESS, serializeJsonLd, BUSINESS_HOURS } from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '(239) 555-0123'
-const DEALER_ADDRESS = process.env.NEXT_PUBLIC_DEALER_ADDRESS ?? '1029 Airport-Pulling Rd, Naples, FL 34104'
 
 export const metadata: Metadata = {
   title: 'About Us | E&S Car Sales — Naples, FL Car Dealership',
@@ -28,7 +27,7 @@ export const metadata: Metadata = {
     description: `Family-owned car dealership in Naples, FL. Honest pricing, quality vehicles, and real customer care. Serving Southwest Florida.`,
     url: `${SITE_URL}/about`,
     type: 'website',
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: 'About E&S Car Sales Naples FL' }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: 'About E&S Car Sales Naples FL' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -60,8 +59,8 @@ export default function AboutPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(localBusinessJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
       {/* Hero */}
       <div className="bg-hero-gradient px-4 py-14 text-white text-center">
@@ -118,15 +117,16 @@ export default function AboutPage() {
                   <Phone className="h-5 w-5 text-brand-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Phone</p>
-                    <a href={`tel:${DEALER_PHONE.replace(/[^0-9]/g, '')}`} className="text-sm text-brand-600 hover:underline">{DEALER_PHONE}</a>
+                    <a href={TEL_HREF} className="text-sm text-brand-600 hover:underline">{DEALER_PHONE}</a>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <Star className="h-5 w-5 text-brand-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Hours</p>
-                    <p className="text-sm text-gray-600">Mon – Sat: 9am – 7pm</p>
-                    <p className="text-sm text-gray-600">Sun: 11am – 5pm</p>
+                    {BUSINESS_HOURS.map((h) => (
+                      <p key={h.label} className="text-sm text-gray-600">{h.label}: {h.display}</p>
+                    ))}
                   </div>
                 </div>
               </div>

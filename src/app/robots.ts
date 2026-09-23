@@ -8,22 +8,8 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/_next/',
-          '/static/',
-        ],
-      },
-      {
-        userAgent: 'Googlebot',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
-      },
-      {
-        userAgent: 'Bingbot',
-        allow: '/',
-        disallow: ['/admin/', '/api/'],
+        // Never block /_next/: crawlers need its CSS/JS to render pages and /_next/image to index vehicle photos
+        disallow: ['/admin', '/api/'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

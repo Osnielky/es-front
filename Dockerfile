@@ -57,10 +57,7 @@ RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
 # Set environment variables for production
-ENV DATABASE_URL="postgresql://postgres:Admin123@/esfront_dev?host=/cloudsql/es-cars-dev:us-east1:es-cars-dev-db"
-ENV ADMIN_EMAIL="admin@eandscars.com"
-ENV ADMIN_PASSWORD="your-admin-password-here"
-ENV ADMIN_SESSION_SECRET="your-32-char-minimum-secret-key-here"
+# Secrets (DATABASE_URL, ADMIN_*) are injected by Cloud Run from Secret Manager — never bake them into the image
 ENV NEXT_PUBLIC_DEALER_NAME="E&S Car Sales"
 ENV NEXT_PUBLIC_DEALER_PHONE="+1 (941) 499-7415"
 ENV NEXT_PUBLIC_DEALER_ADDRESS="1029 Airport-Pulling Rd unit c 49 Naples FL 34104"

@@ -45,8 +45,9 @@
     @apply card hover:shadow-card-hover hover:-translate-y-1 cursor-pointer;
   }
 
+  /* text-base on phones: iOS Safari zooms into inputs below 16px */
   .input {
-    @apply block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400
+    @apply block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 sm:text-sm placeholder-gray-400
       shadow-sm transition-all duration-150
       focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200;
   }
@@ -71,6 +72,26 @@
     @apply badge bg-violet-100 text-violet-700;
   }
 
+  /* Vehicle card grid: as many >=22rem columns as fit, and cards stretch into unused tracks
+     (auto-fit), so 2 results on a wide screen fill the row instead of leaving an empty column */
+  .vehicle-grid {
+    @apply grid gap-6;
+    --card-min: 20rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min)), 1fr));
+  }
+
+  /* Roomier cards on desktop: 2 columns at 1440px, 3 on wider screens */
+  @media (min-width: 1280px) {
+    .vehicle-grid {
+      --card-min: 22rem;
+    }
+  }
+
+  /* A lone result shouldn't become a 1,200px-wide card */
+  .vehicle-grid > :only-child {
+    max-width: 42rem;
+  }
+
   .section-title {
     @apply text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl;
   }
@@ -78,4 +99,85 @@
   .section-sub {
     @apply mt-3 text-lg text-gray-500;
   }
+}
+
+/* Keep page content (incl. footer) clear of fixed bottom bars: the VDP mobile CTA bar (lg:hidden) and the compare tray */
+body:has(.sticky-cta:not(.lg\:hidden)) {
+  padding-bottom: 5rem;
+}
+@media (max-width: 1023px) {
+  body:has(.sticky-cta) {
+    padding-bottom: 5rem;
+  }
+}
+
+/* ── Sand + Navy theme: wrap a page in .theme-sand to restyle the shared component classes ── */
+@layer components {
+  .theme-sand {
+    @apply bg-sand;
+  }
+
+  .theme-sand .card {
+    @apply border-sand-200 bg-ivory;
+  }
+
+  .theme-sand .btn-primary {
+    @apply bg-navy shadow-none hover:bg-navy-800 hover:shadow-md focus:ring-navy;
+  }
+
+  .theme-sand .btn-secondary {
+    @apply border-sand-200 bg-ivory hover:border-navy-200 hover:bg-ivory focus:ring-navy;
+  }
+
+  .theme-sand .input {
+    @apply border-sand-200 bg-ivory focus:border-navy focus:ring-navy-100;
+  }
+
+  .theme-sand .lead-form-header {
+    @apply bg-navy;
+  }
+
+  .theme-sand .lead-form-header p {
+    @apply text-navy-100;
+  }
+
+  .theme-sand .badge-used {
+    @apply bg-navy-50 text-navy;
+  }
+
+  /* Cool grays read muddy on sand and gray-500 fails 4.5:1 contrast there; use warm stone tones instead */
+  .theme-sand .text-gray-500 {
+    @apply text-stone-600;
+  }
+
+  .theme-sand .text-gray-400 {
+    @apply text-stone-500;
+  }
+}
+
+/* Dual-thumb price slider: two stacked range inputs; only the thumbs take pointer events */
+.range-thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  background: #16324f;
+  border: 3px solid #fffdf8;
+  box-shadow: 0 1px 4px rgba(22, 50, 79, 0.35);
+  cursor: pointer;
+}
+.range-thumb::-moz-range-thumb {
+  pointer-events: auto;
+  height: 1.25rem;
+  width: 1.25rem;
+  border-radius: 9999px;
+  background: #16324f;
+  border: 3px solid #fffdf8;
+  box-shadow: 0 1px 4px rgba(22, 50, 79, 0.35);
+  cursor: pointer;
+}
+.range-thumb:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid #b7c6d8;
+  outline-offset: 2px;
 }

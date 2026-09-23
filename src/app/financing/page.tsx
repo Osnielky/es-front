@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { CheckCircle2, Clock, CreditCard, DollarSign, FileText, Phone, ShieldCheck, Users } from 'lucide-react'
 import LeadForm from '@/components/leads/LeadForm'
-import { buildBreadcrumbJsonLd, buildFinancingJsonLd, buildFAQJsonLd, LOCATION } from '@/lib/seo'
+import { buildBreadcrumbJsonLd, buildFinancingJsonLd, buildFAQJsonLd, LOCATION, DEFAULT_OG_IMAGE, serializeJsonLd } from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? '(239) 555-0123'
 
 export const metadata: Metadata = {
   title: 'Car Financing in Naples, FL | All Credit Welcome',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     description: `Fast, easy auto financing for all credit situations in Naples, FL. Get pre-approved in minutes at ${DEALER_NAME}.`,
     url: `${SITE_URL}/financing`,
     type: 'website',
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: 'Car Financing Naples FL' }],
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: 'Car Financing Naples FL' }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -79,9 +79,9 @@ export default function FinancingPage() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(financingJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(financingJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
       {/* Hero */}
       <div className="bg-hero-gradient px-4 py-14 text-white text-center">
@@ -94,7 +94,7 @@ export default function FinancingPage() {
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="#apply" className="btn-primary px-8 py-3.5 shadow-glow">Apply Now — It&apos;s Free</a>
-          <a href={`tel:${DEALER_PHONE.replace(/[^0-9]/g, '')}`} className="btn-ghost-white px-8 py-3.5">
+          <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5">
             <Phone className="h-4 w-4" /> Call {DEALER_PHONE}
           </a>
         </div>
