@@ -55,18 +55,38 @@ steps:
   - name: 'node:20-slim'
     id: 'migrate'
     entrypoint: 'bash'
-    # DATABASE_URL comes from Secret Manager and uses the Unix-socket form
-    # (?host=/cloudsql/PROJECT:REGION:INSTANCE), so the proxy listens on /cloudsql
+    # DATABASE_URL comes from Secret Manager (DATABASE_URL_MIGRATE). It may use the Unix-socket form
+    # (?host=/cloudsql/PROJECT:REGION:INSTANCE) or TCP (@127.0.0.1:5432 / @localhost:5432); the proxy
+    # is started in whichever mode the URL expects. ($$ escapes bash variables from Cloud Build substitution.)
     secretEnv: ['DATABASE_URL']
     args:
       - '-c'
       - |
+        set -e
         apt-get update && apt-get install -y curl openssl
         curl -o /tmp/cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.8.0/cloud-sql-proxy.linux.amd64
         chmod +x /tmp/cloud-sql-proxy
-        mkdir -p /cloudsql
-        /tmp/cloud-sql-proxy $PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE --unix-socket /cloudsql &
-        sleep 5
+        INSTANCE="$PROJECT_ID:$_REGION:$_CLOUD_SQL_INSTANCE"
+        case "$$DATABASE_URL" in
+          *host=/cloudsql*)
+            echo "Cloud SQL proxy: unix socket"
+            mkdir -p /cloudsql
+            /tmp/cloud-sql-proxy "$$INSTANCE" --unix-socket /cloudsql &
+            READY="/cloudsql/$$INSTANCE/.s.PGSQL.5432"
+            ;;
+          *)
+            echo "Cloud SQL proxy: tcp 127.0.0.1:5432"
+            /tmp/cloud-sql-proxy "$$INSTANCE" --address 127.0.0.1 --port 5432 &
+            READY=""
+            ;;
+        esac
+        # Wait up to 30s for the proxy instead of a fixed sleep
+        for i in $$(seq 1 30); do
+          if [ -n "$$READY" ]; then [ -S "$$READY" ] && break
+          else (echo > /dev/tcp/127.0.0.1/5432) 2>/dev/null && break
+          fi
+          sleep 1
+        done
         npm ci --legacy-peer-deps
         npx prisma generate
         npx prisma migrate deploy
