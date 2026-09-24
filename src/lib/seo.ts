@@ -361,11 +361,11 @@ export function buildFAQJsonLd() {
   const faqs = [
     {
       question: 'What financing options do you offer?',
-      answer: `At ${DEALER_NAME}, we offer flexible financing options for all credit situations. Get pre-approved in minutes with competitive rates. We work with multiple lenders to find the best terms for you.`,
+      answer: `Yes. ${DEALER_NAME} arranges financing through lender partners. Apply online or at the dealership, and we'll go over the options available for your credit and budget.`,
     },
     {
       question: 'Do you accept trade-ins?',
-      answer: 'Yes! We accept trade-ins and offer competitive market value for your current vehicle. The trade-in value can be applied directly to your new purchase.',
+      answer: 'Yes. We accept trade-ins, and the value of your current vehicle can be applied directly toward your purchase.',
     },
     {
       question: 'Where are you located?',
@@ -377,11 +377,7 @@ export function buildFAQJsonLd() {
     },
     {
       question: 'Do you offer test drives?',
-      answer: 'Absolutely! Schedule a test drive online or call us at ' + DEALER_PHONE + '. We can work around your schedule to find a convenient time.',
-    },
-    {
-      question: 'Are your vehicles inspected?',
-      answer: 'Yes, every vehicle passes a comprehensive 150-point inspection before being listed. We ensure quality and reliability for all our customers.',
+      answer: 'Yes. Request a test drive time on any vehicle page or call us at ' + DEALER_PHONE + ', and we will confirm the time with you.',
     },
   ]
 
@@ -410,7 +406,7 @@ export function buildWebsiteJsonLd() {
     '@id': `${SITE_URL}/#website`,
     name: DEALER_NAME,
     url: SITE_URL,
-    description: `${DEALER_NAME} - Your trusted car dealership in Naples, Florida. Browse new and used vehicles, get financing, and find your perfect car.`,
+    description: `${DEALER_NAME} - used car dealership in Naples, Florida. Browse our current inventory, get financing, and find your next car.`,
     publisher: {
       '@id': `${SITE_URL}/#organization`,
     },
@@ -418,7 +414,7 @@ export function buildWebsiteJsonLd() {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${SITE_URL}/inventory?make={search_term_string}`,
+        urlTemplate: `${SITE_URL}/inventory?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -434,7 +430,7 @@ export function buildFinancingJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'FinancialService',
     name: `Auto Financing at ${DEALER_NAME}`,
-    description: 'Car financing for all credit situations in Naples, FL. Get pre-approved in minutes with competitive rates.',
+    description: 'Auto financing through our lender partners in Naples, FL. Apply online before you visit.',
     provider: {
       '@type': 'AutoDealer',
       name: DEALER_NAME,

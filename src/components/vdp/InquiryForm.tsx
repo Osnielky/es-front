@@ -137,15 +137,15 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
   if (status.state === 'success') {
     return (
       <div className="py-4 text-center" role="status">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/15">
           {isTestDrive ? (
-            <CalendarClock className="h-7 w-7 text-emerald-700" aria-hidden="true" />
+            <CalendarClock className="h-7 w-7 text-emerald-200" aria-hidden="true" />
           ) : (
-            <CheckCircle2 className="h-7 w-7 text-emerald-700" aria-hidden="true" />
+            <CheckCircle2 className="h-7 w-7 text-emerald-200" aria-hidden="true" />
           )}
         </div>
-        <p className="mt-4 text-lg font-semibold text-navy">{isTestDrive ? 'Test drive request received' : 'Message sent'}</p>
-        <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-ink-muted">{status.summary}</p>
+        <p className="mt-4 text-lg font-semibold text-ivory">{isTestDrive ? 'Test drive request received' : 'Message sent'}</p>
+        <p className="mx-auto mt-2 max-w-sm text-[0.9375rem] leading-relaxed text-ivory/75">{status.summary}</p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
           <button type="button" onClick={onDone} className="vdp-btn-primary">
             Done
@@ -196,7 +196,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
           ).map(([value, label]) => (
             <label
               key={value}
-              className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-line bg-white px-3 text-sm font-semibold text-ink-muted transition-colors duration-150 has-[:checked]:border-navy has-[:checked]:bg-navy-50 has-[:checked]:text-navy has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-navy"
+              className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-ivory/20 bg-ivory/[0.04] px-3 text-sm font-semibold text-ivory/75 transition-colors duration-150 hover:bg-ivory/[0.08] has-[:checked]:border-[#F0B27A] has-[:checked]:bg-ivory/10 has-[:checked]:text-ivory has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#F0B27A] has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-[#0c1e33]"
             >
               <input type="radio" value={value} className="sr-only" {...register('contactMethod')} />
               {label}
@@ -247,7 +247,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
               id={id('date')}
               type="date"
               min={today}
-              className="vdp-input min-h-[3.125rem]"
+              className="vdp-input min-h-[3.125rem] [color-scheme:dark]"
               aria-invalid={errors.preferredDate ? 'true' : 'false'}
               aria-describedby={errors.preferredDate ? id('date-error') : undefined}
               {...register('preferredDate')}
@@ -272,7 +272,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
             {errors.preferredTime ? (
               <p id={id('time-error')} className="vdp-error">{errors.preferredTime.message}</p>
             ) : (
-              <p id={id('time-hint')} className="mt-1.5 text-xs text-ink-muted">
+              <p id={id('time-hint')} className="mt-1.5 text-xs text-ivory/75">
                 {preferredDate && slots.length === 0 ? 'Please choose another day.' : 'We’ll confirm the exact time with you.'}
               </p>
             )}
@@ -282,7 +282,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
 
       <div>
         <label htmlFor={id('message')} className="vdp-label">
-          Message <span className="font-normal text-ink-muted">(optional)</span>
+          Message <span className="font-normal text-ivory/70">(optional)</span>
         </label>
         <textarea
           id={id('message')}
@@ -296,7 +296,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
       </div>
 
       {status.state === 'error' && (
-        <div role="alert" className="flex gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div role="alert" className="flex gap-2.5 rounded-xl border border-red-300/30 bg-red-400/15 px-4 py-3 text-sm text-red-200">
           <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
           <p>{status.message}</p>
         </div>
@@ -316,7 +316,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
           'Send message'
         )}
       </button>
-      <p className="text-center text-xs text-ink-muted">We only use your details to reply about this vehicle.</p>
+      <p className="text-center text-xs text-ivory/70">We only use your details to reply about this vehicle.</p>
     </form>
   )
 }

@@ -60,11 +60,11 @@ export default function ContactPage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
       />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="theme-glass min-h-screen">
         {/* Page header */}
-        <div className="bg-hero-gradient px-4 py-14 text-white text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Contact {DEALER_NAME}</h1>
-          <p className="mt-3 text-brand-200">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
+        <div className="border-b border-ivory/10 bg-[#0c1e33]/30 px-4 py-14 text-center text-ivory">
+          <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Contact {DEALER_NAME}</h1>
+          <p className="mt-3 text-ivory/75">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
         </div>
 
         <div className="mx-auto max-w-5xl px-4 py-14">
@@ -77,43 +77,39 @@ export default function ContactPage() {
             {[
               {
                 icon: MapPin,
-                color: 'bg-brand-50 text-brand-600',
                 title: 'Visit Us',
                 content: DEALER_ADDRESS,
               },
               {
                 icon: Phone,
-                color: 'bg-emerald-50 text-emerald-600',
                 title: 'Call Us',
                 content: DEALER_PHONE,
                 href: TEL_HREF,
               },
               {
                 icon: Mail,
-                color: 'bg-violet-50 text-violet-600',
                 title: 'Email Us',
                 content: process.env.NEXT_PUBLIC_DEALER_EMAIL ?? 'info@eandscars.com',
                 href: `mailto:${process.env.NEXT_PUBLIC_DEALER_EMAIL ?? 'info@eandscars.com'}`,
               },
               {
                 icon: Clock,
-                color: 'bg-amber-50 text-amber-600',
                 title: 'Hours',
                 content: BUSINESS_HOURS.map((h) => `${h.label}: ${h.display}`).join('\n'),
               },
-            ].map(({ icon: Icon, color, title, content, href }) => (
+            ].map(({ icon: Icon, title, content, href }) => (
               <div key={title} className="card flex items-start gap-4 p-5">
-                <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${color}`}>
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-ivory/10 text-[#F0B27A]">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-900">{title}</p>
+                  <p className="text-sm font-bold text-ivory">{title}</p>
                   {href ? (
-                    <a href={href} className="mt-0.5 text-sm text-brand-600 hover:underline whitespace-pre-line">
+                    <a href={href} className="mt-0.5 rounded text-sm text-[#F0B27A] hover:text-[#f6c89c] hover:underline whitespace-pre-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
                       {content}
                     </a>
                   ) : (
-                    <p className="mt-0.5 text-sm text-gray-500 whitespace-pre-line">{content}</p>
+                    <p className="mt-0.5 text-sm text-ivory/75 whitespace-pre-line">{content}</p>
                   )}
                 </div>
               </div>

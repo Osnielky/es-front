@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { LOCATION, DEFAULT_OG_IMAGE } from '@/lib/seo'
+import { serif } from '@/lib/fonts'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -15,10 +16,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#1e40af' },
-    { media: '(prefers-color-scheme: dark)', color: '#1e3a8a' },
-  ],
+  // Matches the dusk backdrop so the mobile browser chrome blends into the glass header
+  themeColor: '#0c1e33',
 }
 
 export const metadata: Metadata = {
@@ -115,7 +114,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    // Browser extensions (e.g. LanguageTool's data-lt-installed) add attributes to <html> before React hydrates.
+    // This only ignores attribute differences on <html> itself; mismatches inside the page are still reported.
+    <html lang="en" className={`${inter.variable} ${serif.variable}`} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1">{children}</main>

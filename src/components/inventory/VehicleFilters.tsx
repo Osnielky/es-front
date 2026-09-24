@@ -32,7 +32,7 @@ function Select({ id, label, hideLabel = false, value, onChange, children }: { i
         <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className="input appearance-none pr-10">
           {children}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" aria-hidden="true" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/75" aria-hidden="true" />
       </div>
     </div>
   )
@@ -106,25 +106,25 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           aria-controls="filter-panel"
           className="flex items-center gap-2.5 lg:pointer-events-none"
         >
-          <SlidersHorizontal className="h-5 w-5 text-navy" aria-hidden="true" />
-          <span className="text-lg font-bold text-gray-900">Filters</span>
+          <SlidersHorizontal className="h-5 w-5 text-ivory" aria-hidden="true" />
+          <span className="text-lg font-bold text-ivory">Filters</span>
           {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-navy px-1.5 text-xs font-bold text-white">{activeCount}</span>
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F0B27A] px-1.5 text-xs font-bold text-[#0c1e33]">{activeCount}</span>
           )}
-          <ChevronDown className={`h-5 w-5 text-gray-600 transition-transform lg:hidden ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronDown className={`h-5 w-5 text-ivory/75 transition-transform lg:hidden ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={() => push(Object.fromEntries(FILTER_KEYS.map((k) => [k, undefined])))}
           disabled={activeCount === 0}
-          className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-navy disabled:opacity-50"
+          className="flex items-center gap-1.5 text-sm font-medium text-ivory/75 hover:text-ivory disabled:opacity-50"
         >
           <RotateCw className="h-4 w-4" aria-hidden="true" />
           Reset
         </button>
       </div>
 
-      <div id="filter-panel" className={`${isOpen ? 'block' : 'hidden'} space-y-6 border-t border-sand-200 px-5 py-5 lg:block`}>
+      <div id="filter-panel" className={`${isOpen ? 'block' : 'hidden'} space-y-6 border-t border-ivory/15 px-5 py-5 lg:block`}>
         <Select id="filter-make" label="Make" value={searchParams.make ?? ''} onChange={(v) => push({ make: v || undefined, model: undefined })}>
           <option value="">All makes</option>
           {makes.map((m) => (
@@ -135,9 +135,9 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
         <fieldset>
           <legend className="label">Price range</legend>
           <div className="relative mx-2 h-6">
-            <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-sand-200" />
+            <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-ivory/20" />
             <div
-              className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-navy"
+              className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-[#F0B27A]"
               style={{ left: `${pct(price[0])}%`, right: `${100 - pct(price[1])}%` }}
             />
             {([0, 1] as const).map((i) => (
@@ -158,7 +158,7 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           <div className="mt-3 flex items-center gap-2">
             <label className="sr-only" htmlFor="price-min">Minimum price</label>
             <input id="price-min" {...priceInputProps(0)} />
-            <span className="text-gray-500" aria-hidden="true">–</span>
+            <span className="text-ivory/55" aria-hidden="true">–</span>
             <label className="sr-only" htmlFor="price-max">Maximum price</label>
             <input id="price-max" {...priceInputProps(1)} />
           </div>
@@ -196,8 +196,8 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           </Select>
         )}
 
-        <p className="flex items-center gap-2 text-sm text-gray-600">
-          <Info className="h-4 w-4 flex-shrink-0 text-navy" aria-hidden="true" />
+        <p className="flex items-center gap-2 text-sm text-ivory/75">
+          <Info className="h-4 w-4 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
           {isPending ? 'Updating results…' : 'Filters update automatically'}
         </p>
       </div>

@@ -21,7 +21,7 @@ export default function BackLink() {
           router.back()
         }
       }}
-      className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-navy hover:text-navy-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+      className="-ml-2 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-ivory/90 hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
     >
       <ArrowLeft className="h-4 w-4" aria-hidden="true" />
       Back to inventory

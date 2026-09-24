@@ -64,7 +64,7 @@ export default function SaveShare() {
         className="vdp-icon-btn"
       >
         <Heart
-          className={`h-5 w-5 transition-[color,fill,transform] duration-200 ${saved ? 'scale-110 fill-navy text-navy' : ''}`}
+          className={`h-5 w-5 transition-[color,fill,transform] duration-200 ${saved ? 'scale-110 fill-[#F0B27A] text-[#F0B27A]' : ''}`}
           aria-hidden="true"
         />
         <span>{saved ? 'Saved' : 'Save'}</span>
@@ -75,7 +75,7 @@ export default function SaveShare() {
       </button>
       <p
         role="status"
-        className={`pointer-events-none absolute right-0 top-full z-10 mt-2 flex items-center gap-1.5 whitespace-nowrap rounded-full bg-navy px-3 py-1.5 text-sm font-medium text-white shadow-md transition-opacity duration-200 ${
+        className={`pointer-events-none absolute right-0 top-full z-10 mt-2 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-ivory/15 bg-[#0c1e33]/90 px-3 py-1.5 text-sm font-medium text-ivory shadow-md backdrop-blur-md transition-opacity duration-200 ${
           note ? 'opacity-100' : 'opacity-0'
         }`}
       >

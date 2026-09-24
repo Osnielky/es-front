@@ -46,8 +46,8 @@ export default function LazyMapEmbed({ embedUrl, title, address }: Props) {
           title={title}
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center gap-2 bg-[radial-gradient(circle_at_center,#374151_0,#1f2937_70%)] px-4 text-center text-sm text-gray-300">
-          <MapPin className="h-5 w-5 flex-shrink-0 text-brand-400" aria-hidden="true" />
+        <div className="flex h-full w-full items-center justify-center gap-2 bg-[radial-gradient(circle_at_center,rgb(46_127_140/0.35)_0,rgb(12_30_51/0.6)_70%)] px-4 text-center text-sm text-ivory/80">
+          <MapPin className="h-5 w-5 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
           <span>{address}</span>
         </div>
       )}

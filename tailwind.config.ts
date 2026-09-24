@@ -49,7 +49,7 @@ const config: Config = {
         },
       },
       screens: {
-        // VDP two-column breakpoint (gallery 2/3, contact panel 1/3)
+        // VDP two-column breakpoint (gallery + sections left, sticky contact panel right)
         desk: '1200px',
       },
       fontFamily: {
@@ -59,6 +59,10 @@ const config: Config = {
       },
       borderRadius: {
         panel: '16px',
+      },
+      maxWidth: {
+        // Shared page width for the header and inventory pages (1536px, 1760px from 1800px screens); see --site-max
+        site: 'var(--site-max)',
       },
       backgroundImage: {
         'hero-gradient': 'linear-gradient(135deg, #111a50 0%, #1a2a80 40%, #1f3ee8 100%)',

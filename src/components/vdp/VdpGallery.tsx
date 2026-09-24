@@ -35,7 +35,9 @@ export default function VdpGallery({ images, name }: Props) {
   // Slides whose <Image> has been mounted; starts with the hero only so first load fetches one photo
   const [mounted, setMounted] = useState<Set<number>>(() => new Set([0]))
   const [warm, setWarm] = useState(false)
-  const [failed, setFailed] = useState<Set<number>>(() => new Set())
+  const [failed, setFailed] = useState<Set<string>>(() => new Set())
+  // One automatic retry per photo: a cold Cloud Run instance can time out optimizing a 3–4 MB phone photo
+  const [retries, setRetries] = useState<Record<string, number>>({})
   const [sizes, setSizes] = useState<Record<number, Size>>({})
   const [frameRatio, setFrameRatio] = useState(4 / 3)
   const [viewerOpen, setViewerOpen] = useState(false)
@@ -83,7 +85,7 @@ export default function VdpGallery({ images, name }: Props) {
     }
   }, [mainApi, thumbsApi])
 
-  // The frame is 4:3 on phones and 3:2 from md (height-capped on tablets); the fit decision needs its actual shape
+  // The frame is 4:3 on phones, 3:2 from md, 16:10 from desk (height-capped to the viewport); the fit decision needs its actual shape
   useEffect(() => {
     const el = frameRef.current
     if (!el) return
@@ -127,6 +129,15 @@ export default function VdpGallery({ images, name }: Props) {
     }
   }
 
+  // key: `m${i}` for the main slide, `t${i}` for its thumbnail
+  const onImageError = (key: string) => {
+    if ((retries[key] ?? 0) < 1) {
+      window.setTimeout(() => setRetries((r) => ({ ...r, [key]: (r[key] ?? 0) + 1 })), 1500)
+    } else {
+      setFailed((f) => new Set(f).add(key))
+    }
+  }
+
   const alt = (i: number) => (i === 0 ? `${name} for sale in Naples, FL` : `${name}, photo ${i + 1} of ${count}`)
 
   const fitFor = (i: number) => {
@@ -138,16 +149,16 @@ export default function VdpGallery({ images, name }: Props) {
 
   if (count === 0) {
     return (
-      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-panel border border-line bg-ivory text-center md:aspect-[3/2]">
-        <Camera className="h-10 w-10 text-champagne" strokeWidth={1.25} aria-hidden="true" />
-        <p className="text-base font-semibold text-navy">Photos coming soon</p>
-        <p className="max-w-xs text-sm text-ink-muted">Ask us and we’ll send current photos or a walkaround video of this vehicle.</p>
+      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 glass rounded-panel text-center md:aspect-[3/2]">
+        <Camera className="h-10 w-10 text-[#F0B27A]" strokeWidth={1.25} aria-hidden="true" />
+        <p className="text-base font-semibold text-ivory">Photos coming soon</p>
+        <p className="max-w-xs text-sm text-ivory/75">Ask us and we’ll send current photos or a walkaround video of this vehicle.</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-3">
+    <div className="relative space-y-3 md:space-y-0">
       <div
         role="region"
         aria-roledescription="carousel"
@@ -155,10 +166,14 @@ export default function VdpGallery({ images, name }: Props) {
         tabIndex={0}
         onKeyDown={onKeyDown}
         onPointerEnter={() => setWarm(true)}
-        className="group relative overflow-hidden rounded-panel border border-line bg-[#EFE6D6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-sand"
+        className="group relative overflow-hidden rounded-panel border border-ivory/15 bg-[#0c1e33]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
       >
         <div ref={mainRef} className="overflow-hidden">
-          <div ref={frameRef} className="flex aspect-[4/3] w-full touch-pan-y md:aspect-[3/2] md:max-h-[62vh] desk:max-h-none">
+          {/* Never taller than the viewport; photos narrower than the frame get a blurred fill instead of flat bars */}
+          <div
+            ref={frameRef}
+            className="flex aspect-[4/3] w-full touch-pan-y md:aspect-[3/2] md:max-h-[62vh] desk:aspect-[16/10] desk:max-h-[max(28rem,calc(100svh-var(--header-h)-11rem))]"
+          >
             {images.map((src, i) => (
               <div
                 key={`${src}-${i}`}
@@ -168,8 +183,8 @@ export default function VdpGallery({ images, name }: Props) {
                 aria-label={`${i + 1} of ${count}`}
                 aria-hidden={i !== index}
               >
-                {failed.has(i) ? (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-ink-muted">
+                {failed.has(`m${i}`) ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-2 text-ivory/75">
                     <ImageOff className="h-9 w-9" strokeWidth={1.25} aria-hidden="true" />
                     <span className="text-sm">This photo couldn’t be loaded</span>
                   </div>
@@ -181,11 +196,24 @@ export default function VdpGallery({ images, name }: Props) {
                     className="relative block h-full w-full cursor-zoom-in"
                     aria-label={`${alt(i)}. Open full screen`}
                   >
+                    {fitFor(i) === 'object-contain' && sizes[i] && (
+                      <Image
+                        src={src}
+                        alt=""
+                        aria-hidden="true"
+                        fill
+                        sizes="160px"
+                        loading="lazy"
+                        draggable={false}
+                        className="scale-110 select-none object-cover opacity-60 blur-2xl"
+                      />
+                    )}
                     <Image
+                      key={retries[`m${i}`] ?? 0}
                       src={src}
                       alt={alt(i)}
                       fill
-                      sizes="(min-width: 1200px) 900px, (min-width: 768px) 92vw, 100vw"
+                      sizes="(min-width: 1800px) 1150px, (min-width: 1200px) 64vw, (min-width: 768px) 92vw, 100vw"
                       quality={85}
                       priority={i === 0}
                       fetchPriority={i === 0 ? 'high' : 'low'}
@@ -196,7 +224,7 @@ export default function VdpGallery({ images, name }: Props) {
                         const img = e.currentTarget
                         if (img.naturalWidth) setSizes((s) => ({ ...s, [i]: { width: img.naturalWidth, height: img.naturalHeight } }))
                       }}
-                      onError={() => setFailed((f) => new Set(f).add(i))}
+                      onError={() => onImageError(`m${i}`)}
                     />
                   </button>
                 ) : null}
@@ -213,7 +241,7 @@ export default function VdpGallery({ images, name }: Props) {
                 setWarm(true)
                 prev()
               }}
-              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
               aria-label="Previous photo"
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -224,12 +252,12 @@ export default function VdpGallery({ images, name }: Props) {
                 setWarm(true)
                 next()
               }}
-              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
               aria-label="Next photo"
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
             </button>
-            <p className="pointer-events-none absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-ink/70 px-3 py-1.5 text-sm font-medium text-white">
+            <p className="pointer-events-none absolute bottom-3 left-3 flex items-center md:bottom-auto md:top-3 gap-1.5 rounded-full bg-[#0c1e33]/70 px-3 py-1.5 text-sm font-medium text-ivory backdrop-blur-sm">
               <Camera className="h-4 w-4" aria-hidden="true" />
               <span aria-live="polite" aria-atomic="true">
                 <span className="sr-only">Photo </span>
@@ -246,49 +274,60 @@ export default function VdpGallery({ images, name }: Props) {
           ref={expandRef}
           type="button"
           onClick={openViewer}
-          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
           aria-label={`View photo ${index + 1} full screen with zoom`}
         >
           <Maximize2 className="h-5 w-5" aria-hidden="true" />
         </button>
       </div>
 
+      {/* Phones: strip under the photo. From md: a small translucent strip overlaid on the photo's bottom edge */}
       {multiple && (
-        <div ref={thumbsRef} className="overflow-hidden">
-          <ul className="flex gap-2 p-0.5" aria-label="Choose a photo">
-            {images.map((src, i) => (
-              <li key={`${src}-${i}`} className="flex-[0_0_auto]">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setWarm(true)
-                    goTo(i)
-                  }}
-                  aria-label={`Show photo ${i + 1} of ${count}`}
-                  aria-current={i === index ? 'true' : undefined}
-                  className={`relative block h-16 w-[5.5rem] overflow-hidden rounded-lg border-2 bg-[#EFE6D6] transition-[border-color,opacity] duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-1 md:h-[4.5rem] md:w-24 ${
-                    i === index ? 'border-navy' : 'border-transparent opacity-75 hover:opacity-100'
-                  }`}
-                >
-                  {failed.has(i) ? (
-                    <ImageOff className="mx-auto h-5 w-5 text-ink-muted" aria-hidden="true" />
-                  ) : (
-                    <Image
-                      src={src}
-                      alt=""
-                      width={96}
-                      height={72}
-                      sizes="96px"
-                      loading="lazy"
-                      draggable={false}
-                      className="h-full w-full object-cover"
-                      onError={() => setFailed((f) => new Set(f).add(i))}
-                    />
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
+        <div className="md:pointer-events-none md:absolute md:inset-x-0 md:bottom-3 md:flex md:justify-center md:px-16">
+          <div
+            ref={thumbsRef}
+            className="overflow-hidden md:pointer-events-auto md:max-w-full md:rounded-xl md:bg-[#0c1e33]/45 md:p-1.5 md:opacity-90 md:shadow-lg md:backdrop-blur-sm md:transition-opacity md:duration-200 md:hover:opacity-100 md:focus-within:opacity-100"
+          >
+            <ul className="flex gap-2 p-1 md:gap-1.5" aria-label="Choose a photo">
+              {images.map((src, i) => (
+                <li key={`${src}-${i}`} className="flex-[0_0_auto]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWarm(true)
+                      goTo(i)
+                    }}
+                    aria-label={`Show photo ${i + 1} of ${count}`}
+                    aria-current={i === index ? 'true' : undefined}
+                    className={`relative block h-16 w-[5.5rem] overflow-hidden rounded-lg border-2 bg-ivory/[0.06] transition-[border-color,opacity,transform,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-1 focus-visible:ring-offset-[#0c1e33] md:h-11 md:w-16 md:rounded-md md:focus-visible:ring-ivory md:focus-visible:ring-offset-0 desk:h-12 desk:w-[4.5rem] ${
+                      // The current photo always stands out: full brightness, outline + glow, slightly larger.
+                      // Ivory outline on the dark glass (phones) and over the overlay strip (md+). Others are dimmed.
+                      i === index
+                        ? 'z-10 scale-105 border-ivory shadow-[0_0_0_2px_rgba(255,253,248,0.45),0_4px_12px_rgba(0,0,0,0.35)]'
+                        : 'border-transparent opacity-50 hover:opacity-100 focus-visible:opacity-100'
+                    }`}
+                  >
+                    {failed.has(`t${i}`) ? (
+                      <ImageOff className="mx-auto h-5 w-5 text-ivory/60" aria-hidden="true" />
+                    ) : (
+                      <Image
+                        key={retries[`t${i}`] ?? 0}
+                        src={src}
+                        alt=""
+                        width={112}
+                        height={80}
+                        sizes="(min-width: 768px) 72px, 88px"
+                        loading="lazy"
+                        draggable={false}
+                        className="h-full w-full object-cover"
+                        onError={() => onImageError(`t${i}`)}
+                      />
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 

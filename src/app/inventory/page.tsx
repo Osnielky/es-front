@@ -158,45 +158,45 @@ export default async function InventoryPage({ searchParams }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(inventoryJsonLd) }} />
 
-      <div className="theme-sand min-h-screen">
+      <div className="theme-glass min-h-screen">
         {/* Hero band */}
-        <section className="relative overflow-hidden border-b border-sand-200">
+        <section className="relative overflow-hidden border-b border-ivory/15">
           <HeroArt />
-          <div className="relative mx-auto max-w-screen-2xl px-4 pb-8 pt-6 sm:pb-10">
+          <div className="relative mx-auto max-w-site px-4 pb-8 pt-6 sm:pb-10">
             <nav aria-label="Breadcrumb">
-              <ol className="flex items-center gap-2 text-sm text-gray-600">
-                <li><Link href="/" className="hover:text-navy">Home</Link></li>
+              <ol className="flex items-center gap-2 text-sm text-ivory/75">
+                <li><Link href="/" className="hover:text-ivory">Home</Link></li>
                 <li aria-hidden="true">/</li>
-                <li className="font-semibold text-navy" aria-current="page">Inventory</li>
+                <li className="font-semibold text-ivory" aria-current="page">Inventory</li>
               </ol>
             </nav>
 
             <div className="mt-3 flex flex-col gap-4 lg:max-w-3xl">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-4xl font-extrabold tracking-tight text-navy sm:text-5xl">Find your next {conditionWord}car.</h1>
-                  <p className="mt-2 text-lg text-gray-700">
+                  <h1 className="font-serif text-5xl font-semibold text-ivory sm:text-6xl">Find your next {conditionWord}car.</h1>
+                  <p className="mt-2 text-lg text-ivory/75">
                     Browse our available vehicles in {LOCATION.city}, {LOCATION.stateCode} and find your perfect fit.
                   </p>
                 </div>
                 <SavedCarsMenu />
               </div>
 
-              <form action="/inventory" method="get" role="search" className="flex overflow-hidden rounded-xl border border-sand-200 bg-ivory shadow-sm focus-within:ring-2 focus-within:ring-navy-100">
+              <form action="/inventory" method="get" role="search" className="flex overflow-hidden glass rounded-xl focus-within:ring-2 focus-within:ring-[#F0B27A]">
                 {carried.map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
                 <label htmlFor="inventory-search" className="sr-only">Search by make, model, or keyword</label>
                 <div className="relative flex-1">
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-navy" aria-hidden="true" />
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-ivory/75" aria-hidden="true" />
                   <input
                     id="inventory-search"
                     name="q"
                     type="search"
                     defaultValue={q}
                     placeholder="Search by make, model, or keyword"
-                    className="h-full w-full bg-transparent py-3.5 pl-12 pr-3 text-base text-gray-900 placeholder-gray-500 focus:outline-none"
+                    className="h-full w-full bg-transparent py-3.5 pl-12 pr-3 text-base text-ivory placeholder-ivory/55 focus:outline-none"
                   />
                 </div>
-                <button type="submit" className="bg-navy px-6 text-sm font-semibold text-white hover:bg-navy-800 sm:px-9">
+                <button type="submit" className="bg-ivory px-6 text-sm font-semibold text-navy hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F0B27A] sm:px-9">
                   Search
                 </button>
               </form>
@@ -204,7 +204,7 @@ export default async function InventoryPage({ searchParams }: Props) {
           </div>
         </section>
 
-        <div id="results" className="mx-auto max-w-screen-2xl scroll-mt-28 px-4 py-8">
+        <div id="results" className="mx-auto max-w-site scroll-mt-28 px-4 py-8">
           <div className="lg:grid lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[280px_minmax(0,1fr)] xl:gap-8">
             <aside aria-label="Filter vehicles" className="lg:sticky lg:top-28 lg:self-start">
               <VehicleFilters
@@ -220,14 +220,14 @@ export default async function InventoryPage({ searchParams }: Props) {
             <div>
               {/* Toolbar */}
               <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <h2 className="text-2xl font-bold text-navy" aria-live="polite">
+                <h2 className="text-2xl font-bold text-ivory" aria-live="polite">
                   {total} {total === 1 ? 'vehicle' : 'vehicles'} available
-                  {q && <span className="font-medium text-gray-600"> for &ldquo;{q}&rdquo;</span>}
+                  {q && <span className="font-medium text-ivory/75"> for &ldquo;{q}&rdquo;</span>}
                 </h2>
                 <CompareModeToggle />
                 <div className="ml-auto flex items-center gap-2">
                   <SortSelect value={sort} options={Object.entries(VEHICLE_SORTS).map(([value, { label }]) => ({ value, label }))} />
-                  <div className="flex rounded-xl border border-sand-200 bg-ivory p-1" role="group" aria-label="Layout">
+                  <div className="flex rounded-xl border border-ivory/20 bg-ivory/[0.06] p-1" role="group" aria-label="Layout">
                     {([['grid', LayoutGrid, 'Grid view'], ['list', List, 'List view']] as const).map(([mode, Icon, label]) => (
                       <Link
                         key={mode}
@@ -235,7 +235,7 @@ export default async function InventoryPage({ searchParams }: Props) {
                         scroll={false}
                         aria-label={label}
                         aria-current={layout === mode ? 'true' : undefined}
-                        className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${layout === mode ? 'bg-navy text-white' : 'text-navy hover:bg-sand'}`}
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] ${layout === mode ? 'bg-ivory text-navy' : 'text-ivory/75 hover:bg-ivory/10 hover:text-ivory'}`}
                       >
                         <Icon className="h-5 w-5" aria-hidden="true" />
                       </Link>
@@ -246,11 +246,11 @@ export default async function InventoryPage({ searchParams }: Props) {
 
               {vehicles.length === 0 ? (
                 <div className="card flex flex-col items-center justify-center py-20 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-sand">
-                    <Search className="h-8 w-8 text-navy" aria-hidden="true" />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-ivory/10">
+                    <Search className="h-8 w-8 text-ivory" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-4 text-lg font-bold text-gray-800">No vehicles found</h3>
-                  <p className="mt-1 text-sm text-gray-600">Try a different search or adjust your filters.</p>
+                  <h3 className="mt-4 text-lg font-bold text-ivory">No vehicles found</h3>
+                  <p className="mt-1 text-sm text-ivory/75">Try a different search or adjust your filters.</p>
                   <Link href="/inventory" className="btn-secondary mt-5">Clear search &amp; filters</Link>
                 </div>
               ) : (
@@ -268,8 +268,8 @@ export default async function InventoryPage({ searchParams }: Props) {
                       key={p}
                       href={inventoryHref(params, { page: String(p) })}
                       aria-current={p === page ? 'page' : undefined}
-                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
-                        p === page ? 'bg-navy text-white' : 'border border-sand-200 bg-ivory text-gray-700 hover:border-navy-200 hover:text-navy'
+                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33] ${
+                        p === page ? 'bg-ivory text-navy' : 'border border-ivory/20 bg-ivory/[0.06] text-ivory/85 hover:border-ivory/40 hover:bg-ivory/10 hover:text-ivory'
                       }`}
                     >
                       {p}
@@ -278,43 +278,43 @@ export default async function InventoryPage({ searchParams }: Props) {
                 </nav>
               )}
 
-              {vehicles.length > 0 && <p className="mt-5 text-center text-xs text-gray-600">* {FINANCE_DISCLAIMER}</p>}
+              {vehicles.length > 0 && <p className="mt-5 text-center text-xs text-ivory/75">* {FINANCE_DISCLAIMER}</p>}
 
               {/* Help banner */}
-              <div className="mt-6 flex flex-col items-start gap-4 rounded-2xl border border-sand-200 bg-sand-200/60 p-5 sm:flex-row sm:items-center">
-                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-ivory">
-                  <MessageSquareMore className="h-6 w-6 text-navy" aria-hidden="true" />
+              <div className="mt-6 flex flex-col items-start gap-4 glass rounded-2xl p-5 sm:flex-row sm:items-center">
+                <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-ivory/10">
+                  <MessageSquareMore className="h-6 w-6 text-[#F0B27A]" aria-hidden="true" />
                 </span>
                 <div className="flex-1">
-                  <h2 className="text-base font-bold text-navy">Need help choosing?</h2>
-                  <p className="text-sm text-gray-700">Our team is here to help you find the right fit.</p>
+                  <h2 className="text-base font-bold text-ivory">Need help choosing?</h2>
+                  <p className="text-sm text-ivory/75">Our team is here to help you find the right fit.</p>
                 </div>
-                <Link href="/contact" className="rounded-xl border-2 border-navy bg-ivory px-5 py-2.5 text-sm font-semibold text-navy hover:bg-navy hover:text-white">
+                <Link href="/contact" className="rounded-xl border-2 border-ivory/30 px-5 py-2.5 text-sm font-semibold text-ivory transition-colors hover:border-ivory/50 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
                   Talk to our team
                 </Link>
               </div>
 
               {/* Crawlable links into make / body-style landing pages */}
               {(facets.makes.length > 0 || facets.bodyStyles.length > 0) && (
-                <section aria-labelledby="shop-by-heading" className="mt-10 border-t border-sand-200 pt-8">
-                  <h2 id="shop-by-heading" className="text-lg font-bold text-navy">Shop by make</h2>
+                <section aria-labelledby="shop-by-heading" className="mt-10 border-t border-ivory/15 pt-8">
+                  <h2 id="shop-by-heading" className="text-lg font-bold text-ivory">Shop by make</h2>
                   <ul className="mt-3 flex flex-wrap gap-2">
                     {facets.makes.map((make) => (
                       <li key={make.slug}>
-                        <Link href={makePath(make.name)} className="inline-block rounded-full border border-sand-200 bg-ivory px-4 py-2 text-sm font-medium text-gray-700 hover:border-navy-200 hover:text-navy">
-                          {make.name} <span className="text-gray-400">({make.count})</span>
+                        <Link href={makePath(make.name)} className="inline-block rounded-full border border-ivory/15 bg-ivory/[0.06] px-4 py-2 text-sm font-medium text-ivory/85 transition-colors hover:border-ivory/35 hover:bg-ivory/10 hover:text-ivory">
+                          {make.name} <span className="text-ivory/55">({make.count})</span>
                         </Link>
                       </li>
                     ))}
                   </ul>
                   {facets.bodyStyles.length > 0 && (
                     <>
-                      <h2 className="mt-6 text-lg font-bold text-navy">Shop by body style</h2>
+                      <h2 className="mt-6 text-lg font-bold text-ivory">Shop by body style</h2>
                       <ul className="mt-3 flex flex-wrap gap-2">
                         {facets.bodyStyles.map((style) => (
                           <li key={style.slug}>
-                            <Link href={bodyStylePath(style.name)} className="inline-block rounded-full border border-sand-200 bg-ivory px-4 py-2 text-sm font-medium text-gray-700 hover:border-navy-200 hover:text-navy">
-                              {style.name} <span className="text-gray-400">({style.count})</span>
+                            <Link href={bodyStylePath(style.name)} className="inline-block rounded-full border border-ivory/15 bg-ivory/[0.06] px-4 py-2 text-sm font-medium text-ivory/85 transition-colors hover:border-ivory/35 hover:bg-ivory/10 hover:text-ivory">
+                              {style.name} <span className="text-ivory/55">({style.count})</span>
                             </Link>
                           </li>
                         ))}
@@ -336,32 +336,25 @@ export default async function InventoryPage({ searchParams }: Props) {
 // Decorative coastal road + palms for the hero band (pure SVG, no image request)
 function HeroArt() {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden w-[42%] lg:block">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 hidden w-[42%] [mask-image:linear-gradient(90deg,transparent,#000_35%)] lg:block">
       <svg viewBox="0 0 600 300" preserveAspectRatio="xMaxYMid slice" className="h-full w-full">
-        <defs>
-          <linearGradient id="hero-fade" x1="0" x2="1">
-            <stop offset="0" stopColor="#F3EBDD" />
-            <stop offset="0.35" stopColor="#F3EBDD" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M120 300 C 260 250, 330 190, 600 170 L 600 215 C 380 225, 300 270, 230 300 Z" fill="#E8DCC5" />
-        <path d="M175 300 C 300 255, 360 205, 600 190" fill="none" stroke="#FFFDF8" strokeWidth="3" strokeDasharray="14 12" />
-        <path d="M60 300 C 230 230, 320 150, 600 130" fill="none" stroke="#D9C7A6" strokeWidth="2" opacity="0.6" />
+        <path d="M120 300 C 260 250, 330 190, 600 170 L 600 215 C 380 225, 300 270, 230 300 Z" fill="#FFFDF8" fillOpacity="0.06" />
+        <path d="M175 300 C 300 255, 360 205, 600 190" fill="none" stroke="#FFFDF8" strokeOpacity="0.3" strokeWidth="3" strokeDasharray="14 12" />
+        <path d="M60 300 C 230 230, 320 150, 600 130" fill="none" stroke="#FFFDF8" strokeWidth="2" opacity="0.12" />
         {[{ x: 470, h: 150, s: 1 }, { x: 540, h: 185, s: 1.15 }].map(({ x, h, s }) => (
-          <g key={x} fill="#D9C7A6" opacity="0.8">
-            <path d={`M${x} 300 C ${x - 4} ${300 - h * 0.5}, ${x + 6} ${300 - h * 0.8}, ${x + 2} ${300 - h}`} stroke="#D9C7A6" strokeWidth={6 * s} fill="none" />
+          <g key={x} fill="#FFFDF8" opacity="0.1">
+            <path d={`M${x} 300 C ${x - 4} ${300 - h * 0.5}, ${x + 6} ${300 - h * 0.8}, ${x + 2} ${300 - h}`} stroke="#FFFDF8" strokeWidth={6 * s} fill="none" />
             {[-70, -30, 10, 50, 95, 140].map((angle) => (
               <ellipse key={angle} cx={x + 2} cy={300 - h} rx={38 * s} ry={7 * s} transform={`rotate(${angle} ${x + 2} ${300 - h}) translate(${30 * s} 0)`} />
             ))}
           </g>
         ))}
-        <rect width="600" height="300" fill="url(#hero-fade)" />
       </svg>
-      <p className="absolute right-[38%] top-[58%] hidden -translate-y-1/2 text-left text-xs font-semibold uppercase leading-5 tracking-[0.3em] text-navy xl:block">
+      <p className="absolute right-[38%] top-[58%] hidden -translate-y-1/2 text-left text-xs font-semibold uppercase leading-5 tracking-[0.3em] text-ivory/70 xl:block">
         Great cars
         <br />
         Brighter journeys
-        <span className="mt-3 block h-px w-8 bg-navy" />
+        <span className="mt-3 block h-px w-8 bg-[#F0B27A]" />
       </p>
     </div>
   )

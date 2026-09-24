@@ -57,7 +57,7 @@ export default function SectionNav({ sections }: { sections: SectionLink[] }) {
     <nav
       ref={navRef}
       aria-label="Vehicle sections"
-      className="sticky top-[var(--header-h)] z-20 -mx-4 border-b border-line bg-sand/95 px-4 backdrop-blur-md sm:-mx-6 sm:px-6 desk:mx-0 desk:px-0"
+      className="sticky top-[var(--header-h)] z-20 -mx-4 border-b border-ivory/15 bg-[#0c1e33]/70 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 desk:mx-0 desk:px-0"
     >
       <ul ref={listRef} className="no-scrollbar flex gap-1 overflow-x-auto">
         {sections.map(({ id, label }) => (
@@ -67,8 +67,8 @@ export default function SectionNav({ sections }: { sections: SectionLink[] }) {
               data-id={id}
               onClick={() => setActive(id)}
               aria-current={active === id ? 'location' : undefined}
-              className={`relative inline-flex min-h-12 items-center px-3 text-[0.9375rem] font-semibold transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-navy ${
-                active === id ? 'text-navy after:bg-navy' : 'text-ink-muted after:bg-transparent hover:text-navy'
+              className={`relative inline-flex min-h-12 items-center px-3 text-[0.9375rem] font-semibold transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors after:duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F0B27A] ${
+                active === id ? 'text-ivory after:bg-[#F0B27A]' : 'text-ivory/70 after:bg-transparent hover:text-ivory'
               }`}
             >
               {label}

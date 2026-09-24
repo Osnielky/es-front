@@ -1,16 +1,22 @@
+// Home page: frosted glass panels over the Gulf-dusk backdrop (body::before in globals.css), with the lot
+// video behind the hero on desktop. Everything shown comes from inventory data or lib/seo constants.
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Shield, Zap, HeartHandshake, ChevronRight, Star, Car, Gauge, ArrowRight, MapPin } from 'lucide-react'
-import { buildDealerJsonLd, buildWebsiteJsonLd, buildFAQJsonLd, LOCATION, DEFAULT_OG_IMAGE, serializeJsonLd } from '@/lib/seo'
-import { getVehicles } from '@/lib/data'
+import Image from 'next/image'
+import { CalendarClock, Gauge, MapPin, Navigation, Phone, Search, Repeat, BadgeDollarSign, Clock } from 'lucide-react'
+import { getVehicles, getInventoryFacets } from '@/lib/data'
+import {
+  BUSINESS_HOURS, DEALER_ADDRESS, LOCATION, bodyStylePath, makePath, vehiclePath,
+  buildDealerJsonLd, buildWebsiteJsonLd, buildFAQJsonLd, DEFAULT_OG_IMAGE, serializeJsonLd,
+} from '@/lib/seo'
+import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
+import { vehicleName } from '@/lib/vehicle-display'
 import type { Vehicle } from '@/types'
-import VehicleCard from '@/components/inventory/VehicleCard'
 import HeroVideoRotator from '@/components/HeroVideoRotator'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 
-// Force dynamic rendering - requires database connection
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
@@ -52,269 +58,303 @@ export const metadata: Metadata = {
   },
 }
 
+const STEPS = [
+  {
+    icon: Search,
+    title: 'Find the car',
+    body: 'Search by make, body style or price. Save the ones you like and compare up to three side by side.',
+  },
+  {
+    icon: CalendarClock,
+    title: 'Check it out in person',
+    body: 'Ask if it’s still available or pick a time for a test drive. We confirm the appointment with you.',
+  },
+  {
+    icon: BadgeDollarSign,
+    title: 'Finance, trade in, drive home',
+    body: 'Apply for financing and value your trade-in online before you visit, so the paperwork goes faster.',
+  },
+]
+
+function priceLabel(price: number) {
+  return price > 0 ? `$${price.toLocaleString('en-US')}` : 'Call for price'
+}
+
 export default async function HomePage() {
-  const dealerJsonLd = buildDealerJsonLd()
-  const websiteJsonLd = buildWebsiteJsonLd()
-  const faqJsonLd = buildFAQJsonLd()
-  
-  // Gracefully handle database connection errors
   let featured: Vehicle[] = []
   let total = 0
+  let facets: Awaited<ReturnType<typeof getInventoryFacets>> | null = null
   try {
-    const result = await getVehicles({ limit: 3 })
+    const [result, f] = await Promise.all([getVehicles({ limit: 4 }), getInventoryFacets()])
     featured = result.vehicles
     total = result.total
+    facets = f
   } catch (error) {
-    console.error('Failed to fetch featured vehicles:', error)
-    // Continue with empty featured list if database is unavailable
+    // Render without inventory sections if the database is unavailable
+    console.error('Home: failed to load inventory', error)
   }
 
+  const bodyStyles = facets?.bodyStyles.slice(0, 6) ?? []
+  const makes = facets?.makes.slice(0, 10) ?? []
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(DEALER_ADDRESS)}`
+
   return (
-    <>
-      {/* Structured Data for SEO */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(dealerJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqJsonLd) }}
-      />
+    <div className="theme-glass">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildDealerJsonLd()) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildWebsiteJsonLd()) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildFAQJsonLd()) }} />
 
-
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-hero-gradient px-4 pt-36 pb-20 text-white sm:pt-48 sm:pb-32">
-        {/* Rotating video backgrounds */}
-        <HeroVideoRotator />
-
-        {/* Overlay for text readability */}
-        <div className="absolute inset-0 bg-black/40" />
-
-        <div className="relative mx-auto max-w-5xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-brand-200 backdrop-blur-sm mb-6">
-            <MapPin className="h-3.5 w-3.5 text-accent-400" />
-            Naples, FL · Serving Southwest Florida
-          </div>
-
-          <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-            Drive Your{' '}
-            <span className="bg-gradient-to-r from-accent-400 to-amber-300 bg-clip-text text-transparent">
-              Dream Car
-            </span>{' '}
-            Today
-          </h1>
-
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-brand-200 sm:text-xl">
-            Quality pre-owned vehicles. Transparent pricing. Zero pressure. Your perfect ride is one click away.
-          </p>
-
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/inventory" className="btn-primary px-8 py-3.5 text-base shadow-glow">
-              Browse Inventory
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link href="/contact" className="btn-ghost-white px-8 py-3.5 text-base">
-              Talk to a Specialist
-            </Link>
-          </div>
-
-          {/* Stats bar */}
-          <div className="mt-14 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm">
-            {[
-              { value: total > 0 ? String(total) : '—', label: 'Vehicles in Stock' },
-              { value: '4.9★', label: 'Customer Rating' },
-              { value: '15yr', label: 'Serving the Community' },
-            ].map((s) => (
-              <div key={s.label} className="px-4 py-5 sm:px-8">
-                <p className="text-2xl font-extrabold text-white sm:text-3xl">{s.value}</p>
-                <p className="mt-1 text-xs text-brand-300 sm:text-sm">{s.label}</p>
-              </div>
-            ))}
-          </div>
+      {/* ── Hero: lot video (desktop) under a frosted search console ── */}
+      {/* From lg the hero takes the video's 16:9 shape (capped at the window height) so wide screens
+          see the whole scene instead of a zoomed-in strip; content is centered vertically in it */}
+      <section className="relative isolate flex flex-col justify-center overflow-hidden px-4 pb-16 pt-[calc(var(--header-h)+2.5rem)] sm:pb-24 lg:min-h-[min(56.25vw,100svh)] lg:pb-20 lg:pt-[calc(var(--header-h)+2rem)]">
+        {/* Videos rotate on their own; their dot controls would sit under the fade, so they're hidden here */}
+        <div className="absolute inset-0 -z-20 opacity-70 [mask-image:linear-gradient(to_bottom,black_70%,transparent)] [&_button]:hidden" aria-hidden="true">
+          <HeroVideoRotator />
         </div>
-      </section>
+        {/* Darkens the video for text contrast; the mask above fades it into the dusk backdrop, so there's no seam */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-[#0c1e33]/70 via-[#0c1e33]/35 to-transparent" aria-hidden="true" />
 
-      {/* ── Value Props ──────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center">
-            <h2 className="section-title">Why Choose Us?</h2>
-            <p className="section-sub">We make buying a car simple, transparent, and enjoyable.</p>
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              {
-                icon: Shield,
-                color: 'bg-blue-50 text-blue-600',
-                title: 'Certified & Inspected',
-                desc: 'Every vehicle passes a 150-point inspection before it hits our lot.',
-              },
-              {
-                icon: Zap,
-                color: 'bg-amber-50 text-amber-600',
-                title: 'Fast & Easy Financing',
-                desc: 'Get pre-approved in minutes. Flexible terms for every credit situation.',
-              },
-              {
-                icon: HeartHandshake,
-                color: 'bg-emerald-50 text-emerald-600',
-                title: 'Trade-In Welcome',
-                desc: 'Get a competitive offer for your current vehicle, applied instantly to your deal.',
-              },
-            ].map(({ icon: Icon, color, title, desc }) => (
-              <div key={title} className="card p-7 text-center hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200">
-                <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-2xl ${color}`}>
-                  <Icon className="h-7 w-7" />
-                </div>
-                <h3 className="mt-5 text-lg font-bold text-gray-900">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Featured Inventory ───────────────────────────────── */}
-      <section className="bg-gray-50 px-4 py-16 sm:py-24">
-        <div className="mx-auto max-w-screen-2xl">
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <h2 className="section-title">Featured Vehicles</h2>
-              <p className="section-sub">Hand-picked from our latest arrivals.</p>
-            </div>
-            <Link href="/inventory" className="btn-secondary shrink-0">
-              View All
-              <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((v) => (
-              <VehicleCard key={v.id} vehicle={v} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── How It Works ─────────────────────────────────────── */}
-      <section className="px-4 py-16 sm:py-24">
-        <div className="mx-auto max-w-5xl text-center">
-          <h2 className="section-title">How It Works</h2>
-          <p className="section-sub">Three simple steps to your next vehicle.</p>
-
-          <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {[
-              { step: '01', icon: Car, title: 'Browse & Pick', desc: 'Filter by make, model, price, and more to find your perfect match.' },
-              { step: '02', icon: Gauge, title: 'Test Drive', desc: 'Schedule a test drive at your convenience — we work around your schedule.' },
-              { step: '03', icon: HeartHandshake, title: 'Drive Home', desc: 'Finalise paperwork, apply financing, and drive off same day.' },
-            ].map(({ step, icon: Icon, title, desc }) => (
-              <div key={step} className="relative card p-7 text-center">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-3 py-0.5 text-xs font-bold text-white shadow-md">
-                  Step {step}
-                </span>
-                <div className="mx-auto mt-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
-                  <Icon className="h-7 w-7" />
-                </div>
-                <h3 className="mt-5 text-lg font-bold text-gray-900">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Services Bar ─────────────────────────────────────── */}
-      <section className="border-y border-gray-100 bg-white px-4 py-12">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 text-center">
-            {[
-              { href: '/financing', icon: Zap, color: 'text-amber-600 bg-amber-50', title: 'Easy Financing', desc: 'All credit welcome. Get pre-approved in minutes.' },
-              { href: '/trade-in', icon: ArrowRight, color: 'text-emerald-600 bg-emerald-50', title: 'Trade-In', desc: 'Get top dollar for your current vehicle.' },
-              { href: '/about', icon: Star, color: 'text-brand-600 bg-brand-50', title: 'About Us', desc: 'Naples\' trusted dealer for over 15 years.' },
-            ].map(({ href, icon: Icon, color, title, desc }) => (
-              <Link key={title} href={href} className="group card p-6 flex flex-col items-center hover:-translate-y-1 transition-all duration-200">
-                <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${color} mb-3`}>
-                  <Icon className="h-6 w-6" />
-                </div>
-                <p className="font-bold text-gray-900 group-hover:text-brand-600 transition-colors">{title}</p>
-                <p className="mt-1 text-sm text-gray-500">{desc}</p>
+        <div className="mx-auto grid w-full max-w-site grid-cols-1 items-end gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)] lg:gap-16">
+          <div className="max-w-2xl">
+            <p className="flex items-center gap-2 text-[0.9375rem] text-[#fffdf8]/80">
+              <MapPin className="h-4 w-4 text-[#F0B27A]" aria-hidden="true" />
+              {LOCATION.streetAddress}, {LOCATION.city}
+            </p>
+            <h1 className="mt-5 font-serif text-[2.75rem] font-semibold leading-[1.02] tracking-[-0.01em] sm:text-6xl lg:text-[5.25rem]">
+              Well-kept used cars, priced up front.
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[#fffdf8]/80">
+              {total > 0 ? `${total} vehicles on our Naples lot right now.` : 'Our Naples lot, online.'} See every photo, check
+              availability, and book a test drive without a phone call.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                href="/inventory"
+                className="inline-flex min-h-12 items-center rounded-xl bg-[#fffdf8] px-6 text-[0.9375rem] font-semibold text-navy transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+              >
+                Browse inventory
               </Link>
-            ))}
+              <a
+                href={TEL_HREF}
+                className="glass inline-flex min-h-12 items-center gap-2 rounded-xl px-6 text-[0.9375rem] font-semibold transition-colors duration-150 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+              >
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                {DEALER_PHONE}
+              </a>
+            </div>
+          </div>
+
+          {/* Plain GET form to /inventory: works without JavaScript */}
+          <div className="glass glass-strong rounded-3xl p-5 sm:p-7">
+            <h2 className="font-serif text-[1.75rem] font-semibold leading-tight">Find your car</h2>
+            <form action="/inventory" method="get" role="search" className="mt-4 flex gap-2">
+              <label htmlFor="glass-search" className="sr-only">Search inventory</label>
+              <input
+                id="glass-search"
+                name="q"
+                type="search"
+                placeholder="Make, model or type"
+                className="min-h-12 min-w-0 flex-1 rounded-xl border border-white/20 bg-white/10 px-4 text-base text-[#fffdf8] placeholder:text-[#fffdf8]/55 focus:border-[#F0B27A] focus:outline-none focus:ring-2 focus:ring-[#F0B27A]/40"
+              />
+              <button
+                type="submit"
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#fffdf8] px-5 text-[0.9375rem] font-semibold text-navy transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+              >
+                <Search className="h-4 w-4" aria-hidden="true" />
+                Search
+              </button>
+            </form>
+
+            {bodyStyles.length > 0 && (
+              <nav aria-label="Shop by body style" className="mt-5">
+                <p className="text-sm text-[#fffdf8]/70">Or shop by body style</p>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {bodyStyles.map((b) => (
+                    <li key={b.slug}>
+                      <Link
+                        href={bodyStylePath(b.name)}
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 text-sm font-medium transition-colors duration-150 hover:border-white/40 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+                      >
+                        {b.name}
+                        <span className="text-[#fffdf8]/60">{b.count}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+
+            <div className="mt-6 flex items-baseline justify-between gap-4 border-t border-white/15 pt-5">
+              <p className="text-sm text-[#fffdf8]/70">In stock today</p>
+              <p className="text-3xl font-semibold tabular-nums">{total > 0 ? total : '—'}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Serving Naples FL ─────────────────────────────────── */}
-      <section className="px-4 py-16 sm:py-20 bg-gray-50">
-        <div className="mx-auto max-w-5xl">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-center">
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="h-5 w-5 text-brand-600" />
-                <span className="text-sm font-semibold uppercase tracking-wider text-brand-600">Local Dealership</span>
-              </div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-                Proudly Serving Naples & Southwest Florida
-              </h2>
-              <p className="mt-4 text-gray-500 leading-relaxed">
-                We are a <strong>Naples, Florida</strong> dealership focused on one thing: helping our neighbors find a reliable vehicle at a fair price. No high-pressure tactics, no hidden fees. Just honest deals and real customer care.
-              </p>
-              <p className="mt-3 text-gray-500 leading-relaxed">
-                From our lot on Airport-Pulling Road, we serve buyers across <strong>Collier County</strong> — including Marco Island, Bonita Springs, Fort Myers, Estero, Golden Gate, and Immokalee. Whether you are commuting on I-75, heading to the beach, or need a dependable truck for work, we have the right vehicle for your Florida lifestyle.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {['Naples', ...LOCATION.nearbyAreas].map(area => (
-                  <span key={area} className="rounded-full bg-white border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600">
-                    {area}, FL
-                  </span>
-                ))}
-              </div>
+      {/* ── Newest arrivals ── */}
+      {featured.length > 0 && (
+        <section aria-labelledby="arrivals-heading" className="px-4 py-16 sm:py-20">
+          <div className="mx-auto max-w-site">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 id="arrivals-heading" className="font-serif text-4xl font-semibold sm:text-5xl">Newest arrivals</h2>
+              <Link href="/inventory" className="inline-flex min-h-11 items-center text-[0.9375rem] font-semibold text-[#F0B27A] hover:text-[#f6c89c]">
+                See all {total} vehicles
+              </Link>
             </div>
-            <div className="space-y-4">
-              {[
-                { href: '/inventory?condition=USED', label: 'Used Cars in Naples, FL', sub: 'Inspected, affordable, ready to drive' },
-                { href: '/inventory?condition=NEW', label: 'New Cars in Naples, FL', sub: 'Latest models with full manufacturer warranty' },
-                { href: '/inventory?condition=CERTIFIED', label: 'Certified Pre-Owned in Naples', sub: 'Extended warranty and low mileage' },
-                { href: '/financing', label: 'Auto Financing Naples FL', sub: 'All credit welcome — fast approval' },
-                { href: '/trade-in', label: 'Trade In Your Car — Naples', sub: 'Competitive offers, instant credit' },
-              ].map(({ href, label, sub }) => (
-                <Link key={href} href={href} className="group flex items-center justify-between card px-5 py-4 hover:border-brand-300 transition-all">
-                  <div>
-                    <p className="font-semibold text-gray-900 group-hover:text-brand-700 text-sm">{label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{sub}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-brand-600 transition-colors flex-shrink-0" />
-                </Link>
+            {/* auto-fill (not the inventory auto-fit grid): a few arrivals keep card size instead of stretching */}
+            <ul className="mt-8 grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(min(100%,19rem),1fr))]">
+              {featured.map((v) => (
+                <li key={v.id}>
+                  <Link
+                    href={vehiclePath(v)}
+                    className="glass group block overflow-hidden rounded-3xl transition-[border-color,background-color] duration-200 hover:border-white/35 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+                  >
+                    <div className="relative aspect-[4/3] bg-white/5">
+                      {v.images[0] && (
+                        <Image
+                          src={v.images[0]}
+                          alt={`${vehicleName(v)} for sale in Naples, FL`}
+                          fill
+                          sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+                          loading="lazy"
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="p-5">
+                      <h3 className="text-lg font-semibold leading-snug">{vehicleName(v)}</h3>
+                      <div className="mt-3 flex items-baseline justify-between gap-3">
+                        <p className="text-2xl font-semibold tabular-nums">{priceLabel(v.price)}</p>
+                        <p className="flex items-center gap-1.5 text-sm text-[#fffdf8]/70">
+                          <Gauge className="h-4 w-4" aria-hidden="true" />
+                          {v.mileage.toLocaleString('en-US')} mi
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
+
+            {makes.length > 0 && (
+              <nav aria-label="Shop by make" className="mt-10">
+                <h3 className="text-[0.9375rem] font-semibold text-[#fffdf8]/80">Shop by make</h3>
+                <ul className="mt-3 flex flex-wrap gap-2">
+                  {makes.map((m) => (
+                    <li key={m.slug}>
+                      <Link
+                        href={makePath(m.name)}
+                        className="glass inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors duration-150 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+                      >
+                        {m.name}
+                        <span className="text-[#fffdf8]/60">{m.count}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── How buying works (a real sequence, so the steps are numbered) ── */}
+      <section aria-labelledby="steps-heading" className="px-4 py-16 sm:py-20">
+        <div className="mx-auto max-w-site">
+          <h2 id="steps-heading" className="max-w-2xl font-serif text-4xl font-semibold sm:text-5xl">
+            How buying from us works
+          </h2>
+          <ol className="mt-8 grid gap-5 md:grid-cols-3">
+            {STEPS.map(({ icon: Icon, title, body }, i) => (
+              <li key={title} className="glass rounded-3xl p-6 sm:p-7">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#F0B27A]/50 font-serif text-xl font-semibold text-[#F0B27A]">
+                    {i + 1}
+                  </span>
+                  <Icon className="h-5 w-5 text-[#fffdf8]/70" aria-hidden="true" />
+                </div>
+                <h3 className="mt-5 text-xl font-semibold">{title}</h3>
+                <p className="mt-2 leading-relaxed text-[#fffdf8]/75">{body}</p>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-5 grid gap-5 md:grid-cols-2">
+            <Link
+              href="/financing"
+              className="glass group flex items-start gap-4 rounded-3xl p-6 transition-colors duration-200 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:p-7"
+            >
+              <BadgeDollarSign className="mt-1 h-6 w-6 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
+              <span>
+                <span className="block text-xl font-semibold">Get pre-approved</span>
+                <span className="mt-1 block text-[#fffdf8]/75">Apply online and know your budget before you pick a car.</span>
+              </span>
+            </Link>
+            <Link
+              href="/trade-in"
+              className="glass group flex items-start gap-4 rounded-3xl p-6 transition-colors duration-200 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:p-7"
+            >
+              <Repeat className="mt-1 h-6 w-6 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
+              <span>
+                <span className="block text-xl font-semibold">Value your trade-in</span>
+                <span className="mt-1 block text-[#fffdf8]/75">Tell us about your current car and we’ll send you an offer.</span>
+              </span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ── CTA Banner ───────────────────────────────────────── */}
-      <section className="mx-4 mb-16 overflow-hidden rounded-3xl bg-hero-gradient px-6 py-14 text-center text-white sm:mx-8 sm:py-20">
-        <div className="pointer-events-none absolute inset-0 bg-card-shine" />
-        <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Ready to Find Your Next Ride?
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-brand-200">
-          Our specialists are standing by to help you get the best deal. No pressure, no gimmicks.
-        </p>
-        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Link href="/inventory" className="btn-primary px-8 py-3.5 shadow-glow">
-            Browse Inventory
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link href="/contact" className="btn-ghost-white px-8 py-3.5">
-            Contact Us
-          </Link>
+      {/* ── Visit ── */}
+      <section aria-labelledby="visit-heading" className="px-4 pb-20 pt-4 sm:pb-24">
+        <div className="glass mx-auto grid max-w-site gap-10 rounded-[2rem] p-6 sm:p-10 lg:grid-cols-[1.2fr_1fr]">
+          <div>
+            <h2 id="visit-heading" className="font-serif text-4xl font-semibold sm:text-5xl">Come see it in person</h2>
+            <address className="mt-5 text-lg not-italic leading-relaxed text-[#fffdf8]/85">
+              {LOCATION.streetAddress}
+              <br />
+              {LOCATION.city}, {LOCATION.stateCode} {LOCATION.zipCode}
+            </address>
+            <p className="mt-4 max-w-xl leading-relaxed text-[#fffdf8]/75">
+              We serve buyers across {LOCATION.county}, including {LOCATION.nearbyAreas.slice(0, -1).join(', ')} and{' '}
+              {LOCATION.nearbyAreas.at(-1)}.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-[#fffdf8] px-6 text-[0.9375rem] font-semibold text-navy transition-colors duration-150 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+              >
+                <Navigation className="h-4 w-4" aria-hidden="true" />
+                Get directions
+              </a>
+              <a
+                href={TEL_HREF}
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-white/25 px-6 text-[0.9375rem] font-semibold transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+              >
+                <Phone className="h-4 w-4" aria-hidden="true" />
+                {DEALER_PHONE}
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 className="flex items-center gap-2 text-lg font-semibold">
+              <Clock className="h-5 w-5 text-[#F0B27A]" aria-hidden="true" />
+              Hours
+            </h3>
+            <dl className="mt-3 divide-y divide-white/15 text-lg">
+              {BUSINESS_HOURS.map((h) => (
+                <div key={h.label} className="flex justify-between gap-4 py-3">
+                  <dt className="text-[#fffdf8]/75">{h.label}</dt>
+                  <dd className="font-semibold tabular-nums">{h.display}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

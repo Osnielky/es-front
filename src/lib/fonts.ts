@@ -1,7 +1,7 @@
 import { Cormorant_Garamond } from 'next/font/google'
 
-// Restrained serif for short editorial headings on the vehicle detail page.
-// Applied by adding `serif.variable` to the page wrapper, so other routes don't download it.
+// Serif for editorial headings across the public site (glass theme). Applied once on <html> in
+// app/layout.tsx; body text, forms, prices and specs stay in Inter.
 export const serif = Cormorant_Garamond({
   subsets: ['latin'],
   weight: ['500', '600'],

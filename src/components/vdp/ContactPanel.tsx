@@ -21,32 +21,32 @@ export default function ContactPanel({ hasSimilar = false }: { hasSimilar?: bool
       <div>
         <p className="vdp-eyebrow">{sold ? 'Sold' : vehicle.status === 'PENDING' ? 'Sale pending' : 'Asking price'}</p>
         {price ? (
-          <p className={`mt-1 text-[2.25rem] font-bold leading-none tracking-tight desk:text-[2.625rem] ${sold ? 'text-ink-muted line-through decoration-1' : 'text-navy'}`}>
+          <p className={`mt-1 text-[2.25rem] font-bold leading-none tracking-tight desk:text-[2.625rem] ${sold ? 'text-ivory/60 line-through decoration-1' : 'text-ivory'}`}>
             {price}
           </p>
         ) : (
-          <p className="mt-1 text-2xl font-bold text-navy">Call for price</p>
+          <p className="mt-1 text-2xl font-bold text-ivory">Call for price</p>
         )}
         {!sold && vehicle.estMonthly && (
-          <p className="mt-2 text-[0.9375rem] text-ink-muted">
-            Est. <span className="font-semibold text-ink">${vehicle.estMonthly.toLocaleString('en-US')}/mo</span>
-            <a href="#finance-disclaimer" className="ml-0.5 rounded text-ink-muted hover:text-navy" aria-label="How the estimate is calculated">
+          <p className="mt-2 text-[0.9375rem] text-ivory/75">
+            Est. <span className="font-semibold text-ivory">${vehicle.estMonthly.toLocaleString('en-US')}/mo</span>
+            <a href="#finance-disclaimer" className="ml-0.5 rounded text-ivory/75 hover:text-[#F0B27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]" aria-label="How the estimate is calculated">
               *
             </a>
           </p>
         )}
 
-        <div className="my-5 h-px bg-line md:hidden desk:block" aria-hidden="true" />
+        <div className="my-5 h-px bg-ivory/15 md:hidden desk:block" aria-hidden="true" />
 
         {sold ? (
           <div className="md:mt-5 desk:mt-0">
             <h2 className="vdp-heading">This one has found a home.</h2>
-            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">Browse similar vehicles, or tell us what you’re looking for.</p>
+            <p className="mt-1.5 text-[0.9375rem] text-ivory/75">Browse similar vehicles, or tell us what you’re looking for.</p>
           </div>
         ) : (
           <div className="md:mt-5 desk:mt-0">
             <h2 className="vdp-heading">Take a closer look.</h2>
-            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">Ask a question or plan your visit.</p>
+            <p className="mt-1.5 text-[0.9375rem] text-ivory/75">Ask a question or plan your visit.</p>
           </div>
         )}
       </div>
@@ -80,12 +80,12 @@ export default function ContactPanel({ hasSimilar = false }: { hasSimilar?: bool
               trim={vehicle.trim}
               stockNumber={vehicle.stock}
               url={vehicle.url}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-3 text-sm font-semibold text-[#136C3A] transition-colors duration-150 hover:border-[#136C3A]/40 hover:bg-[#F1F8F3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-ivory/20 bg-ivory/[0.06] px-3 text-sm font-semibold text-[#7ee2a8] transition-colors duration-150 hover:border-[#7ee2a8]/40 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
             />
           )}
           <a
             href={TEL_HREF}
-            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-line bg-white px-3 text-sm font-semibold text-navy transition-colors duration-150 hover:border-navy-200 hover:bg-navy-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy ${sold ? 'col-span-2' : ''}`}
+            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-ivory/20 bg-ivory/[0.06] px-3 text-sm font-semibold text-ivory transition-colors duration-150 hover:border-ivory/35 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33] ${sold ? 'col-span-2' : ''}`}
             aria-label={`Call ${DEALER_PHONE}`}
           >
             <Phone className="h-4 w-4" aria-hidden="true" />
@@ -93,17 +93,17 @@ export default function ContactPanel({ hasSimilar = false }: { hasSimilar?: bool
           </a>
         </div>
 
-        <ul className="mt-4 flex flex-wrap gap-x-5 border-t border-line pt-2 text-sm">
+        <ul className="mt-4 flex flex-wrap gap-x-5 border-t border-ivory/15 pt-2 text-sm">
           <li>
-            <Link href="/financing" className="group inline-flex min-h-11 items-center gap-1.5 font-medium text-ink-muted transition-colors hover:text-navy">
-              <BadgeDollarSign className="h-4 w-4 text-champagne" aria-hidden="true" />
+            <Link href="/financing" className="group inline-flex min-h-11 items-center gap-1.5 rounded font-medium text-ivory/75 transition-colors hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
+              <BadgeDollarSign className="h-4 w-4 text-[#F0B27A]" aria-hidden="true" />
               Get pre-approved
               <ChevronRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
           </li>
           <li>
-            <Link href="/trade-in" className="group inline-flex min-h-11 items-center gap-1.5 font-medium text-ink-muted transition-colors hover:text-navy">
-              <Repeat className="h-4 w-4 text-champagne" aria-hidden="true" />
+            <Link href="/trade-in" className="group inline-flex min-h-11 items-center gap-1.5 rounded font-medium text-ivory/75 transition-colors hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
+              <Repeat className="h-4 w-4 text-[#F0B27A]" aria-hidden="true" />
               Value your trade-in
               <ChevronRight className="h-3.5 w-3.5 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>

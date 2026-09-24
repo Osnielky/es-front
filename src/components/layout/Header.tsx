@@ -26,26 +26,35 @@ export default function Header() {
   const isHome = pathname === '/'
   // Section stays highlighted on child pages (e.g. Inventory on a vehicle detail page)
   const isActive = (href: string) => (href === '/' ? isHome : pathname === href || pathname.startsWith(`${href}/`))
-  const transparent = isHome && !scrolled && !open
+  // Clear glass at the top of the page; once scrolled (or with the menu open) the frosted layer fades in
+  const solid = scrolled || open
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', handler)
+    // Also check on mount: a reload or back navigation can restore a scrolled position
+    handler()
+    window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
+
+  // Compact header height from sm up (globals.css): sticky offsets and anchor scroll-margins follow it
+  useEffect(() => {
+    document.documentElement.toggleAttribute('data-header-compact', scrolled)
+  }, [scrolled])
 
   return (
     <>
     <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        transparent
-          ? ''
-          : 'bg-ivory/95 backdrop-blur-md shadow-sm border-b border-sand-200'
+      // The frosted layer is a pseudo-element so its opacity can fade (backdrop-filter itself doesn't transition)
+      className={`fixed top-0 z-50 w-full border-b text-ivory transition-[border-color,box-shadow] duration-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[#0c1e33]/65 before:backdrop-blur-xl before:transition-opacity before:duration-300 ${
+        solid
+          ? 'border-ivory/10 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)] before:opacity-100'
+          : 'border-transparent before:opacity-0'
       }`}
     >
-      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-2.5 sm:py-3.5">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
+      <div className={`mx-auto flex max-w-site items-center justify-between px-4 py-2.5 transition-[padding] duration-300 ${scrolled ? 'sm:py-2' : 'sm:py-3.5'}`}>
+        {/* Logo: the artwork is made for light backgrounds, so it sits on a small ivory tile */}
+        <Link href="/" className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]">
           <Image
             src="/logo.png"
             alt={DEALER_NAME}
@@ -53,7 +62,7 @@ export default function Header() {
             height={80}
             sizes="81px"
             priority
-            className="h-14 w-auto sm:h-20"
+            className={`h-14 w-auto rounded-xl bg-ivory/95 p-1 transition-[height] duration-300 ${scrolled ? 'sm:h-16' : 'sm:h-20'}`}
           />
         </Link>
 
@@ -63,14 +72,9 @@ export default function Header() {
             <Link
               key={href}
               href={href}
-              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-xs font-semibold uppercase tracking-widest transition-colors lg:px-4 ${
-                transparent
-                  ? isActive(href)
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  : isActive(href)
-                    ? 'bg-sand text-navy'
-                    : 'text-navy/80 hover:bg-sand hover:text-navy'
+              aria-current={isActive(href) ? 'page' : undefined}
+              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-xs font-semibold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] lg:px-4 ${
+                isActive(href) ? 'bg-ivory/15 text-ivory' : 'text-ivory/75 hover:bg-ivory/10 hover:text-ivory'
               }`}
             >
               {label}
@@ -83,9 +87,7 @@ export default function Header() {
             <a
               href={TEL_HREF}
               aria-label={`Call ${DEALER_PHONE}`}
-              className={`flex min-h-11 min-w-11 items-center justify-center gap-1.5 whitespace-nowrap text-sm font-semibold tracking-wide transition-colors ${
-                transparent ? 'text-white/90 hover:text-white' : 'text-navy hover:text-navy-800'
-              }`}
+              className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-semibold tracking-wide text-ivory/90 transition-colors hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
             >
               <Phone className="h-4 w-4" aria-hidden="true" />
               {/* Number collapses to the icon on tablets so the nav fits on one line */}
@@ -94,9 +96,7 @@ export default function Header() {
           )}
           <Link
             href="/contact"
-            className={`whitespace-nowrap rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-colors lg:px-5 ${
-              transparent ? 'border-white/80 text-white hover:bg-white hover:text-navy' : 'border-navy text-navy hover:bg-navy hover:text-white'
-            }`}
+            className="whitespace-nowrap rounded-xl border border-ivory/40 bg-ivory/[0.06] px-4 py-2 text-sm font-semibold text-ivory transition-colors hover:bg-ivory hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] lg:px-5"
           >
             Get in touch
           </Link>
@@ -104,9 +104,7 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className={`flex h-11 w-11 items-center justify-center rounded-lg sm:hidden transition-colors ${
-            transparent ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-sand'
-          }`}
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-ivory transition-colors hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
           aria-expanded={open}
@@ -117,16 +115,15 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="border-t border-sand-200 bg-ivory px-4 pb-5 pt-3 sm:hidden rounded-b-2xl shadow-lg">
+        <div className="rounded-b-2xl border-t border-ivory/10 bg-[#0c1e33]/90 px-4 pb-5 pt-3 shadow-lg backdrop-blur-xl sm:hidden">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               onClick={() => setOpen(false)}
-              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                isActive(href)
-                  ? 'bg-sand text-navy'
-                  : 'text-navy/80 hover:bg-sand'
+              aria-current={isActive(href) ? 'page' : undefined}
+              className={`flex min-h-11 items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                isActive(href) ? 'bg-ivory/15 text-ivory' : 'text-ivory/80 hover:bg-ivory/10'
               }`}
             >
               {label}
@@ -135,25 +132,25 @@ export default function Header() {
           {DEALER_PHONE && (
             <a
               href={TEL_HREF}
-              className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-navy hover:bg-sand"
+              className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-ivory hover:bg-ivory/10"
             >
-              <Phone className="h-4 w-4" />
+              <Phone className="h-4 w-4" aria-hidden="true" />
               {DEALER_PHONE}
             </a>
           )}
           <Link
             href="/contact"
             onClick={() => setOpen(false)}
-            className="mt-3 flex w-full items-center justify-center rounded-xl border-2 border-navy px-5 py-3 text-sm font-semibold text-navy hover:bg-navy hover:text-white"
+            className="mt-3 flex min-h-12 w-full items-center justify-center rounded-xl bg-ivory px-5 py-3 text-sm font-semibold text-navy hover:bg-white"
           >
             Get in touch
           </Link>
         </div>
       )}
     </header>
-    {/* Spacer = fixed header height (--header-h in globals.css: 56px logo + py-2.5 on phones, 80px + py-3.5 from sm)
-        so content never starts underneath it */}
-    {!isHome && <div className="h-[var(--header-h)]" aria-hidden="true" />}
+    {/* Spacer = full header height (--header-space in globals.css), fixed even when the header compacts on scroll
+        so content never jumps. The home hero runs under the header instead. */}
+    {!isHome && <div className="h-[var(--header-space)]" aria-hidden="true" />}
     </>
   )
 }

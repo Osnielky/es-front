@@ -49,12 +49,12 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
   if (submitted) {
     return (
       <div className="card flex flex-col items-center gap-4 px-8 py-12 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-          <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-200">
+          <CheckCircle2 className="h-8 w-8" />
         </div>
         <div>
-          <p className="text-xl font-bold text-gray-900">Message Sent!</p>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="text-xl font-bold text-ivory">Message Sent!</p>
+          <p className="mt-1 text-sm text-ivory/75">
             We&apos;ve received your message and will be in touch shortly.
           </p>
         </div>
@@ -65,11 +65,11 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
   return (
     <div className="card overflow-hidden">
       {/* Card header */}
-      <div className="lead-form-header bg-brand-600 px-6 py-5">
-        <h3 className="text-base font-bold text-white">
+      <div className="lead-form-header px-6 py-5">
+        <h3 className="text-base font-bold text-ivory">
           {vehicleName ? `Interested in the ${vehicleName}?` : 'Get in Touch'}
         </h3>
-        <p className="mt-1 text-sm text-brand-200">Fill out the form — we&apos;ll reach out fast.</p>
+        <p className="mt-1 text-sm text-ivory/75">Fill out the form — we&apos;ll reach out fast.</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6" noValidate>
@@ -79,7 +79,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
         <div>
           <label htmlFor="name" className="label">Full Name *</label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ivory/55" />
             <input
               id="name"
               type="text"
@@ -89,29 +89,32 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
               {...register('name')}
             />
           </div>
-          {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+          {errors.name && <p className="mt-1 text-xs text-red-300">{errors.name.message}</p>}
         </div>
 
         <div>
-          <label htmlFor="email" className="label">Email *</label>
+          {/* leadSchema requires an email or a phone number, not both */}
+          <p id="contact-hint" className="mb-3 text-sm text-ivory/70">Leave an email, a phone number, or both.</p>
+          <label htmlFor="email" className="label">Email</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ivory/55" />
             <input
               id="email"
               type="email"
               autoComplete="email"
               className="input pl-10"
               placeholder="jane@example.com"
+              aria-describedby="contact-hint"
               {...register('email')}
             />
           </div>
-          {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1 text-xs text-red-300">{errors.email.message}</p>}
         </div>
 
         <div>
           <label htmlFor="phone" className="label">Phone</label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ivory/55" />
             <input
               id="phone"
               type="tel"
@@ -119,6 +122,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
               inputMode="tel"
               className="input pl-10"
               placeholder="(555) 000-0000"
+              aria-describedby="contact-hint"
               {...register('phone')}
             />
           </div>
@@ -127,7 +131,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
         <div>
           <label htmlFor="message" className="label">Message</label>
           <div className="relative">
-            <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <MessageSquare className="absolute left-3 top-3 h-4 w-4 text-ivory/55" />
             <textarea
               id="message"
               rows={3}
@@ -139,7 +143,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+          <p className="rounded-lg bg-red-400/15 px-3 py-2 text-sm text-red-200">{error}</p>
         )}
 
         <button

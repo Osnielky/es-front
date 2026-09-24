@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { Phone, MapPin, Mail, Clock, ExternalLink, ChevronRight } from 'lucide-react'
 import { DEALER_ADDRESS, BUSINESS_HOURS } from '@/lib/seo'
 import { DEALER_PHONE, TEL_HREF, whatsappHref } from '@/lib/contact'
@@ -12,20 +13,18 @@ export default function Footer() {
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`
 
   return (
-    <footer className="bg-gray-900">
+    <footer className="border-t border-ivory/10 bg-[#0c1e33]/55 text-ivory backdrop-blur-xl">
       {/* Main Footer Content */}
-      <div className="mx-auto max-w-7xl px-4 pt-16 pb-8">
+      <div className="mx-auto max-w-site px-4 pt-16 pb-8">
         <div className="grid gap-12 lg:grid-cols-12">
           {/* Brand & Contact Column */}
           <div className="lg:col-span-5">
-            <Link href="/" className="inline-flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-600">
-                <span className="text-xl font-black text-white">E&S</span>
-              </div>
-              <span className="text-xl font-bold text-white">{DEALER_NAME}</span>
+            <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]">
+              <Image src="/logo.png" alt="" width={48} height={48} sizes="48px" className="h-12 w-auto rounded-lg bg-ivory/95 p-0.5" />
+              <span className="font-serif text-2xl font-semibold text-ivory">{DEALER_NAME}</span>
             </Link>
             
-            <p className="mt-4 text-gray-400 leading-relaxed max-w-md">
+            <p className="mt-4 text-ivory/70 leading-relaxed max-w-md">
               Your trusted dealership in Naples, FL. We offer quality pre-owned vehicles 
               with honest pricing and exceptional customer service.
             </p>
@@ -35,26 +34,26 @@ export default function Footer() {
               {DEALER_PHONE && (
                 <a
                   href={TEL_HREF}
-                  className="flex items-center gap-4 rounded-xl bg-gray-800/50 p-4 transition-colors hover:bg-gray-800"
+                  className="glass flex items-center gap-4 rounded-xl p-4 transition-colors hover:bg-ivory/[0.12]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-brand-600">
-                    <Phone className="h-5 w-5 text-white" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-ivory/10">
+                    <Phone className="h-5 w-5 text-[#F0B27A]" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Call or Text</p>
-                    <p className="text-lg font-bold text-white">{DEALER_PHONE}</p>
+                    <p className="text-sm text-ivory/70">Call or Text</p>
+                    <p className="text-lg font-bold text-ivory">{DEALER_PHONE}</p>
                   </div>
                 </a>
               )}
 
-              <div className="flex items-center gap-4 rounded-xl bg-gray-800/50 p-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">
-                  <Clock className="h-5 w-5 text-gray-300" />
+              <div className="glass flex items-center gap-4 rounded-xl p-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-ivory/10">
+                  <Clock className="h-5 w-5 text-[#F0B27A]" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Business Hours</p>
+                  <p className="text-sm text-ivory/70">Business Hours</p>
                   {BUSINESS_HOURS.map((h, i) => (
-                    <p key={h.label} className={i === 0 ? 'font-semibold text-white' : 'text-sm text-gray-400'}>
+                    <p key={h.label} className={i === 0 ? 'font-semibold text-ivory' : 'text-sm text-ivory/70'}>
                       {h.label}: {h.display}
                     </p>
                   ))}
@@ -65,27 +64,27 @@ export default function Footer() {
                 href={directionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-xl bg-gray-800/50 p-4 transition-colors hover:bg-gray-800"
+                className="glass flex items-center gap-4 rounded-xl p-4 transition-colors hover:bg-ivory/[0.12]"
               >
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-700">
-                  <MapPin className="h-5 w-5 text-gray-300" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-ivory/10">
+                  <MapPin className="h-5 w-5 text-[#F0B27A]" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs font-medium uppercase tracking-wider text-gray-400">Visit Us</p>
-                  <p className="text-sm font-medium text-white">{DEALER_ADDRESS}</p>
+                  <p className="text-sm text-ivory/70">Visit Us</p>
+                  <p className="text-sm font-medium text-ivory">{DEALER_ADDRESS}</p>
                 </div>
-                <ExternalLink className="h-4 w-4 text-gray-500" />
+                <ExternalLink className="h-4 w-4 text-ivory/60" />
               </a>
             </div>
 
             {/* Social Links */}
             <div className="mt-8 flex items-center gap-3">
-              <span className="text-sm text-gray-400">Follow us:</span>
+              <span className="text-sm text-ivory/70">Follow us:</span>
               <a
                 href="https://www.instagram.com/eands_car_sales_llc"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-all hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-lg border border-ivory/15 bg-ivory/[0.06] text-ivory/80 transition-colors hover:bg-ivory/15 hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
                 aria-label="Instagram"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -96,7 +95,7 @@ export default function Footer() {
                 href="https://www.tiktok.com/@gomez_car_sales"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-all hover:bg-black hover:text-white"
+                className="flex h-11 w-11 items-center justify-center rounded-lg border border-ivory/15 bg-ivory/[0.06] text-ivory/80 transition-colors hover:bg-ivory/15 hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
                 aria-label="TikTok"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -108,7 +107,7 @@ export default function Footer() {
                   href={whatsappHref("Hi! I'm interested in your vehicles.")}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800 text-gray-400 transition-all hover:bg-green-600 hover:text-white"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg border border-ivory/15 bg-ivory/[0.06] text-ivory/80 transition-colors hover:bg-ivory/15 hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
                   aria-label="WhatsApp"
                 >
                   <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -124,18 +123,18 @@ export default function Footer() {
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
               {/* Inventory */}
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-white">Inventory</h3>
+                <h3 className="text-base font-semibold text-ivory">Inventory</h3>
                 <ul className="mt-4 space-y-3">
                   {[
                     { href: '/inventory', label: 'All Vehicles' },
-                    { href: '/inventory?condition=NEW', label: 'New Cars' },
-                    { href: '/inventory?condition=USED', label: 'Used Cars' },
-                    { href: '/inventory?condition=CERTIFIED', label: 'Certified Pre-Owned' },
+                    { href: '/inventory?sort=price-asc', label: 'Lowest Price' },
+                    { href: '/inventory?sort=mileage-asc', label: 'Lowest Mileage' },
+                    { href: '/inventory?sort=year-desc', label: 'Newest Models' },
                   ].map(({ href, label }) => (
                     <li key={label}>
                       <Link 
                         href={href} 
-                        className="group flex items-center text-gray-400 transition-colors hover:text-white"
+                        className="group flex items-center text-ivory/70 transition-colors hover:text-ivory"
                       >
                         <ChevronRight className="mr-1 h-4 w-4 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
                         {label}
@@ -147,7 +146,7 @@ export default function Footer() {
 
               {/* Company */}
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-white">Company</h3>
+                <h3 className="text-base font-semibold text-ivory">Company</h3>
                 <ul className="mt-4 space-y-3">
                   {[
                     { href: '/contact', label: 'Contact Us' },
@@ -158,7 +157,7 @@ export default function Footer() {
                     <li key={label}>
                       <Link
                         href={href}
-                        className="group flex items-center text-gray-400 transition-colors hover:text-white"
+                        className="group flex items-center text-ivory/70 transition-colors hover:text-ivory"
                       >
                         <ChevronRight className="mr-1 h-4 w-4 opacity-0 -translate-x-2 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
                         {label}
@@ -170,13 +169,13 @@ export default function Footer() {
 
               {/* Service Areas */}
               <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-white">Service Areas</h3>
+                <h3 className="text-base font-semibold text-ivory">Service Areas</h3>
                 <ul className="mt-4 space-y-3">
                   {['Naples', 'Marco Island', 'Bonita Springs', 'Fort Myers', 'Estero', 'Golden Gate'].map((area) => (
                     <li key={area}>
                       <Link
                         href="/inventory"
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-ivory/70 hover:text-ivory transition-colors"
                       >
                         {area}, FL
                       </Link>
@@ -192,15 +191,15 @@ export default function Footer() {
                 href={mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative block overflow-hidden rounded-xl bg-gray-800"
+                className="glass group relative block overflow-hidden rounded-xl"
               >
                 <LazyMapEmbed
                   embedUrl={`https://www.google.com/maps?q=${encodedAddress}&output=embed`}
                   title={`Map to ${DEALER_NAME}`}
                   address={DEALER_ADDRESS}
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
-                  <span className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-gray-900">
+                <div className="absolute inset-0 flex items-center justify-center bg-[#0c1e33]/40 opacity-0 transition-opacity group-hover:opacity-100">
+                  <span className="flex items-center gap-2 rounded-full bg-ivory px-4 py-2 text-sm font-semibold text-navy">
                     <MapPin className="h-4 w-4" />
                     Open in Google Maps
                   </span>
@@ -212,18 +211,18 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
-        <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="border-t border-ivory/10">
+        <div className="mx-auto max-w-site px-4 py-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-ivory/70">
               © {new Date().getFullYear()} {DEALER_NAME}. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-sm text-gray-400">
-              <Link href="/sitemap.xml" className="hover:text-white transition-colors">Sitemap</Link>
+            <div className="flex items-center gap-6 text-sm text-ivory/70">
+              <Link href="/sitemap.xml" className="hover:text-ivory transition-colors">Sitemap</Link>
             </div>
           </div>
-          <p className="mt-4 text-center text-xs text-gray-400">
-            Website created by OSMIO LLC · <a href="mailto:info@osmioservices.com" className="hover:text-white transition-colors">info@osmioservices.com</a>
+          <p className="mt-4 text-center text-xs text-ivory/70">
+            Website created by OSMIO LLC · <a href="mailto:info@osmioservices.com" className="hover:text-ivory transition-colors">info@osmioservices.com</a>
           </p>
         </div>
       </div>

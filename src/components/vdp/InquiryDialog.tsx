@@ -88,21 +88,21 @@ export default function InquiryDialog({ vehicle, intent, onClose }: Props) {
       // Backdrop click: the dialog element itself is the target only outside the panel
       onClick={(e) => e.target === e.currentTarget && ref.current?.close()}
     >
-      <div data-initial-focus tabIndex={-1} className="flex max-h-[inherit] flex-col outline-none overflow-hidden rounded-t-panel border border-line bg-ivory text-ink shadow-2xl md:rounded-panel">
-        <div className="flex items-start justify-between gap-4 border-b border-line px-5 pb-4 pt-5 sm:px-6">
+      <div data-initial-focus tabIndex={-1} className="flex max-h-[inherit] flex-col outline-none overflow-hidden glass glass-strong rounded-t-panel text-ivory shadow-2xl md:rounded-panel">
+        <div className="flex items-start justify-between gap-4 border-b border-ivory/15 px-5 pb-4 pt-5 sm:px-6">
           <div className="min-w-0">
-            <h2 id="inquiry-title" className="text-xl font-semibold text-navy">{TITLES[active].title}</h2>
-            <p id="inquiry-sub" className="mt-1 text-sm text-ink-muted">
+            <h2 id="inquiry-title" className="text-xl font-semibold text-ivory">{TITLES[active].title}</h2>
+            <p id="inquiry-sub" className="mt-1 text-sm text-ivory/75">
               {TITLES[active].sub}
             </p>
-            <p className="mt-2 truncate text-sm font-medium text-ink">
-              {vehicle.name} <span className="font-normal text-ink-muted">· Stock #{vehicle.stock}</span>
+            <p className="mt-2 truncate text-sm font-medium text-ivory">
+              {vehicle.name} <span className="font-normal text-ivory/75">· Stock #{vehicle.stock}</span>
             </p>
           </div>
           <button
             type="button"
             onClick={() => ref.current?.close()}
-            className="-mr-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-sand hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy"
+            className="-mr-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-ivory/80 transition-colors hover:bg-ivory/10 hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
             aria-label="Close"
           >
             <X className="h-5 w-5" aria-hidden="true" />

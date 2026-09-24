@@ -25,8 +25,8 @@ export default function CardImageCarousel({ images, alt, href, priority = false,
 
   if (count === 0) {
     return (
-      <Link href={href} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center bg-sand">
-        <Car className="h-16 w-16 text-sand-300" />
+      <Link href={href} tabIndex={-1} aria-hidden="true" className="flex h-full w-full items-center justify-center bg-ivory/[0.06]">
+        <Car className="h-16 w-16 text-ivory/25" />
       </Link>
     )
   }
@@ -94,7 +94,7 @@ export default function CardImageCarousel({ images, alt, href, priority = false,
         </div>
       )}
 
-      <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-lg bg-gray-900/80 px-2.5 py-1 text-xs font-medium text-white">
+      <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-lg bg-[#0c1e33]/75 px-2.5 py-1 text-xs font-medium text-ivory backdrop-blur-sm">
         <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" />
         {count} {count === 1 ? 'photo' : 'photos'}
       </span>
