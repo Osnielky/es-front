@@ -56,7 +56,7 @@ Local env vars live in `.env` (see `dev.env.example` for the list). Required: `D
 
 ### Leads
 
-`POST /api/leads` validates with `leadSchema` (`lib/validations/lead.ts`), creates a `Lead`, then fires `sendLeadNotification` (`lib/email.ts`, Resend) without awaiting it. Lead sources: `LeadForm` (contact, financing, trade-in, and the VDP sidebar/`#inquire`) and `WhatsAppButton` (cards, the VDP sticky mobile CTA bar), which logs a `WHATSAPP` lead on click before opening WhatsApp. Adding a `LeadType` requires a Prisma migration plus updates to the Zod schema and `TYPE_LABEL` in `email.ts`.
+`POST /api/leads` validates with `leadSchema` (`lib/validations/lead.ts`; email **or** phone is required, and `Lead.email` is nullable), creates a `Lead`, then fires `sendLeadNotification` (`lib/email.ts`, Resend, HTML-escaped) without awaiting it. Lead sources: `LeadForm` (contact, financing, trade-in), the VDP `InquiryForm` (`VEHICLE` for "Check availability", `TEST_DRIVE` for test-drive *requests*: there is no booking service, so the preferred day/time goes into the message and the dealer confirms), and `WhatsAppButton` (cards, VDP panel, VDP mobile bar), which logs a `WHATSAPP` lead on click before opening WhatsApp. The VDP form folds vehicle name, stock #, VIN, id and URL into the message. Adding a `LeadType` requires a Prisma migration plus updates to the Zod schema and `TYPE_LABEL` in `email.ts`.
 
 ### Admin
 
@@ -68,11 +68,13 @@ Local env vars live in `.env` (see `dev.env.example` for the list). Required: `D
 
 ### SEO
 
-`src/lib/seo.ts` holds all metadata/JSON-LD builders (`buildVehicleJsonLd`, `buildLocalBusinessJsonLd`, `buildPageMetadata`, FAQ/financing/trade-in schemas, etc.) and the `LOCATION` constant for the dealership. Pages inject JSON-LD as inline `<script type="application/ld+json">`. `robots.ts` and `sitemap.ts` are generated. Vehicle pages use `dynamic = 'force-dynamic'`.
+`src/lib/seo.ts` holds all metadata/JSON-LD builders (`buildVehicleJsonLd`, `buildLocalBusinessJsonLd`, `buildPageMetadata`, FAQ/financing/trade-in schemas, etc.) and the `LOCATION` constant for the dealership. Pages inject JSON-LD as inline `<script type="application/ld+json">`. `robots.ts` and `sitemap.ts` are generated. Vehicle pages use ISR (`revalidate = 300`).
 
 ### Styling
 
-Shared component classes (`.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.label`, `.badge-*`) are defined in `src/app/globals.css`. Reuse them instead of repeating long inline Tailwind strings. Layouts are mobile-first. On the vehicle detail page, mobile order is: images → price → title → specs → lead CTA → financing → description.
+Shared component classes (`.btn-primary`, `.btn-secondary`, `.card`, `.input`, `.label`, `.badge-*`) are defined in `src/app/globals.css`. Reuse them instead of repeating long inline Tailwind strings. Layouts are mobile-first. The fixed header height is the `--header-h` CSS variable (76px phones, 108px from `sm`); use it for sticky offsets and `scroll-mt`.
+
+**Vehicle detail page** (`app/inventory/[vin]/page.tsx`, components in `components/vdp/`): `VdpProvider` (`VdpContext.tsx`) holds the serializable `VdpVehicle` and opens the inquiry `<dialog>` (`InquiryDialog`/`InquiryForm`, lazy-loaded); `VdpGallery` (Embla + thumbnails; hero only loads first) opens `VdpLightbox` (yet-another-react-lightbox with Zoom/Thumbnails, loaded on first open); `ContactPanel` (price, est. payment, CTAs; sticky from the `desk` = 1200px breakpoint); `VehicleSpecs`, `SectionNav` (scroll-spy), `MobileActionBar` (<768px, hides while an overlay is open). VDP-only tokens/classes: `ink`, `ink-muted`, `line`, `champagne` (decoration only), `rounded-panel`, `.vdp-*` in globals.css, and the Cormorant serif from `lib/fonts.ts` for short editorial headings only. Order at every width below 1200px: back link/title → gallery → price panel → sections (overview/specs, features, details, visit). Missing inventory fields render "Not listed"; never infer values from photos.
 
 **Sand + Navy inventory theme:** `/inventory`, VDPs and `/cars-for-sale/*` wrap their content in `.theme-sand`. Tokens live in `tailwind.config.ts`: `sand` #F3EBDD (page background), `ivory` #FFFDF8 (cards), `navy` #16324F (buttons and links; hover `navy-800`). Inside the scope, `globals.css` restyles `.card`, `.btn-primary`, `.btn-secondary`, `.input`, `.badge-used` and the `LeadForm` header, and maps `text-gray-400/500` to warm stone tones for contrast on sand. Vehicle lists use the `.vehicle-grid` class (auto-fit columns with a 20rem minimum, 22rem from `xl`), so cards stretch into free space instead of leaving empty columns. Don't hardcode `grid-cols-*` for card grids. In inventory components use `bg-navy`/`text-navy`/`border-sand-200`, not `brand-*`. The rest of the site still uses `brand-*` blue.
 

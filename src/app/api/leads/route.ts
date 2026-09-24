@@ -16,7 +16,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: result.error.flatten() }, { status: 422 })
   }
 
-  const lead = await prisma.lead.create({ data: result.data })
+  const { email, phone, ...rest } = result.data
+  const lead = await prisma.lead.create({ data: { ...rest, email: email || null, phone: phone || null } })
 
   sendLeadNotification(lead).catch(() => {})
 

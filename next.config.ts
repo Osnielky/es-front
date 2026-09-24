@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     // 256 covers 80px thumbnails on 3x phones (240px); without it they jump to 384
     imageSizes: [80, 160, 256, 384],
     formats: ['image/avif', 'image/webp'],
+    // 85 for VDP gallery/lightbox photos; Next 16 rejects qualities that aren't listed
+    qualities: [75, 85],
     // Vehicle uploads get timestamped filenames and never change, so optimized variants can be cached
     // for 30 days instead of re-encoding every hour (GCS sends max-age=3600)
     minimumCacheTTL: 60 * 60 * 24 * 30,

@@ -45,7 +45,8 @@ model Vehicle {
 model Lead {
   id        String   @id @default(cuid())
   name      String
-  email     String
+  // Null when the visitor asked to be contacted by phone only
+  email     String?
   phone     String?
   message   String?
   vehicleId String?
@@ -71,4 +72,5 @@ enum LeadType {
   FINANCING
   TRADE_IN
   WHATSAPP
+  TEST_DRIVE
 }

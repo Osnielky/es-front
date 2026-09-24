@@ -3,6 +3,16 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Fixed header height (see Header.tsx); sticky elements and anchor offsets use it */
+    --header-h: 76px;
+  }
+  @media (min-width: 640px) {
+    :root {
+      --header-h: 108px;
+    }
+  }
+
   html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
@@ -15,6 +25,19 @@
 
   * {
     @apply box-border;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -102,12 +125,17 @@
 }
 
 /* Keep page content (incl. footer) clear of fixed bottom bars: the VDP mobile CTA bar (lg:hidden) and the compare tray */
-body:has(.sticky-cta:not(.lg\:hidden)) {
-  padding-bottom: 5rem;
+body:has(.sticky-cta:not(.lg\:hidden):not(.md\:hidden)) {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
 }
 @media (max-width: 1023px) {
+  body:has(.sticky-cta:not(.md\:hidden)) {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 767px) {
   body:has(.sticky-cta) {
-    padding-bottom: 5rem;
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
 }
 
@@ -180,4 +208,109 @@ body:has(.sticky-cta:not(.lg\:hidden)) {
 .range-thumb:focus-visible::-webkit-slider-thumb {
   outline: 3px solid #b7c6d8;
   outline-offset: 2px;
+}
+
+/* ── Vehicle detail page (VDP) ── */
+@layer components {
+  .vdp {
+    @apply text-ink;
+  }
+
+  .vdp-panel {
+    @apply rounded-panel border border-line bg-ivory shadow-panel;
+  }
+
+  .vdp-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted;
+  }
+
+  .vdp-heading {
+    @apply font-serif text-[1.75rem] font-semibold leading-tight text-navy sm:text-[2rem];
+  }
+
+  .vdp-icon-btn {
+    @apply inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-line bg-ivory px-3 text-sm font-semibold text-navy transition-colors duration-150
+      hover:border-navy-200 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-sand;
+  }
+
+  .vdp-btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-[0.9375rem] font-semibold transition-colors duration-150
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-navy focus-visible:ring-offset-2 focus-visible:ring-offset-ivory disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .vdp-btn-primary {
+    @apply vdp-btn bg-navy text-white hover:bg-navy-800;
+  }
+
+  .vdp-btn-outline {
+    @apply vdp-btn border border-navy bg-transparent text-navy hover:bg-navy-50;
+  }
+
+  .vdp-input {
+    @apply block w-full rounded-xl border border-line bg-white px-4 py-3 text-base text-ink placeholder:text-ink-muted/70 transition-colors duration-150
+      focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy-100 aria-[invalid=true]:border-red-600;
+  }
+
+  .vdp-label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+
+  .vdp-error {
+    @apply mt-1.5 text-sm text-red-700;
+  }
+}
+
+/* Inquiry dialog: centered on tablet/desktop, bottom sheet on phones */
+.vdp-dialog {
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  width: min(100% - 2rem, 32rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: visible;
+  color: inherit;
+}
+.vdp-dialog::backdrop {
+  background: rgb(20 36 59 / 0.45);
+  backdrop-filter: blur(2px);
+}
+.vdp-dialog[open] {
+  animation: vdp-dialog-in 200ms ease-out;
+}
+.vdp-dialog[open]::backdrop {
+  animation: vdp-fade-in 200ms ease-out;
+}
+@media (max-width: 767px) {
+  .vdp-dialog {
+    width: 100%;
+    max-width: 100%;
+    margin: auto 0 0;
+    /* --vv-inset: height the on-screen keyboard covers (set from visualViewport), so the sheet sits above it */
+    margin-bottom: var(--vv-inset, 0px);
+    max-height: calc(100dvh - var(--vv-inset, 0px) - 0.75rem);
+  }
+  .vdp-dialog[open] {
+    animation-name: vdp-sheet-in;
+  }
+}
+@keyframes vdp-dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes vdp-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes vdp-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Hide scrollbars on the horizontally scrolling section nav / thumbnail strip (still scrollable) */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

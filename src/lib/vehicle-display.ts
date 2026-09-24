@@ -32,3 +32,15 @@ export function engineLabel(engine?: string | null) {
   if (vee) return `${vee[1].toUpperCase()}${vee[2]} engine`
   return engine
 }
+
+// Cylinder count from the recorded engine text: "2.5L 4-Cylinder" → "4 cylinders", "3.5L V6" → "6 cylinders".
+// Undefined when the engine text doesn't state it (never guessed).
+export function cylinderLabel(engine?: string | null) {
+  if (!engine) return undefined
+  const count = engine.match(/(\d{1,2})[\s-]*cyl/i)?.[1] ?? engine.match(/\b[VWIH]-?(\d{1,2})\b/i)?.[1]
+  return count ? `${Number(count)} cylinders` : undefined
+}
+
+export function vehicleName(vehicle: { year: number; make: string; model: string; trim?: string | null }) {
+  return [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(' ')
+}

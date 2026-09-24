@@ -7,7 +7,7 @@ import Image from 'next/image'
 import {
   LogOut, Plus, Car, CheckCircle2, AlertCircle, Clock,
   DollarSign, TrendingUp, Users, Edit2, Trash2, Search,
-  Filter, ChevronDown, MessageCircle, Phone, Mail, ArrowUpRight, ArrowDownRight,
+  Filter, ChevronDown, MessageCircle, Phone, Mail, ArrowUpRight, ArrowDownRight, CalendarClock,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -30,7 +30,7 @@ interface Statistics {
 interface Lead {
   id: string
   name: string
-  email: string
+  email: string | null
   phone: string | null
   message: string | null
   type: string
@@ -67,6 +67,7 @@ const LEAD_TYPE_META: Record<string, { label: string; color: string; icon: React
   FINANCING: { label: 'Financing', color: 'bg-amber-100 text-amber-700',  icon: DollarSign },
   TRADE_IN:  { label: 'Trade-In',  color: 'bg-emerald-100 text-emerald-700', icon: TrendingUp },
   WHATSAPP:  { label: 'WhatsApp',  color: 'bg-green-100 text-green-700',  icon: MessageCircle },
+  TEST_DRIVE: { label: 'Test drive', color: 'bg-violet-100 text-violet-700', icon: CalendarClock },
 }
 
 function timeAgo(dateStr: string) {
@@ -208,7 +209,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-gray-50">
 
       {/* ── Top bar ─────────────────────────────────────────────────────────── */}
-      <div className="sticky top-[90px] sm:top-[108px] z-40 bg-white border-b border-gray-100 shadow-sm">
+      <div className="sticky top-[var(--header-h)] z-40 bg-white border-b border-gray-100 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -489,7 +490,7 @@ export default function AdminDashboard() {
                       <tr key={lead.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4">
                           <p className="font-semibold text-gray-900 text-sm">{lead.name}</p>
-                          <a href={`mailto:${lead.email}`} className="text-xs text-brand-600 hover:underline">{lead.email}</a>
+                          {lead.email && <a href={`mailto:${lead.email}`} className="text-xs text-brand-600 hover:underline">{lead.email}</a>}
                         </td>
                         <td className="px-6 py-4">
                           {lead.phone

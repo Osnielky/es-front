@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "LeadType" ADD VALUE 'TEST_DRIVE';
+
+-- AlterTable
+ALTER TABLE "Lead" ALTER COLUMN "email" DROP NOT NULL;

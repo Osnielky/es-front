@@ -287,7 +287,7 @@ export default function AdminInventoryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-[90px] sm:top-[108px] z-40">
+      <div className="bg-white border-b border-gray-100 sticky top-[var(--header-h)] z-40">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>

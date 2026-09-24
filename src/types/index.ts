@@ -27,11 +27,11 @@ export interface Vehicle {
 export interface Lead {
   id: string
   name: string
-  email: string
+  email: string | null
   phone: string | null
   message: string | null
   vehicleId: string | null
-  type: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN'
+  type: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN' | 'WHATSAPP' | 'TEST_DRIVE'
   createdAt: Date
 }
 

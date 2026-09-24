@@ -29,6 +29,12 @@ const config: Config = {
           300: '#D9C7A6',
         },
         ivory: '#FFFDF8',     // cards and raised surfaces
+        line: '#E5DACB',      // VDP dividers and panel outlines
+        champagne: '#B89A66', // decorative accents only; too light for small text on sand/ivory
+        ink: {
+          DEFAULT: '#14243B', // primary text on sand/ivory
+          muted: '#52647A',   // supporting text (5.9:1 on ivory)
+        },
         navy: {
           50:  '#EEF2F7',
           100: '#DCE4EE',
@@ -42,8 +48,17 @@ const config: Config = {
           600: '#ea6c0a',
         },
       },
+      screens: {
+        // VDP two-column breakpoint (gallery 2/3, contact panel 1/3)
+        desk: '1200px',
+      },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        // Short editorial headings on the VDP only ("A closer look"); loaded via lib/fonts
+        serif: ['var(--font-serif)', 'Georgia', 'serif'],
+      },
+      borderRadius: {
+        panel: '16px',
       },
       backgroundImage: {
         'hero-gradient': 'linear-gradient(135deg, #111a50 0%, #1a2a80 40%, #1f3ee8 100%)',
@@ -53,6 +68,7 @@ const config: Config = {
         'glow': '0 0 24px rgba(33, 62, 232, 0.25)',
         'glow-accent': '0 0 24px rgba(249, 115, 22, 0.3)',
         'card-hover': '0 20px 40px rgba(0,0,0,0.12)',
+        panel: '0 1px 2px rgba(20,36,59,0.04), 0 8px 24px -12px rgba(20,36,59,0.12)',
       },
       animation: {
         'fade-up': 'fadeUp 0.5s ease-out forwards',

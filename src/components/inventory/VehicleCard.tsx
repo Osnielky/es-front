@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Gauge, Settings2, Car, CheckCircle2, Calculator, ArrowRight, Cog } from 'lucide-react'
 import type { Vehicle } from '@/types'
-import { vehiclePath, stockNumber as getStockNumber } from '@/lib/seo'
+import { vehiclePath, vehicleUrl, stockNumber as getStockNumber } from '@/lib/seo'
 import { estimateMonthlyPayment, FINANCE_DISCLAIMER } from '@/lib/finance'
 import { colorSwatch, engineLabel } from '@/lib/vehicle-display'
 import WhatsAppButton from './WhatsAppButton'
@@ -165,6 +165,7 @@ export default function VehicleCard({ vehicle, priority = false, headingLevel: H
             model={model}
             trim={trim}
             stockNumber={getStockNumber(vehicle)}
+            url={vehicleUrl(vehicle)}
             className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-green-700 bg-white px-3 py-2.5 text-sm font-semibold text-green-800 transition-colors hover:bg-green-50"
           />
         </div>

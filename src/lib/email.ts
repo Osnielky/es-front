@@ -10,11 +10,17 @@ const TYPE_LABEL: Record<string, string> = {
   FINANCING: 'Financing Request',
   TRADE_IN: 'Trade-In Request',
   WHATSAPP: 'WhatsApp Click',
+  TEST_DRIVE: 'Test Drive Request',
+}
+
+// Lead fields are visitor input; escape before interpolating into the notification HTML
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 }
 
 interface LeadData {
   name: string
-  email: string
+  email?: string | null
   phone?: string | null
   message?: string | null
   type: string
@@ -34,7 +40,7 @@ export async function sendLeadNotification(lead: LeadData): Promise<void> {
     [
       ['Type', TYPE_LABEL[lead.type] ?? lead.type],
       !isWhatsApp && ['Name', lead.name],
-      !isWhatsApp && ['Email', lead.email],
+      !isWhatsApp && lead.email && ['Email', lead.email],
       lead.phone && ['Phone', lead.phone],
       lead.message && ['Message', lead.message],
       lead.vehicleId && ['Vehicle ID', lead.vehicleId],
@@ -42,7 +48,7 @@ export async function sendLeadNotification(lead: LeadData): Promise<void> {
     ] as (string[] | false)[]
   )
     .filter((r): r is string[] => Boolean(r))
-    .map(([label, value]) => `<tr><td style="padding:6px 12px;color:#6b7280;white-space:nowrap">${label}</td><td style="padding:6px 12px;font-weight:600;color:#111827">${value}</td></tr>`)
+    .map(([label, value]) => `<tr><td style="padding:6px 12px;color:#6b7280;white-space:nowrap">${label}</td><td style="padding:6px 12px;font-weight:600;color:#111827">${escapeHtml(value).replace(/\n/g, '<br>')}</td></tr>`)
     .join('')
 
   const html = `

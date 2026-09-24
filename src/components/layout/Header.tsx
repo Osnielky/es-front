@@ -43,7 +43,7 @@ export default function Header() {
           : 'bg-ivory/95 backdrop-blur-md shadow-sm border-b border-sand-200'
       }`}
     >
-      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-3.5">
+      <div className="mx-auto flex max-w-screen-2xl items-center justify-between px-4 py-2.5 sm:py-3.5">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 group">
           <Image
@@ -53,17 +53,17 @@ export default function Header() {
             height={80}
             sizes="81px"
             priority
-            className="h-20 w-auto"
+            className="h-14 w-auto sm:h-20"
           />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 sm:flex">
+        <nav className="hidden items-center gap-0.5 sm:flex lg:gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-widest transition-colors ${
+              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-xs font-semibold uppercase tracking-widest transition-colors lg:px-4 ${
                 transparent
                   ? isActive(href)
                     ? 'bg-white/20 text-white'
@@ -82,17 +82,19 @@ export default function Header() {
           {DEALER_PHONE && (
             <a
               href={TEL_HREF}
-              className={`flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors ${
+              aria-label={`Call ${DEALER_PHONE}`}
+              className={`flex min-h-11 min-w-11 items-center justify-center gap-1.5 whitespace-nowrap text-sm font-semibold tracking-wide transition-colors ${
                 transparent ? 'text-white/90 hover:text-white' : 'text-navy hover:text-navy-800'
               }`}
             >
-              <Phone className="h-4 w-4" />
-              {DEALER_PHONE}
+              <Phone className="h-4 w-4" aria-hidden="true" />
+              {/* Number collapses to the icon on tablets so the nav fits on one line */}
+              <span className="hidden lg:inline">{DEALER_PHONE}</span>
             </a>
           )}
           <Link
             href="/contact"
-            className={`rounded-xl border-2 px-5 py-2 text-sm font-semibold transition-colors ${
+            className={`whitespace-nowrap rounded-xl border-2 px-4 py-2 text-sm font-semibold transition-colors lg:px-5 ${
               transparent ? 'border-white/80 text-white hover:bg-white hover:text-navy' : 'border-navy text-navy hover:bg-navy hover:text-white'
             }`}
           >
@@ -102,11 +104,12 @@ export default function Header() {
 
         {/* Mobile toggle */}
         <button
-          className={`flex h-9 w-9 items-center justify-center rounded-lg sm:hidden transition-colors ${
+          className={`flex h-11 w-11 items-center justify-center rounded-lg sm:hidden transition-colors ${
             transparent ? 'text-white hover:bg-white/10' : 'text-navy hover:bg-sand'
           }`}
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
+          aria-expanded={open}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -148,8 +151,9 @@ export default function Header() {
         </div>
       )}
     </header>
-    {/* Spacer = fixed header height (80px logo + py-3.5) so content never starts underneath it */}
-    {!isHome && <div className="h-[108px]" aria-hidden="true" />}
+    {/* Spacer = fixed header height (--header-h in globals.css: 56px logo + py-2.5 on phones, 80px + py-3.5 from sm)
+        so content never starts underneath it */}
+    {!isHome && <div className="h-[var(--header-h)]" aria-hidden="true" />}
     </>
   )
 }
