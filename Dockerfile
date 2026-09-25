@@ -24,7 +24,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # NEXT_PUBLIC_* vars must be set at build time for client components
 ARG NEXT_PUBLIC_DEALER_NAME="E&S Car Sales"
 ARG NEXT_PUBLIC_DEALER_PHONE="+1 (941) 499-7415"
-ARG NEXT_PUBLIC_DEALER_ADDRESS="1029 Airport-Pulling Rd unit c 49 Naples FL 34104"
+ARG NEXT_PUBLIC_DEALER_ADDRESS="3049 Van Buren Ave Naples FL 34112"
 ARG NEXT_PUBLIC_DEALER_EMAIL="info@eandscars.com"
 ARG NEXT_PUBLIC_SITE_URL="https://eandscars.com"
 ARG NEXT_PUBLIC_WHATSAPP_NUMBER="19414997415"
@@ -60,7 +60,7 @@ RUN chown nextjs:nodejs .next
 # Secrets (DATABASE_URL, ADMIN_*) are injected by Cloud Run from Secret Manager — never bake them into the image
 ENV NEXT_PUBLIC_DEALER_NAME="E&S Car Sales"
 ENV NEXT_PUBLIC_DEALER_PHONE="+1 (941) 499-7415"
-ENV NEXT_PUBLIC_DEALER_ADDRESS="1029 Airport-Pulling Rd unit c 49 Naples FL 34104"
+ENV NEXT_PUBLIC_DEALER_ADDRESS="3049 Van Buren Ave Naples FL 34112"
 ENV NEXT_PUBLIC_DEALER_EMAIL="info@eandscars.com"
 ENV NEXT_PUBLIC_SITE_URL="https://eandscars.com"
 ENV NEXT_PUBLIC_WHATSAPP_NUMBER="19414997415"

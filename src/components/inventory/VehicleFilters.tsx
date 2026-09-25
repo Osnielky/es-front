@@ -23,6 +23,8 @@ const MILEAGE_OPTIONS = [25000, 50000, 75000, 100000, 150000]
 const PRICE_STEP = 500
 // Filters that belong to this panel; Reset clears these but keeps search text and sort
 const FILTER_KEYS = ['make', 'bodyStyle', 'priceMin', 'priceMax', 'yearMin', 'yearMax', 'mileageMax', 'condition', 'model']
+// Fired by FiltersButton (results toolbar, below lg) so the collapsed panel opens
+const OPEN_EVENT = 'inventory:open-filters'
 
 function Select({ id, label, hideLabel = false, value, onChange, children }: { id: string; label: string; hideLabel?: boolean; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return (
@@ -43,6 +45,36 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const scrollAfterOpen = useRef(false)
+
+  const scrollToPanel = () => {
+    rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    toggleRef.current?.focus({ preventScroll: true })
+  }
+
+  // Opening changes the layout above the toolbar (and scroll anchoring shifts the page), which would
+  // cancel a smooth scroll started at the same time, so scroll only after the open panel has rendered
+  const isOpenRef = useRef(isOpen)
+  isOpenRef.current = isOpen
+
+  useEffect(() => {
+    const open = () => {
+      if (isOpenRef.current) return scrollToPanel()
+      scrollAfterOpen.current = true
+      setIsOpen(true)
+    }
+    window.addEventListener(OPEN_EVENT, open)
+    return () => window.removeEventListener(OPEN_EVENT, open)
+  }, [])
+
+  useEffect(() => {
+    if (isOpen && scrollAfterOpen.current) {
+      scrollAfterOpen.current = false
+      scrollToPanel()
+    }
+  }, [isOpen])
 
   const push = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams()
@@ -97,9 +129,10 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
   const pct = (v: number) => (v / priceCeiling) * 100
 
   return (
-    <div className="card mb-6 overflow-hidden lg:mb-0" aria-busy={isPending}>
+    <div ref={rootRef} id="filters" className="card mb-6 scroll-mt-[calc(var(--header-h)+1rem)] overflow-hidden lg:mb-0" aria-busy={isPending}>
       <div className="flex items-center justify-between px-5 py-4">
         <button
+          ref={toggleRef}
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
@@ -202,5 +235,25 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
         </p>
       </div>
     </div>
+  )
+}
+
+// Results-toolbar shortcut below lg, where the panel sits above the results collapsed:
+// scrolls back up to it and opens it
+export function FiltersButton({ activeCount }: { activeCount: number }) {
+  return (
+    <button
+      type="button"
+      // VehicleFilters opens the panel and scrolls to it
+      onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
+      className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-2 rounded-xl border border-ivory/20 bg-ivory/[0.06] px-3 text-sm font-semibold text-ivory transition-colors hover:border-ivory/40 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:px-4 lg:hidden"
+    >
+      <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+      {/* Icon-only on phones so the sort select keeps room for its label */}
+      <span className="sr-only sm:not-sr-only">Filters</span>
+      {activeCount > 0 && (
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F0B27A] px-1.5 text-xs font-bold text-[#0c1e33]">{activeCount}</span>
+      )}
+    </button>
   )
 }

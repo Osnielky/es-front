@@ -112,24 +112,20 @@
     @apply badge bg-violet-100 text-violet-700;
   }
 
-  /* Vehicle card grid: as many >=22rem columns as fit, and cards stretch into unused tracks
-     (auto-fit), so 2 results on a wide screen fill the row instead of leaving an empty column */
+  /* Vehicle card grid: as many >=20rem columns as fit (auto-fill), so cards keep a steady size.
+     The inventory grid spans the full page width, and auto-fit would blow a 2-car result up to
+     half-page-wide cards; with auto-fill a short result set simply leaves room on the right. */
   .vehicle-grid {
     @apply grid gap-6;
     --card-min: 20rem;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--card-min)), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min)), 1fr));
   }
 
-  /* Roomier cards on desktop: 2 columns at 1440px, 3 on wider screens */
+  /* Roomier cards on desktop */
   @media (min-width: 1280px) {
     .vehicle-grid {
       --card-min: 22rem;
     }
-  }
-
-  /* A lone result shouldn't become a 1,200px-wide card */
-  .vehicle-grid > :only-child {
-    max-width: 42rem;
   }
 
   .section-title {

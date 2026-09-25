@@ -11,11 +11,11 @@ export const LOGO_URL = `${SITE_URL}/logo-512.png`
 // Naples, FL location details for local SEO.
 // Keep NAP (name/address/phone) identical to the Google Business Profile.
 export const LOCATION = {
-  streetAddress: '1029 Airport-Pulling Rd, Unit C 49',
+  streetAddress: '3049 Van Buren Ave',
   city: 'Naples',
   state: 'Florida',
   stateCode: 'FL',
-  zipCode: '34104',
+  zipCode: '34112',
   county: 'Collier County',
   // Exact map pin from the Google Business Profile; geo schema is omitted while null
   geo: null as { latitude: number; longitude: number } | null,

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Search, LayoutGrid, List, MessageSquareMore } from 'lucide-react'
+import { Search, LayoutGrid, List, MessageSquareMore, X } from 'lucide-react'
 import { getVehicles, getInventoryFacets, VEHICLE_SORTS, isVehicleSort } from '@/lib/data'
 import { buildBreadcrumbJsonLd, buildInventoryJsonLd, LOCATION, DEFAULT_OG_IMAGE, makePath, bodyStylePath, serializeJsonLd } from '@/lib/seo'
 import { FINANCE_DISCLAIMER } from '@/lib/finance'
 import VehicleCard from '@/components/inventory/VehicleCard'
-import VehicleFilters from '@/components/inventory/VehicleFilters'
+import VehicleFilters, { FiltersButton } from '@/components/inventory/VehicleFilters'
 import { CompareModeToggle, CompareTray, SavedCarsMenu, SortSelect } from '@/components/inventory/ShortlistControls'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
@@ -150,6 +150,30 @@ export default async function InventoryPage({ searchParams }: Props) {
   const inventoryJsonLd = buildInventoryJsonLd(vehicles, { offset: (page - 1) * limit })
 
   const conditionWord = params.condition === 'NEW' ? 'new ' : params.condition === 'USED' ? 'used ' : params.condition === 'CERTIFIED' ? 'certified pre-owned ' : ''
+  const money = (v: string) => `$${Number(v).toLocaleString('en-US')}`
+  type Chip = { label: string; clear: Record<string, undefined> }
+  const chips = ([
+    params.make && { label: params.make, clear: { make: undefined, model: undefined } },
+    params.model && { label: params.model, clear: { model: undefined } },
+    params.bodyStyle && { label: params.bodyStyle, clear: { bodyStyle: undefined } },
+    (params.priceMin || params.priceMax) && {
+      label: params.priceMin && params.priceMax
+        ? `${money(params.priceMin)} – ${money(params.priceMax)}`
+        : params.priceMin ? `From ${money(params.priceMin)}` : `Up to ${money(params.priceMax!)}`,
+      clear: { priceMin: undefined, priceMax: undefined },
+    },
+    (params.yearMin || params.yearMax) && {
+      label: params.yearMin && params.yearMax ? `${params.yearMin} – ${params.yearMax}` : params.yearMin ? `${params.yearMin} or newer` : `${params.yearMax} or older`,
+      clear: { yearMin: undefined, yearMax: undefined },
+    },
+    params.mileageMax && { label: `Under ${Number(params.mileageMax).toLocaleString('en-US')} mi`, clear: { mileageMax: undefined } },
+    params.condition && { label: params.condition === 'CERTIFIED' ? 'Certified' : params.condition.charAt(0) + params.condition.slice(1).toLowerCase(), clear: { condition: undefined } },
+    q && { label: `“${q}”`, clear: { q: undefined } },
+  ] as Array<Chip | false | '' | undefined>).filter((c): c is Chip => Boolean(c))
+  const activeFilterCount = ['make', 'model', 'bodyStyle', 'priceMin', 'priceMax', 'yearMin', 'yearMax', 'mileageMax', 'condition'].filter(
+    (k) => params[k as keyof typeof params]
+  ).length
+
   // Filters carried through a keyword search (the search box resets paging but keeps other filters)
   const carried = Object.entries(params).filter(([k, v]) => v && !['q', 'page'].includes(k))
 
@@ -159,6 +183,7 @@ export default async function InventoryPage({ searchParams }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(inventoryJsonLd) }} />
 
       <div className="theme-glass min-h-screen">
+        {/* Hero band */}
         {/* Hero band */}
         <section className="relative overflow-hidden border-b border-ivory/15">
           <HeroArt />
@@ -200,13 +225,43 @@ export default async function InventoryPage({ searchParams }: Props) {
                   Search
                 </button>
               </form>
+
+              {/* One-tap filters for the most common choices; tapping an active one clears it */}
+              {(facets.bodyStyles.length > 0 || facets.makes.length > 0) && (
+                <nav aria-label="Quick filters" className="mt-2">
+                  <p className="text-sm text-ivory/70">Quick picks</p>
+                  <ul className="mt-2 flex flex-wrap gap-2">
+                    {[
+                      ...facets.bodyStyles.slice(0, 6).map((b) => ({ key: 'bodyStyle', value: b.name, count: b.count })),
+                      ...facets.makes.slice(0, 6).map((m) => ({ key: 'make', value: m.name, count: m.count })),
+                    ].map(({ key, value, count }) => {
+                      const active = params[key as 'make' | 'bodyStyle'] === value
+                      return (
+                        <li key={`${key}-${value}`}>
+                          <Link
+                            href={inventoryHref(params, { [key]: active ? undefined : value, ...(key === 'make' ? { model: undefined } : {}), page: undefined })}
+                            scroll={false}
+                            className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] ${
+                              active ? 'border-[#F0B27A] bg-ivory/15 text-ivory' : 'border-ivory/15 bg-ivory/[0.06] text-ivory/85 hover:border-ivory/35 hover:bg-ivory/10 hover:text-ivory'
+                            }`}
+                          >
+                            {value}
+                            <span className="text-ivory/55">{count}</span>
+                            {active && <span className="sr-only">(selected, select again to remove)</span>}
+                          </Link>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </nav>
+              )}
             </div>
           </div>
         </section>
 
-        <div id="results" className="mx-auto max-w-site scroll-mt-28 px-4 py-8">
+        <div id="results" className="mx-auto max-w-site scroll-mt-[var(--header-h)] px-4 py-8">
           <div className="lg:grid lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-6 xl:grid-cols-[280px_minmax(0,1fr)] xl:gap-8">
-            <aside aria-label="Filter vehicles" className="lg:sticky lg:top-28 lg:self-start">
+            <aside aria-label="Filter vehicles" className="lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:self-start">
               <VehicleFilters
                 searchParams={params}
                 makes={facets.makes}
@@ -218,14 +273,18 @@ export default async function InventoryPage({ searchParams }: Props) {
             </aside>
 
             <div>
-              {/* Toolbar */}
-              <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+              {/* Toolbar: from md it sticks under the header so count, active filters, sort and view stay in reach
+                  while browsing (on phones it would take too much of the screen) */}
+              <div className="z-20 mb-6 rounded-2xl border border-ivory/10 bg-[#0c1e33]/70 px-4 py-3 backdrop-blur-xl md:sticky md:top-[calc(var(--header-h)+0.5rem)]">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
                 <h2 className="text-2xl font-bold text-ivory" aria-live="polite">
                   {total} {total === 1 ? 'vehicle' : 'vehicles'} available
                   {q && <span className="font-medium text-ivory/75"> for &ldquo;{q}&rdquo;</span>}
                 </h2>
                 <CompareModeToggle />
-                <div className="ml-auto flex items-center gap-2">
+                {/* Phones: its own full-width row, with the sort select taking the remaining space */}
+                <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto [&>label]:min-w-0 [&>label]:flex-1 sm:[&>label]:flex-none [&_select]:w-full">
+                  <FiltersButton activeCount={activeFilterCount} />
                   <SortSelect value={sort} options={Object.entries(VEHICLE_SORTS).map(([value, { label }]) => ({ value, label }))} />
                   <div className="flex rounded-xl border border-ivory/20 bg-ivory/[0.06] p-1" role="group" aria-label="Layout">
                     {([['grid', LayoutGrid, 'Grid view'], ['list', List, 'List view']] as const).map(([mode, Icon, label]) => (
@@ -242,6 +301,34 @@ export default async function InventoryPage({ searchParams }: Props) {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {chips.length > 0 && (
+                <ul className="mt-3 flex flex-wrap items-center gap-2" aria-label="Active filters">
+                  {chips.map(({ label, clear }) => (
+                    <li key={label}>
+                      <Link
+                        href={inventoryHref(params, { ...clear, page: undefined })}
+                        scroll={false}
+                        aria-label={`Remove filter: ${label}`}
+                        className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ivory/20 bg-ivory/10 pl-3.5 pr-2.5 text-sm font-medium text-ivory transition-colors hover:border-ivory/40 hover:bg-ivory/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+                      >
+                        {label}
+                        <X className="h-3.5 w-3.5 text-ivory/70" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      href={inventoryHref({ sort: params.sort, view: params.view })}
+                      scroll={false}
+                      className="inline-flex min-h-9 items-center rounded-full px-2 text-sm font-semibold text-[#F0B27A] hover:text-[#f6c89c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
+                    >
+                      Clear all
+                    </Link>
+                  </li>
+                </ul>
+              )}
               </div>
 
               {vehicles.length === 0 ? (
