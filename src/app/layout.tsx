@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
+import CallTracker from '@/components/CallTracker'
 import { LOCATION, DEFAULT_OG_IMAGE } from '@/lib/seo'
 import { sans, display } from '@/lib/fonts'
 import './globals.css'
@@ -118,6 +119,7 @@ export default function RootLayout({
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <CallTracker />
       </body>
     </html>
   )

@@ -163,7 +163,7 @@ export default async function VehicleDetailPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
 
       <VdpProvider vehicle={vdpVehicle}>
-        <div className="theme-glass vdp min-h-screen">
+        <div className="theme-glass vdp min-h-screen" data-vehicle-id={vehicle.id}>
           <div className="mx-auto max-w-site px-4 pb-12 pt-3 sm:px-6 sm:pt-6 lg:px-4">
             {/* Title block: breadcrumb (back link on phones), name + title status, key facts, save/share */}
             <nav aria-label="Breadcrumb" className="hidden md:block">

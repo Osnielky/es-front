@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const LEAD_TYPES = ['GENERAL', 'VEHICLE', 'FINANCING', 'TRADE_IN', 'WHATSAPP', 'TEST_DRIVE'] as const
+export const LEAD_TYPES = ['GENERAL', 'VEHICLE', 'FINANCING', 'TRADE_IN', 'WHATSAPP', 'TEST_DRIVE', 'CALL'] as const
 
 // Either an email or a phone number is required so the dealer can reply.
 // Empty strings from untouched form fields are treated as missing.

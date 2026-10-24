@@ -73,4 +73,5 @@ enum LeadType {
   TRADE_IN
   WHATSAPP
   TEST_DRIVE
+  CALL
 }

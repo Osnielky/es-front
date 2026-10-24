@@ -31,7 +31,7 @@ export interface Lead {
   phone: string | null
   message: string | null
   vehicleId: string | null
-  type: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN' | 'WHATSAPP' | 'TEST_DRIVE'
+  type: 'GENERAL' | 'VEHICLE' | 'FINANCING' | 'TRADE_IN' | 'WHATSAPP' | 'TEST_DRIVE' | 'CALL'
   createdAt: Date
 }
 

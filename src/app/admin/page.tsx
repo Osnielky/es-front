@@ -23,6 +23,8 @@ interface Statistics {
   leadGrowth: number
   whatsappTotal: number
   whatsappThisMonth: number
+  callTotal: number
+  callThisMonth: number
   avgPrice: number
   vehiclesThisMonth: number
 }
@@ -68,6 +70,7 @@ const LEAD_TYPE_META: Record<string, { label: string; color: string; icon: React
   TRADE_IN:  { label: 'Trade-In',  color: 'bg-emerald-100 text-emerald-700', icon: TrendingUp },
   WHATSAPP:  { label: 'WhatsApp',  color: 'bg-green-100 text-green-700',  icon: MessageCircle },
   TEST_DRIVE: { label: 'Test drive', color: 'bg-violet-100 text-violet-700', icon: CalendarClock },
+  CALL:      { label: 'Phone call', color: 'bg-sky-100 text-sky-700',    icon: Phone },
 }
 
 function timeAgo(dateStr: string) {
@@ -249,7 +252,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* ── Lead stats row ──────────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           <div className="card p-5 flex items-center justify-between">
             <div>
               <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Total Leads</p>
@@ -294,6 +297,17 @@ export default function AdminDashboard() {
             </div>
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600">
               <MessageCircle className="h-5 w-5" />
+            </div>
+          </div>
+
+          <div className="card p-5 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone calls</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">{statistics.callTotal ?? 0}</p>
+              <p className="mt-0.5 text-xs text-gray-400">{statistics.callThisMonth ?? 0} this month · taps on call links</p>
+            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
+              <Phone className="h-5 w-5" />
             </div>
           </div>
         </div>

@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
     leadsThisWeek,
     whatsappTotal,
     whatsappThisMonth,
+    callTotal,
+    callThisMonth,
     leadsByType,
     avgPriceResult,
     vehiclesThisMonth,
@@ -47,6 +49,8 @@ export async function GET(request: NextRequest) {
     prisma.lead.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
     prisma.lead.count({ where: { type: 'WHATSAPP' } }),
     prisma.lead.count({ where: { type: 'WHATSAPP', createdAt: { gte: startOfThisMonth } } }),
+    prisma.lead.count({ where: { type: 'CALL' } }),
+    prisma.lead.count({ where: { type: 'CALL', createdAt: { gte: startOfThisMonth } } }),
     prisma.lead.groupBy({ by: ['type'], _count: true }),
     prisma.vehicle.aggregate({ _avg: { price: true } }),
     prisma.vehicle.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
@@ -54,8 +58,8 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
       take: 20,
       where: {
-        // Exclude internal WhatsApp tracking records without real contact info
-        NOT: { email: 'whatsapp@tracked.internal' },
+        // Exclude internal click-tracking records (WhatsApp / phone taps) without real contact info
+        NOT: { email: { in: ['whatsapp@tracked.internal', 'call@tracked.internal'] } },
       },
     }),
     prisma.vehicle.findMany({
@@ -85,6 +89,8 @@ export async function GET(request: NextRequest) {
       leadGrowth,
       whatsappTotal,
       whatsappThisMonth,
+      callTotal,
+      callThisMonth,
       avgPrice,
       vehiclesThisMonth,
     },

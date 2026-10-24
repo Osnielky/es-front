@@ -11,6 +11,7 @@ const TYPE_LABEL: Record<string, string> = {
   TRADE_IN: 'Trade-In Request',
   WHATSAPP: 'WhatsApp Click',
   TEST_DRIVE: 'Test Drive Request',
+  CALL: 'Phone Call Click',
 }
 
 // Lead fields are visitor input; escape before interpolating into the notification HTML
@@ -31,8 +32,11 @@ export async function sendLeadNotification(lead: LeadData): Promise<void> {
   if (!process.env.RESEND_API_KEY || !NOTIFY_TO) return
   const resend = new Resend(process.env.RESEND_API_KEY)
 
-  const isWhatsApp = lead.type === 'WHATSAPP'
-  const subject = isWhatsApp
+  // Click-tracking records (WhatsApp / phone taps) carry no real contact details
+  const isWhatsApp = lead.type === 'WHATSAPP' || lead.type === 'CALL'
+  const subject = lead.type === 'CALL'
+    ? `📞 Phone call click — ${lead.message?.split('\n')[0] ?? 'website'}`
+    : isWhatsApp
     ? `📱 WhatsApp click — ${lead.message ?? 'vehicle inquiry'}`
     : `🔔 New lead: ${lead.name} — ${TYPE_LABEL[lead.type] ?? lead.type}`
 
