@@ -16,6 +16,7 @@ const navLinks = [
   { href: '/trade-in', label: 'Sell or trade' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
+  { href: '/admin', label: 'Admin' },
 ]
 
 // Sticky, always opaque. Height is --header-h / --header-space in globals.css (sticky offsets read it).
