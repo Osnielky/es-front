@@ -23,6 +23,10 @@ const updateVehicleSchema = z.object({
   vin: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   status: z.enum(['AVAILABLE', 'PENDING', 'SOLD']).optional(),
+  // The edit page sends the full photo list after uploads/removals; without these keys Zod
+  // strips them and the update silently leaves the old photos in place.
+  images: z.array(z.string().min(1)).max(15).optional(),
+  features: z.array(z.string()).optional(),
 })
 
 async function isAdmin(request: NextRequest) {
