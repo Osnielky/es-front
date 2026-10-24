@@ -3,6 +3,7 @@ import type { Vehicle } from '@/types'
 import { buildBreadcrumbJsonLd, buildInventoryJsonLd, LOCATION, serializeJsonLd } from '@/lib/seo'
 import { FINANCE_DISCLAIMER } from '@/lib/finance'
 import VehicleCard from './VehicleCard'
+import RecentlySold from './RecentlySold'
 
 interface Crumb {
   name: string
@@ -20,10 +21,12 @@ interface Props {
   vehicles: Vehicle[]
   breadcrumbs: Crumb[]
   related: RelatedGroup[]
+  sold?: Vehicle[]
+  soldSubject?: string
 }
 
 // Shared layout for make / model / body-style SEO landing pages
-export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, related }: Props) {
+export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, related, sold = [], soldSubject }: Props) {
   const breadcrumbJsonLd = buildBreadcrumbJsonLd(breadcrumbs)
   const itemListJsonLd = buildInventoryJsonLd(vehicles, { name: h1 })
 
@@ -64,6 +67,8 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
             ))}
           </div>
           <p className="mt-5 text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>
+
+          <RecentlySold vehicles={sold} subject={soldSubject} />
 
           {related
             .filter((group) => group.links.length > 0)

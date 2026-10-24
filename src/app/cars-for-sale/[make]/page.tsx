@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getInventoryFacets, getVehicles } from '@/lib/data'
+import { getInventoryFacets, getVehicles, getSoldVehicles } from '@/lib/data'
 import { makePath, modelPath, bodyStylePath } from '@/lib/seo'
 import { conditionPrefix, landingIntro, landingMetadata } from '@/lib/landing'
 import InventoryLanding from '@/components/inventory/InventoryLanding'
@@ -20,8 +20,9 @@ async function load(makeSlug: string) {
   if (!make) return null
   const { vehicles } = await getVehicles({ make: make.name, limit: 60 })
   if (vehicles.length === 0) return null
+  const sold = await getSoldVehicles({ make: make.name, limit: 6 }).catch(() => [])
   const h1 = `${conditionPrefix(vehicles)}${make.name} for Sale in Naples, FL`
-  return { make, makes, bodyStyles, vehicles, h1 }
+  return { make, makes, bodyStyles, vehicles, sold, h1 }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -33,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function MakeLandingPage({ params }: Props) {
   const data = await load((await params).make)
   if (!data) notFound()
-  const { make, makes, bodyStyles, vehicles, h1 } = data
+  const { make, makes, bodyStyles, vehicles, sold, h1 } = data
   const styleSlugs = new Set(vehicles.map((v) => v.bodyStyle).filter(Boolean))
 
   return (
@@ -41,6 +42,8 @@ export default async function MakeLandingPage({ params }: Props) {
       h1={h1}
       intro={landingIntro(make.name, vehicles, `Models in stock include ${make.models.slice(0, 5).map((m) => m.name).join(', ')}.`)}
       vehicles={vehicles}
+      sold={sold}
+      soldSubject={make.name}
       breadcrumbs={[
         { name: 'Home', url: '/' },
         { name: 'Inventory', url: '/inventory' },

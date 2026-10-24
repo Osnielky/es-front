@@ -271,6 +271,7 @@ export function buildDealerJsonLd() {
     ],
     openingHoursSpecification: buildOpeningHours(),
     priceRange: '$$',
+    knowsLanguage: ['en', 'es'],
     currenciesAccepted: 'USD',
     paymentAccepted: 'Cash, Credit Card, Financing',
     sameAs: [

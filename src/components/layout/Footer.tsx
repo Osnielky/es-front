@@ -13,6 +13,7 @@ const shopLinks = [
   { href: bodyStylePath('Truck'), label: 'Trucks' },
   { href: bodyStylePath('Sedan'), label: 'Sedans' },
   { href: '/inventory?sort=price-asc', label: 'Lowest price first' },
+  { href: '/inventory/sold', label: 'Recently sold' },
 ]
 
 const dealerLinks = [
@@ -20,6 +21,7 @@ const dealerLinks = [
   { href: '/trade-in', label: 'Sell or trade your car' },
   { href: '/about', label: 'About us' },
   { href: '/contact', label: 'Contact' },
+  { href: '/es', label: 'Español' },
 ]
 
 export default function Footer() {

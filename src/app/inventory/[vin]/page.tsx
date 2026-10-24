@@ -23,6 +23,7 @@ import VehicleSpecs, { NOT_LISTED } from '@/components/vdp/VehicleSpecs'
 import VinCopy from '@/components/vdp/VinCopy'
 import Expandable from '@/components/vdp/Expandable'
 import BackLink from '@/components/vdp/BackLink'
+import TrackView from '@/components/inventory/TrackView'
 
 // ISR: VDPs render on first request, then serve from cache. Admin edits call revalidateTag('vehicles').
 export const revalidate = 300
@@ -43,8 +44,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const vehicle = await getVehicle(decodeURIComponent(vin))
   if (!vehicle) return { title: 'Vehicle Not Found', robots: { index: false } }
 
-  const title = buildVehicleTitle(vehicle.year, vehicle.make, vehicle.model, vehicle.trim)
-  const description = buildVehicleDescription(vehicle.year, vehicle.make, vehicle.model, vehicle.price, vehicle.mileage)
+  const sold = vehicle.status === 'SOLD'
+  const title = (sold ? 'SOLD: ' : '') + buildVehicleTitle(vehicle.year, vehicle.make, vehicle.model, vehicle.trim)
+  const description = sold
+    ? `This ${vehicle.year} ${vehicle.make} ${vehicle.model} has been sold at ${process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'} in Naples, FL. See what it sold for and browse similar ${vehicle.make} vehicles available now.`
+    : buildVehicleDescription(vehicle.year, vehicle.make, vehicle.model, vehicle.price, vehicle.mileage)
   const url = vehicleUrl(vehicle)
   const image = (vehicle.images[0] && absoluteImageUrl(vehicle.images[0])) || DEFAULT_OG_IMAGE
   const availability = vehicle.status === 'SOLD' ? 'out of stock' : vehicle.status === 'PENDING' ? 'pending' : 'in stock'
@@ -164,6 +168,7 @@ export default async function VehicleDetailPage({ params }: Props) {
 
       <VdpProvider vehicle={vdpVehicle}>
         <div className="theme-glass vdp min-h-screen" data-vehicle-id={vehicle.id}>
+          <TrackView id={vehicle.id} name={name} price={vehicle.price} status={vehicle.status} />
           <div className="mx-auto max-w-site px-4 pb-12 pt-3 sm:px-6 sm:pt-6 lg:px-4">
             {/* Title block: breadcrumb (back link on phones), name + title status, key facts, save/share */}
             <nav aria-label="Breadcrumb" className="hidden md:block">

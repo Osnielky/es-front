@@ -67,7 +67,8 @@ const getVehiclesCached = cached(async (opts: GetVehiclesOptions) => {
   const terms = filters.q?.trim().split(/\s+/).filter(Boolean).slice(0, 5) ?? []
 
   const where: Prisma.VehicleWhereInput = {
-    status: 'AVAILABLE',
+    // Pending (under contract) cars stay listed with a badge; sold cars are listed separately via getSoldVehicles
+    status: { in: ['AVAILABLE', 'PENDING'] },
     ...(filters.make && { make: { equals: filters.make, mode: 'insensitive' } }),
     ...(filters.model && {
       model: filters.exactModel
@@ -176,6 +177,30 @@ const getSimilarVehiclesCached = cached(
 export async function getSimilarVehicles(vehicle: Vehicle, limit = 3): Promise<Vehicle[]> {
   const similar = await getSimilarVehiclesCached(vehicle.id, vehicle.make, vehicle.bodyStyle, vehicle.price, limit)
   return similar.map(hydrate)
+}
+
+// Recently sold vehicles, newest sale first. Kept on the site as proof of what the lot carries and what it
+// sells for (inventory page, landing pages, /inventory/sold), and to hand shoppers to similar cars.
+const getSoldVehiclesCached = cached(
+  async (make: string | null, model: string | null, bodyStyle: string | null, limit: number) => {
+    const raw = await prisma.vehicle.findMany({
+      where: {
+        status: 'SOLD',
+        ...(make && { make: { equals: make, mode: 'insensitive' } }),
+        ...(model && { model: { equals: model, mode: 'insensitive' } }),
+        ...(bodyStyle && { bodyStyle: { equals: bodyStyle, mode: 'insensitive' } }),
+      },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }],
+      take: limit,
+    })
+    return raw.map(serialize)
+  },
+  'getSoldVehicles'
+)
+
+export async function getSoldVehicles(opts: { make?: string; model?: string; bodyStyle?: string; limit?: number } = {}): Promise<Vehicle[]> {
+  const sold = await getSoldVehiclesCached(opts.make ?? null, opts.model ?? null, opts.bodyStyle ?? null, opts.limit ?? 6)
+  return sold.map(hydrate)
 }
 
 // ─── Inventory facets (make / model / body style landing pages) ─────────────

@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, CalendarClock, CheckCircle2, Loader2 } from 'lucide-react'
 import { vehicleInquirySchema, type VehicleInquiryInput } from '@/lib/validations/lead'
 import { BUSINESS_HOURS } from '@/lib/seo'
+import { track } from '@/lib/analytics'
 import type { InquiryIntent, VdpVehicle } from './VdpContext'
 
 interface Props {
@@ -117,6 +118,7 @@ export default function InquiryForm({ vehicle, intent, onDone }: Props) {
         }),
       })
       if (!res.ok) throw new Error(String(res.status))
+      track('generate_lead', { lead_type: isTestDrive ? 'TEST_DRIVE' : 'VEHICLE', item_id: vehicle.id, item_name: vehicle.name })
       const via = data.contactMethod === 'phone' ? `call or text you at ${data.phone}` : `email you at ${data.email}`
       setStatus({
         state: 'success',

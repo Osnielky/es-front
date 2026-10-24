@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import CallTracker from '@/components/CallTracker'
+import Analytics from '@/components/Analytics'
 import { LOCATION, DEFAULT_OG_IMAGE } from '@/lib/seo'
 import { sans, display } from '@/lib/fonts'
 import './globals.css'
@@ -82,10 +83,8 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Add these when you have the verification codes
-    // google: 'your-google-verification-code',
-    // yandex: 'your-yandex-verification-code',
-    // bing: 'your-bing-verification-code',
+    // Google Search Console: set NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION to the code from the HTML-tag method
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION && { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }),
   },
   alternates: {
     canonical: SITE_URL,
@@ -120,6 +119,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <CallTracker />
+        <Analytics />
       </body>
     </html>
   )

@@ -4,6 +4,7 @@
 // (header, footer, vehicle pages, contact cards) now and in the future, so nothing has to be wrapped.
 // Each tap is stored as a CALL lead, the same way WhatsApp taps are stored, and shows on the dashboard.
 import { useEffect } from 'react'
+import { track } from '@/lib/analytics'
 
 const TRACKED_EMAIL = 'call@tracked.internal'
 // Ignore a second tap on the same link within this window (double taps, long-press menus)
@@ -39,6 +40,8 @@ export default function CallTracker() {
       ]
         .filter(Boolean)
         .join('\n')
+
+      track('call_click', { page_path: path, item_id: vehicleId })
 
       // keepalive lets the request finish while the phone app opens
       fetch('/api/leads', {

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Search, LayoutGrid, List, MessageSquareMore, X } from 'lucide-react'
-import { getVehicles, getInventoryFacets, VEHICLE_SORTS, isVehicleSort } from '@/lib/data'
+import { getVehicles, getInventoryFacets, getSoldVehicles, VEHICLE_SORTS, isVehicleSort } from '@/lib/data'
 import { buildBreadcrumbJsonLd, buildInventoryJsonLd, LOCATION, DEFAULT_OG_IMAGE, makePath, bodyStylePath, serializeJsonLd } from '@/lib/seo'
 import { FINANCE_DISCLAIMER } from '@/lib/finance'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import VehicleFilters, { FiltersButton } from '@/components/inventory/VehicleFilters'
+import RecentlySold from '@/components/inventory/RecentlySold'
 import { CompareModeToggle, CompareTray, SavedCarsMenu, SortSelect } from '@/components/inventory/ShortlistControls'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
@@ -140,6 +141,8 @@ export default async function InventoryPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil(total / limit)
   const facets = await getInventoryFacets().catch(() => ({ makes: [], bodyStyles: [], yearMin: null, yearMax: null, priceMax: 0 }))
+  // Sold cars close the page: only on the first page of an unfiltered or lightly filtered list, so they never crowd results
+  const sold = page === 1 && !q ? await getSoldVehicles({ make: params.make, bodyStyle: params.bodyStyle, limit: 6 }).catch(() => []) : []
   // Slider tops out at the most expensive car (rounded up to $5k), never below $50k
   const priceCeiling = Math.max(PRICE_SLIDER_FLOOR, Math.ceil(facets.priceMax / 5000) * 5000)
 
@@ -366,6 +369,8 @@ export default async function InventoryPage({ searchParams }: Props) {
               )}
 
               {vehicles.length > 0 && <p className="mt-5 text-center text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>}
+
+              <RecentlySold vehicles={sold} subject={params.make ?? params.bodyStyle ?? undefined} />
 
               {/* Help banner */}
               <div className="mt-6 flex flex-col items-start gap-4 glass rounded-md p-5 sm:flex-row sm:items-center">

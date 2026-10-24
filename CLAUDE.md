@@ -22,7 +22,7 @@ npm run db:generate      # Regenerate Prisma client
 
 There is no test suite. `next dev` and `next build` share `.next/`, so don't run a production build while a dev server is running; it breaks the dev server's assets. Verify changes with `npx tsc --noEmit`, `npm run lint`, and manual QA in the browser.
 
-Local env vars live in `.env` (see `dev.env.example` for the list). Required: `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` (≥32 chars, or auth throws). Optional: `GCS_BUCKET_NAME`/`GCS_PROJECT_ID` (uploads), `RESEND_API_KEY` + `LEAD_NOTIFY_EMAIL` (lead emails; silently skipped if unset), `MAX_UPLOAD_SIZE_MB`, and `NEXT_PUBLIC_DEALER_*`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`.
+Local env vars live in `.env` (see `dev.env.example` for the list). Required: `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` (≥32 chars, or auth throws). Optional: `GCS_BUCKET_NAME`/`GCS_PROJECT_ID` (uploads), `RESEND_API_KEY` + `LEAD_NOTIFY_EMAIL` (lead emails; silently skipped if unset), `MAX_UPLOAD_SIZE_MB`, and `NEXT_PUBLIC_DEALER_*`, `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_WHATSAPP_NUMBER`. Optional growth vars (build-time, see Dockerfile/cloudbuild substitutions): `NEXT_PUBLIC_GA_MEASUREMENT_ID` (GA4), `NEXT_PUBLIC_META_PIXEL_ID` (Meta Pixel), `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` (Search Console). Conversion events (`generate_lead`, `whatsapp_click`, `call_click`, `view_item`) fire from `lib/analytics.ts`.
 
 ## Architecture
 

@@ -41,6 +41,12 @@ steps:
       - 'NEXT_PUBLIC_SITE_URL=https://eandscars.com'
       - '--build-arg'
       - 'NEXT_PUBLIC_WHATSAPP_NUMBER=19414997415'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GA_MEASUREMENT_ID=${_GA_MEASUREMENT_ID}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_META_PIXEL_ID=${_META_PIXEL_ID}'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${_GOOGLE_SITE_VERIFICATION}'
       - '.'
 
   # Step 3: Push all image tags to Artifact Registry
@@ -146,6 +152,10 @@ substitutions:
   _SERVICE: es-front
   _CLOUD_SQL_INSTANCE: es-cars-dev-db
   _GCS_BUCKET: es-cars-dev-images
+  # Analytics / Search Console (optional): set these in the Cloud Build trigger's substitution variables
+  _GA_MEASUREMENT_ID: ''
+  _META_PIXEL_ID: ''
+  _GOOGLE_SITE_VERIFICATION: ''
 
 # Secrets exposed to build steps via secretEnv (created by scripts/setup-gcp-secrets.sh)
 availableSecrets:

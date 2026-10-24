@@ -1,6 +1,7 @@
 'use client'
 
 import { whatsappHref } from '@/lib/contact'
+import { track } from '@/lib/analytics'
 import WhatsAppIcon from '@/components/icons/WhatsAppIcon'
 
 interface Props {
@@ -26,6 +27,7 @@ export default function WhatsAppButton({ vehicleId, year, make, model, trim, sto
 
   // Log the click as a WHATSAPP lead; keepalive lets the request finish while WhatsApp opens
   const handleClick = () => {
+    track('whatsapp_click', { item_id: vehicleId, item_name: vehicleName })
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

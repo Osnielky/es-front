@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getInventoryFacets, getVehicles } from '@/lib/data'
+import { getInventoryFacets, getVehicles, getSoldVehicles } from '@/lib/data'
 import { bodyStylePath, makePath } from '@/lib/seo'
 import { conditionPrefix, landingIntro, landingMetadata } from '@/lib/landing'
 import InventoryLanding from '@/components/inventory/InventoryLanding'
@@ -25,8 +25,9 @@ async function load(styleSlug: string) {
   if (!style) return null
   const { vehicles } = await getVehicles({ bodyStyle: style.name, limit: 60 })
   if (vehicles.length === 0) return null
+  const sold = await getSoldVehicles({ bodyStyle: style.name, limit: 6 }).catch(() => [])
   const h1 = `${conditionPrefix(vehicles)}${pluralize(style.name)} for Sale in Naples, FL`
-  return { style, bodyStyles, vehicles, h1 }
+  return { style, bodyStyles, vehicles, sold, h1 }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BodyStyleLandingPage({ params }: Props) {
   const data = await load((await params).bodyStyle)
   if (!data) notFound()
-  const { style, bodyStyles, vehicles, h1 } = data
+  const { style, bodyStyles, vehicles, sold, h1 } = data
   const makeCounts = new Map<string, number>()
   for (const v of vehicles) makeCounts.set(v.make, (makeCounts.get(v.make) ?? 0) + 1)
 
@@ -47,6 +48,8 @@ export default async function BodyStyleLandingPage({ params }: Props) {
       h1={h1}
       intro={landingIntro(style.name, vehicles, `Makes include ${[...makeCounts.keys()].slice(0, 5).join(', ')}.`)}
       vehicles={vehicles}
+      sold={sold}
+      soldSubject={pluralize(style.name)}
       breadcrumbs={[
         { name: 'Home', url: '/' },
         { name: 'Inventory', url: '/inventory' },

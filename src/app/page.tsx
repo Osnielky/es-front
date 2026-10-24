@@ -6,7 +6,7 @@ import {
   Check, ShieldCheck, CreditCard, Repeat, MessageCircle, MapPin, Car, Clock, Phone, CalendarCheck,
   Navigation, Expand, Handshake, Users, DoorOpen,
 } from 'lucide-react'
-import { getVehicles, getInventoryFacets } from '@/lib/data'
+import { getVehicles, getInventoryFacets, getSoldVehicles } from '@/lib/data'
 import {
   BUSINESS_HOURS, DEALER_ADDRESS, LOCATION, makePath, vehiclePath,
   buildDealerJsonLd, buildWebsiteJsonLd, buildFAQJsonLd, DEFAULT_OG_IMAGE, serializeJsonLd,
@@ -17,6 +17,7 @@ import { vehicleName } from '@/lib/vehicle-display'
 import type { Vehicle } from '@/types'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import LazyMapEmbed from '@/components/layout/LazyMapEmbed'
+import RecentlySold from '@/components/inventory/RecentlySold'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -77,11 +78,13 @@ export default async function HomePage() {
   let vehicles: Vehicle[] = []
   let total = 0
   let facets: Awaited<ReturnType<typeof getInventoryFacets>> | null = null
+  let sold: Vehicle[] = []
   try {
-    const [result, f] = await Promise.all([getVehicles({ limit: 6 }), getInventoryFacets()])
+    const [result, f, s] = await Promise.all([getVehicles({ limit: 6 }), getInventoryFacets(), getSoldVehicles({ limit: 3 })])
     vehicles = result.vehicles
     total = result.total
     facets = f
+    sold = s
   } catch (error) {
     // Render without inventory sections if the database is unavailable
     console.error('Home: failed to load inventory', error)
@@ -198,6 +201,8 @@ export default async function HomePage() {
             <p className="mt-4 text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>
           </>
         )}
+
+        <RecentlySold vehicles={sold} />
 
         {makes.length > 0 && (
           <nav aria-label="Shop by make" className="mt-6 flex flex-wrap items-center gap-2 text-sm">

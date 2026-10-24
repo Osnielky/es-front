@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useId, useState } from 'react'
 import { Send, CheckCircle2 } from 'lucide-react'
 import { leadSchema, type LeadInput } from '@/lib/validations/lead'
+import { track } from '@/lib/analytics'
 
 interface Props {
   vehicleId?: string
@@ -55,6 +56,7 @@ export default function LeadForm({ vehicleId, vehicleName, leadType, defaultMess
       setError('We couldn’t send that. Please try again, or call us.')
       return
     }
+    track('generate_lead', { lead_type: data.type, item_id: data.vehicleId })
     setSubmitted(true)
   }
 
