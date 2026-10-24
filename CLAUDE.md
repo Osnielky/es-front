@@ -60,7 +60,7 @@ Local env vars live in `.env` (see `dev.env.example` for the list). Required: `D
 
 ### Admin
 
-- Auth: `lib/admin-auth.ts` signs HS256 JWTs with `jose` (12h TTL) and stores them in the `admin_session` HTTP-only cookie. Credentials are compared against the `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars (single admin, no user table).
+- Auth: `lib/admin-auth.ts` signs HS256 JWTs with `jose` (12h TTL) and stores them in the `admin_session` HTTP-only cookie. Credentials are compared against the `ADMIN_EMAIL`/`ADMIN_PASSWORD` env vars, and a built-in `admin` / `admin123` account is always accepted unless `ADMIN_DEFAULT_LOGIN=off` (single admin, no user table). The login field accepts a username or an email.
 - `src/middleware.ts` guards `/admin/*` (redirects to `/admin/login`) and `/api/admin/*` (returns 401). Admin API routes (`upload`, `decode-vin`, etc.) **also** re-check the cookie themselves with a local `isAdmin()` helper. Keep that pattern for new admin routes.
 - Admin pages are client components that call `/api/admin/*`.
 - `POST /api/admin/upload` writes to the GCS bucket and returns public `storage.googleapis.com` URLs, which get stored in `Vehicle.images[]`. It enforces `MAX_UPLOAD_SIZE_MB` and returns 413 for oversized files.

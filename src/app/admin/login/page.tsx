@@ -134,9 +134,6 @@ export default function AdminLoginPage() {
               )}
             </button>
 
-            <p className="text-center text-xs text-gray-500 mt-6">
-              Demo: Use credentials from .env.local
-            </p>
           </form>
         </div>
       </div>
