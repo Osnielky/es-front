@@ -50,6 +50,7 @@ export default function Header() {
             <Link
               key={href}
               href={href}
+              prefetch={href === '/admin' ? false : undefined}
               aria-current={isActive(href) ? 'page' : undefined}
               className={`border-b-2 px-3 py-2 text-[15px] font-semibold transition-colors ${
                 isActive(href) ? 'border-accent-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-brand-600'
@@ -95,6 +96,7 @@ export default function Header() {
               <Link
                 key={href}
                 href={href}
+                prefetch={href === '/admin' ? false : undefined}
                 aria-current={isActive(href) ? 'page' : undefined}
                 className={`flex items-center border-b border-slate-100 py-3 font-display text-xl font-bold ${
                   isActive(href) ? 'text-accent-600' : 'text-brand-600'

@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { z } from 'zod'
@@ -19,7 +18,6 @@ type LoginInput = z.infer<typeof loginSchema>
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
 
   const {
@@ -45,7 +43,10 @@ export default function AdminLoginPage() {
         return
       }
 
-      router.push('/admin')
+      // Full navigation, not router.push: the header's Admin link may have prefetched /admin before
+      // login, and the router caches the middleware's redirect to this page. A hard load also makes
+      // sure the fresh session cookie is sent.
+      window.location.assign('/admin')
     } catch {
       setError('Something went wrong. Please try again.')
     }
