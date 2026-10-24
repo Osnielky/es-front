@@ -34,7 +34,7 @@ function Select({ id, label, hideLabel = false, value, onChange, children }: { i
         <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className="input appearance-none pr-10">
           {children}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ivory/75" aria-hidden="true" />
+        <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
       </div>
     </div>
   )
@@ -139,25 +139,25 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           aria-controls="filter-panel"
           className="flex items-center gap-2.5 lg:pointer-events-none"
         >
-          <SlidersHorizontal className="h-5 w-5 text-ivory" aria-hidden="true" />
-          <span className="text-lg font-bold text-ivory">Filters</span>
+          <SlidersHorizontal className="h-5 w-5 text-ink" aria-hidden="true" />
+          <span className="text-lg font-bold text-ink">Filters</span>
           {activeCount > 0 && (
-            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F0B27A] px-1.5 text-xs font-bold text-[#0c1e33]">{activeCount}</span>
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1.5 text-xs font-bold text-white">{activeCount}</span>
           )}
-          <ChevronDown className={`h-5 w-5 text-ivory/75 transition-transform lg:hidden ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+          <ChevronDown className={`h-5 w-5 text-slate-500 transition-transform lg:hidden ${isOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={() => push(Object.fromEntries(FILTER_KEYS.map((k) => [k, undefined])))}
           disabled={activeCount === 0}
-          className="flex items-center gap-1.5 text-sm font-medium text-ivory/75 hover:text-ivory disabled:opacity-50"
+          className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-ink disabled:opacity-50"
         >
           <RotateCw className="h-4 w-4" aria-hidden="true" />
           Reset
         </button>
       </div>
 
-      <div id="filter-panel" className={`${isOpen ? 'block' : 'hidden'} space-y-6 border-t border-ivory/15 px-5 py-5 lg:block`}>
+      <div id="filter-panel" className={`${isOpen ? 'block' : 'hidden'} space-y-6 border-t border-line px-5 py-5 lg:block`}>
         <Select id="filter-make" label="Make" value={searchParams.make ?? ''} onChange={(v) => push({ make: v || undefined, model: undefined })}>
           <option value="">All makes</option>
           {makes.map((m) => (
@@ -168,9 +168,9 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
         <fieldset>
           <legend className="label">Price range</legend>
           <div className="relative mx-2 h-6">
-            <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-ivory/20" />
+            <div className="absolute top-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-slate-100" />
             <div
-              className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-[#F0B27A]"
+              className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-accent-500"
               style={{ left: `${pct(price[0])}%`, right: `${100 - pct(price[1])}%` }}
             />
             {([0, 1] as const).map((i) => (
@@ -191,7 +191,7 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           <div className="mt-3 flex items-center gap-2">
             <label className="sr-only" htmlFor="price-min">Minimum price</label>
             <input id="price-min" {...priceInputProps(0)} />
-            <span className="text-ivory/55" aria-hidden="true">–</span>
+            <span className="text-slate-400" aria-hidden="true">–</span>
             <label className="sr-only" htmlFor="price-max">Maximum price</label>
             <input id="price-max" {...priceInputProps(1)} />
           </div>
@@ -229,8 +229,8 @@ export default function VehicleFilters({ searchParams, makes, bodyStyles, yearMi
           </Select>
         )}
 
-        <p className="flex items-center gap-2 text-sm text-ivory/75">
-          <Info className="h-4 w-4 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
+        <p className="flex items-center gap-2 text-sm text-slate-500">
+          <Info className="h-4 w-4 flex-shrink-0 text-accent-500" aria-hidden="true" />
           {isPending ? 'Updating results…' : 'Filters update automatically'}
         </p>
       </div>
@@ -246,13 +246,13 @@ export function FiltersButton({ activeCount }: { activeCount: number }) {
       type="button"
       // VehicleFilters opens the panel and scrolls to it
       onClick={() => window.dispatchEvent(new Event(OPEN_EVENT))}
-      className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-2 rounded-xl border border-ivory/20 bg-ivory/[0.06] px-3 text-sm font-semibold text-ivory transition-colors hover:border-ivory/40 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:px-4 lg:hidden"
+      className="inline-flex min-h-11 min-w-11 flex-shrink-0 items-center justify-center gap-2 rounded border border-line bg-white px-3 text-sm font-semibold text-ink transition-colors hover:border-brand-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 sm:px-4 lg:hidden"
     >
       <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
       {/* Icon-only on phones so the sort select keeps room for its label */}
       <span className="sr-only sm:not-sr-only">Filters</span>
       {activeCount > 0 && (
-        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#F0B27A] px-1.5 text-xs font-bold text-[#0c1e33]">{activeCount}</span>
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-accent-500 px-1.5 text-xs font-bold text-white">{activeCount}</span>
       )}
     </button>
   )

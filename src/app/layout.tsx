@@ -1,12 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { LOCATION, DEFAULT_OG_IMAGE } from '@/lib/seo'
-import { serif } from '@/lib/fonts'
+import { sans, display } from '@/lib/fonts'
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -16,8 +13,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  // Matches the dusk backdrop so the mobile browser chrome blends into the glass header
-  themeColor: '#0c1e33',
+  // Brand navy, so the mobile browser chrome matches the header
+  themeColor: '#15295A',
 }
 
 export const metadata: Metadata = {
@@ -116,7 +113,7 @@ export default function RootLayout({
   return (
     // Browser extensions (e.g. LanguageTool's data-lt-installed) add attributes to <html> before React hydrates.
     // This only ignores attribute differences on <html> itself; mismatches inside the page are still reported.
-    <html lang="en" className={`${inter.variable} ${serif.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1">{children}</main>

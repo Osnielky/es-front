@@ -44,3 +44,8 @@ export function cylinderLabel(engine?: string | null) {
 export function vehicleName(vehicle: { year: number; make: string; model: string; trim?: string | null }) {
   return [vehicle.year, vehicle.make, vehicle.model, vehicle.trim].filter(Boolean).join(' ')
 }
+
+// 22,140 → "22k mi", 850 → "850 mi"
+export function shortMiles(miles: number) {
+  return miles < 1000 ? `${miles} mi` : `${Math.round(miles / 1000)}k mi`
+}

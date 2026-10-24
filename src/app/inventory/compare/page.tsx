@@ -44,14 +44,14 @@ export default async function ComparePage({ searchParams }: Props) {
   return (
     <div className="theme-glass min-h-screen">
       <div className="mx-auto max-w-site px-4 py-8">
-        <Link href="/inventory" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#F0B27A] hover:text-[#f6c89c] hover:underline">
+        <Link href="/inventory" className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-500 hover:text-accent-600 hover:underline">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Back to inventory
         </Link>
-        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ivory sm:text-4xl">Compare vehicles</h1>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink sm:text-4xl">Compare vehicles</h1>
 
         {vehicles.length < 2 ? (
           <div className="card mt-6 p-10 text-center">
-            <p className="text-ivory/75">Pick at least two vehicles with &ldquo;Add to compare&rdquo; to see them side by side.</p>
+            <p className="text-slate-500">Pick at least two vehicles with &ldquo;Add to compare&rdquo; to see them side by side.</p>
             <Link href="/inventory" className="btn-primary mt-5">Browse inventory</Link>
           </div>
         ) : (
@@ -63,13 +63,13 @@ export default async function ComparePage({ searchParams }: Props) {
                   <td className="w-40 p-4" />
                   {vehicles.map((v) => (
                     <th key={v.id} scope="col" className="p-4 align-top font-normal">
-                      <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-ivory/[0.06]">
+                      <div className="relative aspect-[16/10] overflow-hidden rounded bg-white">
                         {v.images[0] && (
                           <Image src={v.images[0]} alt="" fill sizes="(max-width: 768px) 50vw, 360px" className="object-cover" />
                         )}
                       </div>
-                      <p className="mt-3 text-base font-bold text-ivory">{v.year} {v.make} {v.model}</p>
-                      <Link href={vehiclePath(v)} className="mt-2 inline-flex items-center gap-1 font-semibold text-[#F0B27A] hover:text-[#f6c89c] hover:underline">
+                      <p className="mt-3 text-base font-bold text-ink">{v.year} {v.make} {v.model}</p>
+                      <Link href={vehiclePath(v)} className="mt-2 inline-flex items-center gap-1 font-semibold text-accent-500 hover:text-accent-600 hover:underline">
                         View vehicle <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </th>
@@ -78,16 +78,16 @@ export default async function ComparePage({ searchParams }: Props) {
               </thead>
               <tbody>
                 {ROWS.map(({ label, value }) => (
-                  <tr key={label} className="border-t border-ivory/15">
-                    <th scope="row" className="p-4 font-semibold text-ivory/75">{label}</th>
+                  <tr key={label} className="border-t border-line">
+                    <th scope="row" className="p-4 font-semibold text-slate-500">{label}</th>
                     {vehicles.map((v) => (
-                      <td key={v.id} className="p-4 text-ivory">{value(v) || '—'}</td>
+                      <td key={v.id} className="p-4 text-ink">{value(v) || '—'}</td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
-            <p className="border-t border-ivory/15 p-4 text-xs text-ivory/75">* {FINANCE_DISCLAIMER}</p>
+            <p className="border-t border-line p-4 text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>
           </div>
         )}
       </div>

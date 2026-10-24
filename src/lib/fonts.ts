@@ -1,10 +1,17 @@
-import { Cormorant_Garamond } from 'next/font/google'
+import { Barlow, Barlow_Condensed } from 'next/font/google'
 
-// Serif for editorial headings across the public site (glass theme). Applied once on <html> in
-// app/layout.tsx; body text, forms, prices and specs stay in Inter.
-export const serif = Cormorant_Garamond({
+// Body face. Applied once on <html> in app/layout.tsx as --font-barlow (Tailwind `font-sans`).
+export const sans = Barlow({
   subsets: ['latin'],
-  weight: ['500', '600'],
-  variable: '--font-serif',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-barlow',
+  display: 'swap',
+})
+
+// Display face for headings, prices and buttons (Tailwind `font-display`).
+export const display = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['600', '700', '800'],
+  variable: '--font-barlow-condensed',
   display: 'swap',
 })

@@ -19,7 +19,7 @@ export default function VinCopy({ vin }: { vin: string }) {
           window.clearTimeout(timer.current)
           timer.current = window.setTimeout(() => setState('idle'), 2000)
         }}
-        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-ivory/20 bg-ivory/[0.06] px-2.5 text-xs font-semibold text-ivory transition-colors duration-150 hover:border-ivory/35 hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-line bg-white px-2.5 text-xs font-semibold text-ink transition-colors duration-150 hover:border-brand-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
         aria-label={state === 'copied' ? 'VIN copied' : 'Copy VIN'}
       >
         {state === 'copied' ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}

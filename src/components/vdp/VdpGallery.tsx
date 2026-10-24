@@ -149,10 +149,10 @@ export default function VdpGallery({ images, name }: Props) {
 
   if (count === 0) {
     return (
-      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 glass rounded-panel text-center md:aspect-[3/2]">
-        <Camera className="h-10 w-10 text-[#F0B27A]" strokeWidth={1.25} aria-hidden="true" />
-        <p className="text-base font-semibold text-ivory">Photos coming soon</p>
-        <p className="max-w-xs text-sm text-ivory/75">Ask us and we’ll send current photos or a walkaround video of this vehicle.</p>
+      <div className="flex aspect-[4/3] flex-col items-center justify-center gap-3 rounded-panel border border-line bg-slate-100 text-center md:aspect-[3/2]">
+        <Camera className="h-10 w-10 text-accent-500" strokeWidth={1.25} aria-hidden="true" />
+        <p className="text-base font-semibold text-ink">Photos coming soon</p>
+        <p className="max-w-xs text-sm text-slate-500">Ask us and we’ll send current photos or a walkaround video of this vehicle.</p>
       </div>
     )
   }
@@ -166,7 +166,7 @@ export default function VdpGallery({ images, name }: Props) {
         tabIndex={0}
         onKeyDown={onKeyDown}
         onPointerEnter={() => setWarm(true)}
-        className="group relative overflow-hidden rounded-panel border border-ivory/15 bg-[#0c1e33]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+        className="group relative overflow-hidden rounded-panel border border-line bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
       >
         <div ref={mainRef} className="overflow-hidden">
           {/* Never taller than the viewport; photos narrower than the frame get a blurred fill instead of flat bars */}
@@ -184,7 +184,7 @@ export default function VdpGallery({ images, name }: Props) {
                 aria-hidden={i !== index}
               >
                 {failed.has(`m${i}`) ? (
-                  <div className="flex h-full flex-col items-center justify-center gap-2 text-ivory/75">
+                  <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-500">
                     <ImageOff className="h-9 w-9" strokeWidth={1.25} aria-hidden="true" />
                     <span className="text-sm">This photo couldn’t be loaded</span>
                   </div>
@@ -241,7 +241,7 @@ export default function VdpGallery({ images, name }: Props) {
                 setWarm(true)
                 prev()
               }}
-              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+              className="absolute left-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600/90 text-white shadow-md transition-colors duration-150 hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
               aria-label="Previous photo"
             >
               <ChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -252,12 +252,12 @@ export default function VdpGallery({ images, name }: Props) {
                 setWarm(true)
                 next()
               }}
-              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+              className="absolute right-3 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-brand-600/90 text-white shadow-md transition-colors duration-150 hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
               aria-label="Next photo"
             >
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
             </button>
-            <p className="pointer-events-none absolute bottom-3 left-3 flex items-center md:bottom-auto md:top-3 gap-1.5 rounded-full bg-[#0c1e33]/70 px-3 py-1.5 text-sm font-medium text-ivory backdrop-blur-sm">
+            <p className="pointer-events-none absolute bottom-3 left-3 flex items-center md:bottom-auto md:top-3 gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-sm font-medium text-ink ">
               <Camera className="h-4 w-4" aria-hidden="true" />
               <span aria-live="polite" aria-atomic="true">
                 <span className="sr-only">Photo </span>
@@ -274,7 +274,7 @@ export default function VdpGallery({ images, name }: Props) {
           ref={expandRef}
           type="button"
           onClick={openViewer}
-          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-ivory/90 text-navy shadow-md transition-colors duration-150 hover:bg-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+          className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-brand-600/90 text-white shadow-md transition-colors duration-150 hover:bg-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
           aria-label={`View photo ${index + 1} full screen with zoom`}
         >
           <Maximize2 className="h-5 w-5" aria-hidden="true" />
@@ -286,7 +286,7 @@ export default function VdpGallery({ images, name }: Props) {
         <div className="md:pointer-events-none md:absolute md:inset-x-0 md:bottom-3 md:flex md:justify-center md:px-16">
           <div
             ref={thumbsRef}
-            className="overflow-hidden md:pointer-events-auto md:max-w-full md:rounded-xl md:bg-[#0c1e33]/45 md:p-1.5 md:opacity-90 md:shadow-lg md:backdrop-blur-sm md:transition-opacity md:duration-200 md:hover:opacity-100 md:focus-within:opacity-100"
+            className="overflow-hidden md:pointer-events-auto md:max-w-full md:rounded md:bg-white/95 md:p-1.5 md:opacity-90 md:shadow-lg md: md:transition-opacity md:duration-200 md:hover:opacity-100 md:focus-within:opacity-100"
           >
             <ul className="flex gap-2 p-1 md:gap-1.5" aria-label="Choose a photo">
               {images.map((src, i) => (
@@ -299,16 +299,16 @@ export default function VdpGallery({ images, name }: Props) {
                     }}
                     aria-label={`Show photo ${i + 1} of ${count}`}
                     aria-current={i === index ? 'true' : undefined}
-                    className={`relative block h-16 w-[5.5rem] overflow-hidden rounded-lg border-2 bg-ivory/[0.06] transition-[border-color,opacity,transform,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-1 focus-visible:ring-offset-[#0c1e33] md:h-11 md:w-16 md:rounded-md md:focus-visible:ring-ivory md:focus-visible:ring-offset-0 desk:h-12 desk:w-[4.5rem] ${
+                    className={`relative block h-16 w-[5.5rem] overflow-hidden rounded-lg border-2 bg-white transition-[border-color,opacity,transform,box-shadow] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-1 focus-visible:ring-offset-paper md:h-11 md:w-16 md:rounded-md md:focus-visible:ring-accent-500 md:focus-visible:ring-offset-0 desk:h-12 desk:w-[4.5rem] ${
                       // The current photo always stands out: full brightness, outline + glow, slightly larger.
                       // Ivory outline on the dark glass (phones) and over the overlay strip (md+). Others are dimmed.
                       i === index
-                        ? 'z-10 scale-105 border-ivory shadow-[0_0_0_2px_rgba(255,253,248,0.45),0_4px_12px_rgba(0,0,0,0.35)]'
+                        ? 'z-10 scale-105 border-accent-500 shadow-[0_0_0_2px_rgba(193,18,31,0.35)]'
                         : 'border-transparent opacity-50 hover:opacity-100 focus-visible:opacity-100'
                     }`}
                   >
                     {failed.has(`t${i}`) ? (
-                      <ImageOff className="mx-auto h-5 w-5 text-ivory/60" aria-hidden="true" />
+                      <ImageOff className="mx-auto h-5 w-5 text-slate-400" aria-hidden="true" />
                     ) : (
                       <Image
                         key={retries[`t${i}`] ?? 0}

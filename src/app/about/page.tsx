@@ -56,12 +56,11 @@ export default function AboutPage() {
 
       <div className="theme-glass">
         {/* Hero */}
-        <div className="border-b border-ivory/10 bg-[#0c1e33]/30 px-4 py-14 text-center text-ivory">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#F0B27A] mb-2">About Us</p>
-          <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-6xl">
+        <div className="hero-band px-4 py-12 text-center sm:py-14">
+          <h1 className="font-display text-4xl font-bold sm:text-6xl">
             Naples&apos; Trusted Car Dealership
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-ivory/75 text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
             A Naples dealership helping Southwest Florida drivers find quality used vehicles at honest prices.
           </p>
         </div>
@@ -73,7 +72,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 items-center">
               <div>
                 <h2 className="section-title">Our Story</h2>
-                <div className="space-y-4 text-ivory/75 leading-relaxed">
+                <div className="space-y-4 text-slate-500 leading-relaxed">
                   <p>
                     {DEALER_NAME} was founded with a simple belief: buying a used car should be an honest, comfortable experience — not a stressful one. We started small, built our reputation one customer at a time, and grew by doing the right thing.
                   </p>
@@ -86,28 +85,28 @@ export default function AboutPage() {
                 </div>
               </div>
               <div className="card p-8">
-                <h3 className="font-serif text-2xl font-semibold text-ivory mb-4">Visit Our Dealership</h3>
+                <h3 className="font-display text-2xl font-semibold text-ink mb-4">Visit Our Dealership</h3>
                 <div className="space-y-4">
                   <div className="flex gap-3">
-                    <MapPin className="h-5 w-5 text-[#F0B27A] flex-shrink-0 mt-0.5" />
+                    <MapPin className="h-5 w-5 text-accent-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-ivory">Address</p>
-                      <p className="text-sm text-ivory/75">{DEALER_ADDRESS}</p>
+                      <p className="text-sm font-semibold text-ink">Address</p>
+                      <p className="text-sm text-slate-500">{DEALER_ADDRESS}</p>
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <Phone className="h-5 w-5 text-[#F0B27A] flex-shrink-0 mt-0.5" />
+                    <Phone className="h-5 w-5 text-accent-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-ivory">Phone</p>
-                      <a href={TEL_HREF} className="rounded text-sm text-[#F0B27A] hover:text-[#f6c89c] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">{DEALER_PHONE}</a>
+                      <p className="text-sm font-semibold text-ink">Phone</p>
+                      <a href={TEL_HREF} className="rounded text-sm text-accent-500 hover:text-accent-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">{DEALER_PHONE}</a>
                     </div>
                   </div>
                   <div className="flex gap-3">
-                    <Star className="h-5 w-5 text-[#F0B27A] flex-shrink-0 mt-0.5" />
+                    <Star className="h-5 w-5 text-accent-500 flex-shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-sm font-semibold text-ivory">Hours</p>
+                      <p className="text-sm font-semibold text-ink">Hours</p>
                       {BUSINESS_HOURS.map((h) => (
-                        <p key={h.label} className="text-sm text-ivory/75">{h.label}: {h.display}</p>
+                        <p key={h.label} className="text-sm text-slate-500">{h.label}: {h.display}</p>
                       ))}
                     </div>
                   </div>
@@ -135,11 +134,11 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {values.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-ivory/10 text-[#F0B27A]">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-accent-500">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-bold text-ivory">{title}</h3>
-                  <p className="mt-2 text-sm text-ivory/75 leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -158,27 +157,27 @@ export default function AboutPage() {
                 <Link
                   key={area}
                   href={`/inventory`}
-                  className="rounded-full border border-ivory/15 bg-ivory/10 px-4 py-2 text-sm font-medium text-ivory/90 hover:border-ivory/30 hover:bg-ivory/[0.16] hover:text-ivory transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+                  className="rounded-full border border-line bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:border-brand-600 hover:bg-slate-100 hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
                 >
                   {area}, FL
                 </Link>
               ))}
             </div>
-            <p className="mt-8 text-sm text-ivory/75 max-w-2xl mx-auto">
+            <p className="mt-8 text-sm text-slate-500 max-w-2xl mx-auto">
               No matter where you are in <strong>Collier County</strong> or <strong>Lee County</strong>, {DEALER_NAME} is your local used car dealer. We’re here to help Southwest Florida drivers find reliable transportation at a price that makes sense.
             </p>
           </div>
         </section>
 
         {/* CTA */}
-        <section className="mx-4 mb-16 overflow-hidden glass rounded-3xl px-6 py-14 text-center text-ivory sm:mx-8">
-          <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Ready to Find Your Next Vehicle?</h2>
-          <p className="mx-auto mt-3 max-w-xl text-ivory/75">Browse our current inventory or get in touch — we are happy to help you find exactly what you need.</p>
+        <section className="mx-4 mb-16 overflow-hidden glass rounded-md px-6 py-14 text-center text-ink sm:mx-8">
+          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Ready to Find Your Next Vehicle?</h2>
+          <p className="mx-auto mt-3 max-w-xl text-slate-500">Browse our current inventory or get in touch — we are happy to help you find exactly what you need.</p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/inventory" className="btn-primary px-8 py-3.5">
               Browse Inventory <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/contact" className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">Contact Us</Link>
+            <Link href="/contact" className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">Contact Us</Link>
           </div>
         </section>
       </div>

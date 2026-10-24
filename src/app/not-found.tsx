@@ -12,9 +12,9 @@ export const metadata: Metadata = {
 export default function NotFound() {
   return (
     <div className="theme-glass px-4 py-20 sm:py-28">
-      <div className="glass mx-auto max-w-2xl rounded-3xl p-8 text-center sm:p-12">
-        <h1 className="font-serif text-4xl font-semibold sm:text-5xl">We couldn’t find that page</h1>
-        <p className="mx-auto mt-4 max-w-md leading-relaxed text-ivory/75">
+      <div className="glass mx-auto max-w-2xl rounded-md p-8 text-center sm:p-12">
+        <h1 className="font-display text-4xl font-semibold sm:text-5xl">We couldn’t find that page</h1>
+        <p className="mx-auto mt-4 max-w-md leading-relaxed text-slate-500">
           If you were looking for a specific vehicle, it may have sold. Everything we have right now is in our inventory.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">

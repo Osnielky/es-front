@@ -62,9 +62,9 @@ export default function ContactPage() {
 
       <div className="theme-glass min-h-screen">
         {/* Page header */}
-        <div className="border-b border-ivory/10 bg-[#0c1e33]/30 px-4 py-14 text-center text-ivory">
-          <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-5xl">Contact {DEALER_NAME}</h1>
-          <p className="mt-3 text-ivory/75">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
+        <div className="hero-band px-4 py-12 text-center sm:py-14">
+          <h1 className="font-display text-4xl font-bold sm:text-5xl">Contact {DEALER_NAME}</h1>
+          <p className="mt-3 text-brand-200">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
         </div>
 
         <div className="mx-auto max-w-5xl px-4 py-14">
@@ -99,17 +99,17 @@ export default function ContactPage() {
               },
             ].map(({ icon: Icon, title, content, href }) => (
               <div key={title} className="card flex items-start gap-4 p-5">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-ivory/10 text-[#F0B27A]">
+                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded bg-slate-100 text-accent-500">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-ivory">{title}</p>
+                  <p className="text-sm font-bold text-ink">{title}</p>
                   {href ? (
-                    <a href={href} className="mt-0.5 rounded text-sm text-[#F0B27A] hover:text-[#f6c89c] hover:underline whitespace-pre-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
+                    <a href={href} className="mt-0.5 rounded text-sm text-accent-500 hover:text-accent-600 hover:underline whitespace-pre-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">
                       {content}
                     </a>
                   ) : (
-                    <p className="mt-0.5 text-sm text-ivory/75 whitespace-pre-line">{content}</p>
+                    <p className="mt-0.5 text-sm text-slate-500 whitespace-pre-line">{content}</p>
                   )}
                 </div>
               </div>

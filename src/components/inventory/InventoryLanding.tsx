@@ -32,31 +32,28 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(itemListJsonLd) }} />
 
-      <div className="theme-glass min-h-screen">
-        <nav className="border-b border-ivory/15 px-4 py-3" aria-label="Breadcrumb">
-          <ol className="mx-auto flex max-w-site items-center gap-1.5 overflow-x-auto whitespace-nowrap text-sm text-ivory/75">
-            {breadcrumbs.map((crumb, i) => (
-              <li key={crumb.url} className="flex items-center gap-1.5">
-                {i === breadcrumbs.length - 1 ? (
-                  <span className="font-medium text-ivory" aria-current="page">{crumb.name}</span>
-                ) : (
-                  <>
-                    <Link href={crumb.url} className="hover:text-ivory transition-colors">{crumb.name}</Link>
-                    <span aria-hidden="true">/</span>
-                  </>
-                )}
-              </li>
-            ))}
-          </ol>
-        </nav>
-
-        <header className="border-b border-ivory/15">
-          <div className="mx-auto max-w-site px-4 py-8 sm:py-12">
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#F0B27A]">
-              {LOCATION.city}, {LOCATION.stateCode}
-            </p>
-            <h1 className="mt-2 font-serif text-4xl font-semibold text-ivory sm:text-5xl">{h1}</h1>
-            <p className="mt-3 max-w-3xl text-ivory/75">{intro}</p>
+      <div className="min-h-screen">
+        <header className="hero-band">
+          <div className="mx-auto max-w-site px-4 pb-8 pt-5 sm:pb-9">
+            <nav aria-label="Breadcrumb">
+              <ol className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap text-sm text-brand-200">
+                {breadcrumbs.map((crumb, i) => (
+                  <li key={crumb.url} className="flex items-center gap-1.5">
+                    {i === breadcrumbs.length - 1 ? (
+                      <span className="font-semibold text-white" aria-current="page">{crumb.name}</span>
+                    ) : (
+                      <>
+                        <Link href={crumb.url} className="transition-colors hover:text-white">{crumb.name}</Link>
+                        <span aria-hidden="true">/</span>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </nav>
+            <h1 className="mt-3 font-display text-[40px] font-bold leading-none sm:text-[52px]">{h1}</h1>
+            <p className="mt-3 max-w-3xl text-brand-200">{intro}</p>
+            <p className="mt-2 text-sm text-brand-300">{LOCATION.city}, {LOCATION.stateCode}</p>
           </div>
         </header>
 
@@ -66,22 +63,19 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
               <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 2} />
             ))}
           </div>
-          <p className="mt-6 text-xs text-ivory/75">* {FINANCE_DISCLAIMER}</p>
+          <p className="mt-5 text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>
 
           {related
             .filter((group) => group.links.length > 0)
             .map((group) => (
-              <section key={group.heading} className="mt-10 border-t border-ivory/15 pt-8">
-                <h2 className="text-lg font-bold text-ivory">{group.heading}</h2>
+              <section key={group.heading} className="mt-10 border-t border-line pt-8">
+                <h2 className="font-display text-2xl font-bold text-ink">{group.heading}</h2>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {group.links.map((link) => (
                     <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        className="inline-block rounded-full border border-ivory/15 bg-ivory/[0.06] px-4 py-2 text-sm font-medium text-ivory/85 transition-colors hover:border-ivory/35 hover:bg-ivory/10 hover:text-ivory"
-                      >
+                      <Link href={link.href} className="filter-chip inline-block">
                         {link.label}
-                        {link.count !== undefined && <span className="text-ivory/55"> ({link.count})</span>}
+                        {link.count !== undefined && <span className="text-slate-400"> ({link.count})</span>}
                       </Link>
                     </li>
                   ))}

@@ -3,78 +3,55 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
-import { DEALER_PHONE, TEL_HREF } from '@/lib/contact'
+import WhatsAppIcon from '@/components/icons/WhatsAppIcon'
+import { DEALER_PHONE, TEL_HREF, whatsappHref } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 
 const navLinks = [
-  { href: '/', label: 'Home' },
   { href: '/inventory', label: 'Inventory' },
   { href: '/financing', label: 'Financing' },
-  { href: '/trade-in', label: 'Trade-In' },
+  { href: '/trade-in', label: 'Sell or trade' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]
 
+// Sticky, always opaque. Height is --header-h / --header-space in globals.css (sticky offsets read it).
 export default function Header() {
   const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
-  const isHome = pathname === '/'
+  // Close the drawer on navigation
+  useEffect(() => setOpen(false), [pathname])
+
   // Section stays highlighted on child pages (e.g. Inventory on a vehicle detail page)
-  const isActive = (href: string) => (href === '/' ? isHome : pathname === href || pathname.startsWith(`${href}/`))
-  // Clear glass at the top of the page; once scrolled (or with the menu open) the frosted layer fades in
-  const solid = scrolled || open
-
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 10)
-    // Also check on mount: a reload or back navigation can restore a scrolled position
-    handler()
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
-
-  // Compact header height from sm up (globals.css): sticky offsets and anchor scroll-margins follow it
-  useEffect(() => {
-    document.documentElement.toggleAttribute('data-header-compact', scrolled)
-  }, [scrolled])
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`) || (href === '/inventory' && pathname.startsWith('/cars-for-sale'))
+  const waHref = whatsappHref("Hi! I'm interested in one of your vehicles.")
 
   return (
-    <>
-    <header
-      // The frosted layer is a pseudo-element so its opacity can fade (backdrop-filter itself doesn't transition)
-      className={`fixed top-0 z-50 w-full border-b text-ivory transition-[border-color,box-shadow] duration-300 before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:bg-[#0c1e33]/65 before:backdrop-blur-xl before:transition-opacity before:duration-300 ${
-        solid
-          ? 'border-ivory/10 shadow-[0_10px_30px_-18px_rgba(0,0,0,0.6)] before:opacity-100'
-          : 'border-transparent before:opacity-0'
-      }`}
-    >
-      <div className={`mx-auto flex max-w-site items-center justify-between px-4 py-2.5 transition-[padding] duration-300 ${scrolled ? 'sm:py-2' : 'sm:py-3.5'}`}>
-        {/* Logo: the artwork is made for light backgrounds, so it sits on a small ivory tile */}
-        <Link href="/" className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]">
-          <Image
-            src="/logo.png"
-            alt={DEALER_NAME}
-            width={81}
-            height={80}
-            sizes="81px"
-            priority
-            className={`h-14 w-auto rounded-xl bg-ivory/95 p-1 transition-[height] duration-300 ${scrolled ? 'sm:h-16' : 'sm:h-20'}`}
-          />
+    <header className="sticky top-0 z-50 border-b border-line bg-white">
+      <div className="mx-auto flex h-[var(--header-h)] max-w-site items-center gap-4 px-4">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5 rounded" aria-label={`${DEALER_NAME} home`}>
+          <Image src="/logo.png" alt="" width={48} height={48} sizes="48px" priority className="h-10 w-10 object-contain sm:h-11 sm:w-11" />
+          <span className="font-display text-xl font-extrabold leading-none tracking-wide sm:text-[22px]">
+            E<span className="text-accent-500">&amp;</span>S{' '}
+            <span className="font-semibold text-ink">Car Sales</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-0.5 sm:flex lg:gap-1">
+        <nav className="ml-2 hidden items-center gap-1 lg:flex" aria-label="Main">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
               aria-current={isActive(href) ? 'page' : undefined}
-              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-xs font-semibold uppercase tracking-widest transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] lg:px-4 ${
-                isActive(href) ? 'bg-ivory/15 text-ivory' : 'text-ivory/75 hover:bg-ivory/10 hover:text-ivory'
+              className={`border-b-2 px-3 py-2 text-[15px] font-semibold transition-colors ${
+                isActive(href) ? 'border-accent-500 text-ink' : 'border-transparent text-slate-500 hover:text-ink'
               }`}
             >
               {label}
@@ -82,75 +59,64 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 sm:flex">
+        {/* Actions */}
+        <div className="ml-auto flex items-center gap-2">
           {DEALER_PHONE && (
             <a
               href={TEL_HREF}
+              className="inline-flex h-11 items-center gap-2 rounded border border-line px-3 font-display text-lg font-bold tracking-wide text-ink hover:border-ink sm:border-0 sm:px-2"
               aria-label={`Call ${DEALER_PHONE}`}
-              className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg text-sm font-semibold tracking-wide text-ivory/90 transition-colors hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A]"
             >
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              {/* Number collapses to the icon on tablets so the nav fits on one line */}
-              <span className="hidden lg:inline">{DEALER_PHONE}</span>
+              <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
+              <span className="hidden sm:inline">{DEALER_PHONE}</span>
             </a>
           )}
-          <Link
-            href="/contact"
-            className="whitespace-nowrap rounded-xl border border-ivory/40 bg-ivory/[0.06] px-4 py-2 text-sm font-semibold text-ivory transition-colors hover:bg-ivory hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] lg:px-5"
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-wa btn-sm hidden sm:inline-flex">
+            <WhatsAppIcon className="h-[18px] w-[18px]" />
+            WhatsApp
+          </a>
+          <button
+            className="flex h-11 w-11 items-center justify-center rounded border border-line text-ink hover:border-ink lg:hidden"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
           >
-            Get in touch
-          </Link>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          className="flex h-11 w-11 items-center justify-center rounded-lg text-ivory transition-colors hover:bg-ivory/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] sm:hidden"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-          aria-expanded={open}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
       </div>
 
       {/* Mobile drawer */}
       {open && (
-        <div className="rounded-b-2xl border-t border-ivory/10 bg-[#0c1e33]/90 px-4 pb-5 pt-3 shadow-lg backdrop-blur-xl sm:hidden">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              aria-current={isActive(href) ? 'page' : undefined}
-              className={`flex min-h-11 items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                isActive(href) ? 'bg-ivory/15 text-ivory' : 'text-ivory/80 hover:bg-ivory/10'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
-          {DEALER_PHONE && (
-            <a
-              href={TEL_HREF}
-              className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-ivory hover:bg-ivory/10"
-            >
-              <Phone className="h-4 w-4" aria-hidden="true" />
-              {DEALER_PHONE}
+        <div className="border-t border-line bg-white px-4 pb-5 pt-2 lg:hidden">
+          <nav aria-label="Mobile">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                aria-current={isActive(href) ? 'page' : undefined}
+                className={`flex items-center border-b border-slate-100 py-3 font-display text-xl font-bold ${
+                  isActive(href) ? 'text-accent-500' : 'text-ink'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-wa">
+              <WhatsAppIcon className="h-[18px] w-[18px]" />
+              WhatsApp
             </a>
-          )}
-          <Link
-            href="/contact"
-            onClick={() => setOpen(false)}
-            className="mt-3 flex min-h-12 w-full items-center justify-center rounded-xl bg-ivory px-5 py-3 text-sm font-semibold text-navy hover:bg-white"
-          >
-            Get in touch
-          </Link>
+            {DEALER_PHONE && (
+              <a href={TEL_HREF} className="btn-secondary">
+                <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
+                Call
+              </a>
+            )}
+          </div>
         </div>
       )}
     </header>
-    {/* Spacer = full header height (--header-space in globals.css), fixed even when the header compacts on scroll
-        so content never jumps. The home hero runs under the header instead. */}
-    {!isHome && <div className="h-[var(--header-space)]" aria-hidden="true" />}
-    </>
   )
 }

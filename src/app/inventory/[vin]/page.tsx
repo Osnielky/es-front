@@ -167,17 +167,17 @@ export default async function VehicleDetailPage({ params }: Props) {
           <div className="mx-auto max-w-site px-4 pb-12 pt-3 sm:px-6 sm:pt-6 lg:px-4">
             {/* Title block: breadcrumb (back link on phones), name + title status, key facts, save/share */}
             <nav aria-label="Breadcrumb" className="hidden md:block">
-              <ol className="flex flex-wrap items-center gap-1.5 text-sm text-ivory/75">
+              <ol className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
                 {breadcrumbs.map((crumb, i) => {
                   const isLast = i === breadcrumbs.length - 1
                   return (
                     <li key={crumb.url} className="flex items-center gap-1.5">
                       {isLast ? (
-                        <span className="font-medium text-ivory" aria-current="page">{crumb.name}</span>
+                        <span className="font-medium text-ink" aria-current="page">{crumb.name}</span>
                       ) : (
                         <>
-                          <Link href={crumb.url} className="rounded transition-colors hover:text-ivory focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">{crumb.name}</Link>
-                          <ChevronRight className="h-3.5 w-3.5 text-ivory/45" aria-hidden="true" />
+                          <Link href={crumb.url} className="rounded transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">{crumb.name}</Link>
+                          <ChevronRight className="h-3.5 w-3.5 text-ink/45" aria-hidden="true" />
                         </>
                       )}
                     </li>
@@ -193,25 +193,25 @@ export default async function VehicleDetailPage({ params }: Props) {
               </div>
               <div className="order-last w-full min-w-0 md:order-none md:w-auto md:flex-1">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  <h1 className="min-w-0 break-words text-[1.75rem] font-bold leading-[1.15] tracking-tight text-ivory sm:text-[2rem] desk:text-[2.5rem]">
+                  <h1 className="min-w-0 break-words font-display text-[2rem] font-extrabold leading-none text-ink sm:text-[2.5rem] desk:text-[2.75rem]">
                     {name}
                   </h1>
                   {vehicle.cleanTitle && (
-                    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-sm font-semibold text-emerald-200">
+                    <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
                       <ShieldCheck className="h-4 w-4" aria-hidden="true" />
                       Clean title
                     </span>
                   )}
-                  {isSold && <span className="rounded-full border border-red-300/30 bg-red-400/20 px-3 py-1 text-sm font-semibold text-red-100">Sold</span>}
-                  {vehicle.status === 'PENDING' && <span className="rounded-full border border-amber-300/30 bg-amber-400/15 px-3 py-1 text-sm font-semibold text-amber-100">Sale pending</span>}
+                  {isSold && <span className="rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-semibold text-accent-600">Sold</span>}
+                  {vehicle.status === 'PENDING' && <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Sale pending</span>}
                 </div>
-                <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.9375rem] text-ivory/75">
+                <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.9375rem] text-slate-500">
                   <span>{vehicle.mileage.toLocaleString('en-US')} miles</span>
-                  <span className="h-1 w-1 rounded-full bg-[#F0B27A]/70" aria-hidden="true" />
+                  <span className="h-1 w-1 rounded-full bg-accent-500/70" aria-hidden="true" />
                   <span>Stock #{stock}</span>
-                  <span className="h-1 w-1 rounded-full bg-[#F0B27A]/70" aria-hidden="true" />
+                  <span className="h-1 w-1 rounded-full bg-accent-500/70" aria-hidden="true" />
                   <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-4 w-4 text-[#F0B27A]" aria-hidden="true" />
+                    <MapPin className="h-4 w-4 text-accent-500" aria-hidden="true" />
                     {LOCATION.city}, {LOCATION.stateCode}
                   </span>
                 </p>
@@ -222,9 +222,9 @@ export default async function VehicleDetailPage({ params }: Props) {
             </header>
 
             {isSold && (
-              <div className="mt-5 rounded-panel border border-red-300/30 bg-red-400/15 px-5 py-4 backdrop-blur-md" role="status">
-                <p className="font-semibold text-red-100">This vehicle has been sold.</p>
-                <p className="mt-1 text-sm text-red-100/90">
+              <div className="mt-5 rounded-panel border border-red-200 bg-red-50 px-5 py-4 " role="status">
+                <p className="font-semibold text-accent-600">This vehicle has been sold.</p>
+                <p className="mt-1 text-sm text-accent-600/90">
                   {similar.length > 0 && (
                     <>
                       See <a href="#similar" className="font-semibold underline">similar vehicles</a> or browse
@@ -236,9 +236,9 @@ export default async function VehicleDetailPage({ params }: Props) {
               </div>
             )}
             {vehicle.status === 'PENDING' && (
-              <div className="mt-5 rounded-panel border border-amber-300/30 bg-amber-400/15 px-5 py-4 backdrop-blur-md" role="status">
-                <p className="font-semibold text-amber-100">Sale pending</p>
-                <p className="mt-1 text-sm text-amber-100/90">
+              <div className="mt-5 rounded-panel border border-amber-300 bg-amber-50 px-5 py-4 " role="status">
+                <p className="font-semibold text-amber-800">Sale pending</p>
+                <p className="mt-1 text-sm text-amber-800/90">
                   This vehicle is under contract. Check availability to be first in line if the sale falls through.
                 </p>
               </div>
@@ -256,8 +256,8 @@ export default async function VehicleDetailPage({ params }: Props) {
                   {/* Fills the column under the panel on tall desktop screens; the full Visit us section stays below */}
                   <div className="vdp-panel mt-4 hidden p-5 desk:[@media(min-height:940px)]:block">
                     <p className="vdp-eyebrow">Visit us</p>
-                    <address className="mt-2 flex items-start gap-2 text-[0.9375rem] not-italic leading-snug text-ivory">
-                      <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
+                    <address className="mt-2 flex items-start gap-2 text-[0.9375rem] not-italic leading-snug text-ink">
+                      <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-accent-500" aria-hidden="true" />
                       <span>
                         {LOCATION.streetAddress}
                         <br />
@@ -267,8 +267,8 @@ export default async function VehicleDetailPage({ params }: Props) {
                     <dl className="mt-3 space-y-1 text-sm">
                       {BUSINESS_HOURS.map((h) => (
                         <div key={h.label} className="flex justify-between gap-4">
-                          <dt className="text-ivory/75">{h.label}</dt>
-                          <dd className="font-semibold text-ivory">{h.display}</dd>
+                          <dt className="text-slate-500">{h.label}</dt>
+                          <dd className="font-semibold text-ink">{h.display}</dd>
                         </div>
                       ))}
                     </dl>
@@ -276,7 +276,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                       href={directionsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded text-sm font-semibold text-[#F0B27A] hover:text-[#f6c89c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+                      className="mt-3 inline-flex min-h-11 items-center gap-1.5 rounded text-sm font-semibold text-accent-500 hover:text-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
                     >
                       <Navigation className="h-4 w-4" aria-hidden="true" />
                       Get directions
@@ -297,10 +297,10 @@ export default async function VehicleDetailPage({ params }: Props) {
                     </div>
                     {vehicle.description && (
                       <div className="vdp-panel mt-5 p-5 sm:p-6">
-                        <h3 className="text-lg font-semibold text-ivory">About this {shortName}</h3>
+                        <h3 className="text-lg font-semibold text-ink">About this {shortName}</h3>
                         <div className="mt-2">
                           <Expandable collapsedHeight={168} moreLabel="Read more" lessLabel="Show less">
-                            <p className="whitespace-pre-line text-base leading-relaxed text-ivory/90">{vehicle.description}</p>
+                            <p className="whitespace-pre-line text-base leading-relaxed text-slate-700">{vehicle.description}</p>
                           </Expandable>
                         </div>
                       </div>
@@ -315,8 +315,8 @@ export default async function VehicleDetailPage({ params }: Props) {
                         <Expandable collapsedHeight={220} moreLabel={`Show all ${vehicle.features.length} features`}>
                           <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
                             {vehicle.features.map((f) => (
-                              <li key={f} className="flex items-start gap-2.5 text-base text-ivory/90">
-                                <Check className="mt-1 h-4 w-4 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
+                              <li key={f} className="flex items-start gap-2.5 text-base text-slate-700">
+                                <Check className="mt-1 h-4 w-4 flex-shrink-0 text-accent-500" aria-hidden="true" />
                                 {f}
                               </li>
                             ))}
@@ -324,7 +324,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                         </Expandable>
                       ) : (
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                          <p className="max-w-prose text-base text-ivory/75">
+                          <p className="max-w-prose text-base text-slate-500">
                             The equipment list for this vehicle hasn’t been published yet. Ask us and we’ll send the full feature list.
                           </p>
                           {!isSold && (
@@ -342,16 +342,16 @@ export default async function VehicleDetailPage({ params }: Props) {
                     <h2 id="details-heading" className="vdp-heading mt-1">The particulars</h2>
                     <dl className="vdp-panel mt-5 grid px-5 sm:grid-cols-2 sm:gap-x-10 sm:px-6">
                       {details.map(({ label, value }) => (
-                        <div key={label} className="flex items-baseline justify-between gap-4 border-b border-ivory/15 py-3.5 last:border-b-0 sm:[&:nth-last-child(2):nth-child(odd)]:border-b-0">
-                          <dt className="flex-shrink-0 text-[0.9375rem] text-ivory/75">{label}</dt>
-                          <dd className="min-w-0 text-right text-[0.9375rem] font-semibold text-ivory">
-                            {value ?? <span className="font-normal text-ivory/55">{NOT_LISTED}</span>}
+                        <div key={label} className="flex items-baseline justify-between gap-4 border-b border-line py-3.5 last:border-b-0 sm:[&:nth-last-child(2):nth-child(odd)]:border-b-0">
+                          <dt className="flex-shrink-0 text-[0.9375rem] text-slate-500">{label}</dt>
+                          <dd className="min-w-0 text-right text-[0.9375rem] font-semibold text-ink">
+                            {value ?? <span className="font-normal text-slate-400">{NOT_LISTED}</span>}
                           </dd>
                         </div>
                       ))}
                     </dl>
                     {estMonthly && (
-                      <p id="finance-disclaimer" className="mt-4 text-sm leading-relaxed text-ivory/75">
+                      <p id="finance-disclaimer" className="mt-4 text-sm leading-relaxed text-slate-500">
                         * Est. ${estMonthly.toLocaleString('en-US')}/mo. {FINANCE_DISCLAIMER}
                       </p>
                     )}
@@ -362,11 +362,11 @@ export default async function VehicleDetailPage({ params }: Props) {
                     <h2 id="visit-heading" className="vdp-heading mt-1">See it in person</h2>
                     <div className="vdp-panel mt-5 grid gap-6 p-5 sm:p-6 md:grid-cols-2">
                       <div>
-                        <h3 className="flex items-center gap-2 text-base font-semibold text-ivory">
-                          <MapPin className="h-5 w-5 text-[#F0B27A]" aria-hidden="true" />
+                        <h3 className="flex items-center gap-2 text-base font-semibold text-ink">
+                          <MapPin className="h-5 w-5 text-accent-500" aria-hidden="true" />
                           {process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'}
                         </h3>
-                        <address className="mt-2 text-base not-italic leading-relaxed text-ivory/90">
+                        <address className="mt-2 text-base not-italic leading-relaxed text-slate-700">
                           {LOCATION.streetAddress}
                           <br />
                           {LOCATION.city}, {LOCATION.stateCode} {LOCATION.zipCode}
@@ -383,15 +383,15 @@ export default async function VehicleDetailPage({ params }: Props) {
                         </div>
                       </div>
                       <div>
-                        <h3 className="flex items-center gap-2 text-base font-semibold text-ivory">
-                          <Clock className="h-5 w-5 text-[#F0B27A]" aria-hidden="true" />
+                        <h3 className="flex items-center gap-2 text-base font-semibold text-ink">
+                          <Clock className="h-5 w-5 text-accent-500" aria-hidden="true" />
                           Hours
                         </h3>
                         <dl className="mt-2 space-y-1.5 text-base">
                           {BUSINESS_HOURS.map((h) => (
-                            <div key={h.label} className="flex justify-between gap-4 border-b border-ivory/15 pb-1.5 last:border-b-0">
-                              <dt className="text-ivory/75">{h.label}</dt>
-                              <dd className="font-semibold text-ivory">{h.display}</dd>
+                            <div key={h.label} className="flex justify-between gap-4 border-b border-line pb-1.5 last:border-b-0">
+                              <dt className="text-slate-500">{h.label}</dt>
+                              <dd className="font-semibold text-ink">{h.display}</dd>
                             </div>
                           ))}
                         </dl>
@@ -402,13 +402,13 @@ export default async function VehicleDetailPage({ params }: Props) {
                         )}
                       </div>
                     </div>
-                    <p className="mt-5 text-sm text-ivory/75">
+                    <p className="mt-5 text-sm text-slate-500">
                       Shop more{' '}
-                      <Link href={modelPath(vehicle.make, vehicle.model)} className="font-semibold text-[#F0B27A] underline underline-offset-2 hover:text-[#f6c89c]">
+                      <Link href={modelPath(vehicle.make, vehicle.model)} className="font-semibold text-accent-500 underline underline-offset-2 hover:text-accent-600">
                         {vehicle.make} {vehicle.model}
                       </Link>{' '}
                       and{' '}
-                      <Link href={makePath(vehicle.make)} className="font-semibold text-[#F0B27A] underline underline-offset-2 hover:text-[#f6c89c]">
+                      <Link href={makePath(vehicle.make)} className="font-semibold text-accent-500 underline underline-offset-2 hover:text-accent-600">
                         {vehicle.make}
                       </Link>{' '}
                       vehicles for sale in {LOCATION.city}, {LOCATION.stateCode}.
@@ -420,7 +420,7 @@ export default async function VehicleDetailPage({ params }: Props) {
           </div>
 
           {similar.length > 0 && (
-            <section id="similar" aria-labelledby="similar-heading" className="scroll-mt-[var(--header-h)] border-t border-ivory/15 py-12">
+            <section id="similar" aria-labelledby="similar-heading" className="scroll-mt-[var(--header-h)] border-t border-line py-12">
               <div className="mx-auto max-w-site px-4 sm:px-6 lg:px-4">
                 <h2 id="similar-heading" className="vdp-heading">Similar vehicles</h2>
                 <div className="vehicle-grid mt-6">
@@ -428,7 +428,7 @@ export default async function VehicleDetailPage({ params }: Props) {
                     <VehicleCard key={v.id} vehicle={v} headingLevel="h3" />
                   ))}
                 </div>
-                <p className="mt-6 text-xs text-ivory/70">* {FINANCE_DISCLAIMER}</p>
+                <p className="mt-6 text-xs text-slate-500">* {FINANCE_DISCLAIMER}</p>
               </div>
             </section>
           )}

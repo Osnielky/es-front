@@ -85,17 +85,16 @@ export default function FinancingPage() {
 
       <div className="theme-glass">
         {/* Hero */}
-        <div className="border-b border-ivory/10 bg-[#0c1e33]/30 px-4 py-14 text-center text-ivory">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#F0B27A] mb-2">Auto Financing</p>
-          <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-6xl">
+        <div className="hero-band px-4 py-12 text-center sm:py-14">
+          <h1 className="font-display text-4xl font-bold sm:text-6xl">
             Car Financing in Naples, FL
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-ivory/75 text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
             Apply online, and we’ll go over the options our lender partners offer for your credit and budget.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#apply" className="btn-primary px-8 py-3.5">Apply Now — It&apos;s Free</a>
-            <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
+            <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">
               <Phone className="h-4 w-4" /> Call {DEALER_PHONE}
             </a>
           </div>
@@ -111,11 +110,11 @@ export default function FinancingPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {benefits.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-ivory/10 text-[#F0B27A]">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-slate-100 text-accent-500">
                     <Icon className="h-7 w-7" />
                   </div>
-                  <h3 className="font-bold text-ivory">{title}</h3>
-                  <p className="mt-2 text-sm text-ivory/75 leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -132,14 +131,14 @@ export default function FinancingPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {steps.map(({ icon: Icon, title, desc }, i) => (
                 <div key={title} className="relative card p-6 text-center">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-ivory px-3 py-0.5 text-xs font-bold text-navy">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-3 py-0.5 text-xs font-bold text-white">
                     Step {i + 1}
                   </span>
-                  <div className="mx-auto mt-3 mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-ivory/10 text-[#F0B27A]">
+                  <div className="mx-auto mt-3 mb-4 flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-accent-500">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="font-bold text-ivory">{title}</h3>
-                  <p className="mt-2 text-sm text-ivory/75 leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -152,19 +151,19 @@ export default function FinancingPage() {
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
               {/* Form */}
               <div>
-                <h2 className="text-2xl font-bold text-ivory mb-2">Apply for Financing</h2>
-                <p className="text-ivory/75 mb-6">No commitment. A specialist will follow up to go over your options.</p>
+                <h2 className="text-2xl font-bold text-ink mb-2">Apply for Financing</h2>
+                <p className="text-slate-500 mb-6">No commitment. A specialist will follow up to go over your options.</p>
                 <LeadForm leadType="FINANCING" vehicleName="financing" />
               </div>
 
               {/* FAQ */}
               <div>
-                <h2 className="text-2xl font-bold text-ivory mb-6">Frequently Asked Questions</h2>
+                <h2 className="text-2xl font-bold text-ink mb-6">Frequently Asked Questions</h2>
                 <div className="space-y-4">
                   {faqs.map(({ q, a }) => (
                     <div key={q} className="card p-5">
-                      <h3 className="font-bold text-ivory text-sm">{q}</h3>
-                      <p className="mt-2 text-sm text-ivory/75 leading-relaxed">{a}</p>
+                      <h3 className="font-bold text-ink text-sm">{q}</h3>
+                      <p className="mt-2 text-sm text-slate-500 leading-relaxed">{a}</p>
                     </div>
                   ))}
                 </div>
@@ -176,7 +175,7 @@ export default function FinancingPage() {
         {/* Service area mention for local SEO */}
         <section className="px-4 py-12 text-center">
           <div className="mx-auto max-w-3xl">
-            <p className="text-ivory/75 text-sm leading-relaxed">
+            <p className="text-slate-500 text-sm leading-relaxed">
               {DEALER_NAME} provides auto financing to customers throughout{' '}
               <strong>Naples, FL</strong> and the surrounding communities including{' '}
               {LOCATION.nearbyAreas.join(', ')}, and all of{' '}

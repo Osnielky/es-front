@@ -75,17 +75,16 @@ export default function TradeInPage() {
 
       <div className="theme-glass">
         {/* Hero */}
-        <div className="border-b border-ivory/10 bg-[#0c1e33]/30 px-4 py-14 text-center text-ivory">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#F0B27A] mb-2">Trade-In</p>
-          <h1 className="font-serif text-4xl font-semibold tracking-tight sm:text-6xl">
+        <div className="hero-band px-4 py-12 text-center sm:py-14">
+          <h1 className="font-display text-4xl font-bold sm:text-6xl">
             Trade In Your Car in Naples, FL
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-ivory/75 text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
             Get an appraisal and apply the value toward your next vehicle.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="#appraise" className="btn-primary px-8 py-3.5">Get My Trade-In Value</a>
-            <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]">
+            <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">
               <Phone className="h-4 w-4" /> Call {DEALER_PHONE}
             </a>
           </div>
@@ -101,11 +100,11 @@ export default function TradeInPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {benefits.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-ivory/10 text-[#F0B27A]">
+                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-slate-100 text-accent-500">
                     <Icon className="h-7 w-7" />
                   </div>
-                  <h3 className="font-bold text-ivory">{title}</h3>
-                  <p className="mt-2 text-sm text-ivory/75 leading-relaxed">{desc}</p>
+                  <h3 className="font-bold text-ink">{title}</h3>
+                  <p className="mt-2 text-sm text-slate-500 leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -122,12 +121,12 @@ export default function TradeInPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {steps.map(({ step, title, desc }) => (
                 <div key={step} className="card flex gap-5 p-6">
-                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-ivory text-sm font-black text-navy">
+                  <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-black text-white">
                     {step}
                   </span>
                   <div>
-                    <h3 className="font-bold text-ivory">{title}</h3>
-                    <p className="mt-1 text-sm text-ivory/75 leading-relaxed">{desc}</p>
+                    <h3 className="font-bold text-ink">{title}</h3>
+                    <p className="mt-1 text-sm text-slate-500 leading-relaxed">{desc}</p>
                   </div>
                 </div>
               ))}
@@ -141,21 +140,21 @@ export default function TradeInPage() {
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
               {/* What we accept */}
               <div>
-                <h2 className="text-2xl font-bold text-ivory mb-2">We Accept Almost Any Vehicle</h2>
-                <p className="text-ivory/75 mb-6">
+                <h2 className="text-2xl font-bold text-ink mb-2">We Accept Almost Any Vehicle</h2>
+                <p className="text-slate-500 mb-6">
                   You don&apos;t need a perfect car to get a great offer. We buy vehicles of all shapes, ages, and conditions in the Naples, FL area.
                 </p>
                 <ul className="space-y-3 mb-8">
                   {accepts.map(item => (
-                    <li key={item} className="flex items-center gap-3 text-ivory/90">
-                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-300" />
+                    <li key={item} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-emerald-700" />
                       {item}
                     </li>
                   ))}
                 </ul>
                 <div className="card p-5">
-                  <p className="text-sm font-bold text-ivory mb-1">Have a loan on your current car?</p>
-                  <p className="text-sm text-ivory/75">
+                  <p className="text-sm font-bold text-ink mb-1">Have a loan on your current car?</p>
+                  <p className="text-sm text-slate-500">
                     No problem. We handle the payoff directly with your lender. If you owe more than the car is worth, we can roll the difference into your new financing.
                   </p>
                 </div>
@@ -168,8 +167,8 @@ export default function TradeInPage() {
 
               {/* Form */}
               <div>
-                <h2 className="text-2xl font-bold text-ivory mb-2">Get Your Trade-In Estimate</h2>
-                <p className="text-ivory/75 mb-6">Tell us about your vehicle and we&apos;ll get back to you with an offer fast.</p>
+                <h2 className="text-2xl font-bold text-ink mb-2">Get Your Trade-In Estimate</h2>
+                <p className="text-slate-500 mb-6">Tell us about your vehicle and we&apos;ll get back to you with an offer fast.</p>
                 <LeadForm leadType="TRADE_IN" vehicleName="trade-in" />
               </div>
             </div>
@@ -179,7 +178,7 @@ export default function TradeInPage() {
         {/* Local SEO footer text */}
         <section className="px-4 py-12 text-center">
           <div className="mx-auto max-w-3xl">
-            <p className="text-ivory/75 text-sm leading-relaxed">
+            <p className="text-slate-500 text-sm leading-relaxed">
               {DEALER_NAME} accepts trade-ins from customers throughout{' '}
               <strong>Naples, FL</strong> and the surrounding areas including{' '}
               {LOCATION.nearbyAreas.join(', ')}, and all of <strong>Collier County</strong>.{' '}

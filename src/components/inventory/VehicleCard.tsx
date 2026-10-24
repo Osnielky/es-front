@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { Gauge, Settings2, Car, CheckCircle2, Calculator, ArrowRight, Cog } from 'lucide-react'
+import { Gauge, Settings2, Cog, CheckCircle2, ArrowRight } from 'lucide-react'
 import type { Vehicle } from '@/types'
 import { vehiclePath, vehicleUrl, stockNumber as getStockNumber } from '@/lib/seo'
-import { estimateMonthlyPayment, FINANCE_DISCLAIMER } from '@/lib/finance'
-import { colorSwatch, engineLabel } from '@/lib/vehicle-display'
+import { estimateMonthlyPayment } from '@/lib/finance'
+import { engineLabel, shortMiles } from '@/lib/vehicle-display'
 import WhatsAppButton from './WhatsAppButton'
 import CardImageCarousel from './CardImageCarousel'
 import { SaveCarButton, CompareCheckbox } from './ShortlistControls'
@@ -42,122 +42,94 @@ const CONDITION_LABEL: Record<string, string> = {
   CERTIFIED: 'Certified',
 }
 
-function ColorSpec({ label, color }: { label: string; color: string | null }) {
-  if (!color) return null
-  const swatch = colorSwatch(color)
-  return (
-    <div className="min-w-0">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-ivory/75">{label}</p>
-      <p className="mt-1 flex items-center gap-2 text-sm text-ivory">
-        <span
-          className="h-5 w-5 flex-shrink-0 rounded-full border border-ivory/30"
-          style={{ background: swatch ?? 'repeating-linear-gradient(45deg,rgb(255 253 248 / 0.35),rgb(255 253 248 / 0.35) 3px,transparent 3px,transparent 6px)' }}
-          aria-hidden="true"
-        />
-        <span className="truncate">{color}</span>
-      </p>
-    </div>
-  )
-}
-
+// Card = photo on top, then a "window sticker": name, red price with payment estimate, specs, actions
 export default function VehicleCard({ vehicle, priority = false, headingLevel: Heading = 'h2', layout = 'grid' }: Props) {
-  const { make, model, year, trim, price, mileage, condition, images, exteriorColor, interiorColor, bodyStyle, engine, transmission, cleanTitle } = vehicle
+  const { make, model, year, trim, price, mileage, condition, images, exteriorColor, bodyStyle, engine, transmission, cleanTitle } = vehicle
   const href = vehiclePath(vehicle)
   const title = `${year} ${make} ${model}`
   const fullTitle = [year, make, model, trim].filter(Boolean).join(' ')
-  const estMonthly = estimateMonthlyPayment(Number(price))
+  const estMonthly = price > 0 ? estimateMonthlyPayment(price) : 0
   const isList = layout === 'list'
-  const shortlistItem = { id: vehicle.id, title: fullTitle, href, image: images[0], price: Number(price) }
+  const shortlistItem = { id: vehicle.id, title: fullTitle, href, image: images[0], price }
+  const subtitle = [trim, exteriorColor].filter(Boolean).join(' · ') || bodyStyle
 
   const specs = [
-    { icon: Gauge, value: `${mileage.toLocaleString()} mi`, label: 'Mileage' },
-    { icon: Settings2, value: transmission, label: 'Transmission' },
+    { icon: Gauge, value: `${mileage.toLocaleString('en-US')} mi`, label: 'Mileage' },
     { icon: Cog, value: engineLabel(engine), label: 'Engine' },
-    { icon: Car, value: bodyStyle, label: 'Body style' },
+    { icon: Settings2, value: transmission, label: 'Transmission' },
   ].filter((s): s is typeof s & { value: string } => Boolean(s.value))
 
   return (
-    <article className={`card flex overflow-hidden ${isList ? 'flex-col md:flex-row' : 'flex-col'}`}>
+    <article className={`card-hover flex min-w-0 overflow-hidden ${isList ? 'flex-col md:flex-row' : 'flex-col'}`}>
       {/* Photo */}
-      <div className={`relative flex-shrink-0 overflow-hidden bg-ivory/[0.06] ${isList ? 'aspect-[16/9] md:aspect-auto md:w-[42%]' : 'aspect-[16/9]'}`}>
+      <div className={`relative flex-shrink-0 overflow-hidden bg-slate-100 ${isList ? 'aspect-[4/3] md:aspect-auto md:w-[42%]' : 'aspect-[4/3]'}`}>
         <CardImageCarousel
           images={images}
           alt={`${fullTitle} for sale in Naples, FL`}
           href={href}
           priority={priority}
-          sizes={isList ? '(max-width: 768px) 100vw, 480px' : '(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 640px'}
+          sizes={isList ? '(max-width: 768px) 100vw, 480px' : '(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw'}
         />
-        <span className="pointer-events-none absolute left-3 top-3 rounded-full border border-ivory/20 bg-[#0c1e33]/75 px-3 py-1 text-xs font-semibold text-ivory shadow-sm backdrop-blur-md">
+        <span className="chip pointer-events-none absolute left-2.5 top-2.5">
           {CONDITION_LABEL[condition]}
+          <span className="opacity-80">· {shortMiles(mileage)}</span>
         </span>
-        <div className="absolute right-3 top-3">
+        <div className="absolute right-2.5 top-2.5">
           <SaveCarButton item={shortlistItem} />
         </div>
       </div>
 
-      {/* Details */}
-      <div className="flex flex-1 flex-col p-5">
+      {/* Sticker */}
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <Heading className="text-xl font-bold leading-tight text-ivory">
-              <Link href={href} className="hover:text-[#F0B27A]">
-                {title}
-              </Link>
+            <Heading className="font-display text-2xl font-bold leading-tight text-ink">
+              <Link href={href} className="rounded hover:text-brand-600">{title}</Link>
             </Heading>
-            {(trim || bodyStyle) && <p className="mt-0.5 text-sm text-ivory/75">{trim ?? bodyStyle}</p>}
+            {subtitle && <p className="mt-0.5 truncate text-sm text-slate-500">{subtitle}</p>}
           </div>
           {cleanTitle && (
-            <span className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full border border-emerald-300/40 bg-emerald-400/15 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-              <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+            <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-sm bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+              <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
               Clean title
             </span>
           )}
         </div>
 
-        <p className="mt-2 text-3xl font-extrabold tracking-tight text-ivory">${Number(price).toLocaleString()}</p>
-
-        {estMonthly > 0 && (
-          <p className="mt-3 flex items-center gap-3 rounded-xl bg-ivory/[0.08] px-4 py-2.5 text-ivory/90" title={FINANCE_DISCLAIMER}>
-            <Calculator className="h-5 w-5 flex-shrink-0 text-[#F0B27A]" aria-hidden="true" />
-            <span>
-              Est. <strong className="font-bold text-ivory">${estMonthly.toLocaleString()}</strong>/mo<sup className="text-ivory/75">*</sup>
-            </span>
-          </p>
-        )}
+        <div className="flex items-end justify-between gap-3 border-y border-dashed border-line py-2.5">
+          <div>
+            {price > 0 ? (
+              <>
+                <p className="price text-[32px]">${price.toLocaleString('en-US')}</p>
+                <p className="mt-1 text-xs text-slate-500">Plus tax, tag &amp; title</p>
+              </>
+            ) : (
+              <p className="font-display text-2xl font-bold text-ink">Call for price</p>
+            )}
+          </div>
+          {estMonthly > 0 && (
+            <div className="text-right">
+              <p className="font-display text-xl font-bold leading-none text-ink tabular-nums">${estMonthly.toLocaleString('en-US')}/mo<sup className="text-slate-400">*</sup></p>
+              <p className="mt-1 text-xs text-slate-500">est. payment</p>
+            </div>
+          )}
+        </div>
 
         {specs.length > 0 && (
-          <dl className="mt-4 grid grid-cols-2 border-b border-ivory/15">
-            {specs.map(({ icon: Icon, value, label }, i) => (
-              <div
-                key={label}
-                className={`flex items-center gap-2.5 border-t border-ivory/15 py-2.5 ${i % 2 === 0 ? 'pr-3' : 'border-l pl-3'}`}
-              >
+          <dl className="flex flex-wrap gap-x-3.5 gap-y-1 text-sm text-slate-500">
+            {specs.map(({ icon: Icon, value, label }) => (
+              <div key={label} className="inline-flex items-center gap-1.5">
                 <dt className="flex-shrink-0">
-                  <Icon className="h-5 w-5 text-ivory/70" aria-hidden="true" />
+                  <Icon className="h-3.5 w-3.5 text-brand-600" aria-hidden="true" />
                   <span className="sr-only">{label}</span>
                 </dt>
-                <dd className="truncate text-sm font-medium text-ivory/90">{value}</dd>
+                <dd className="truncate">{value}</dd>
               </div>
             ))}
           </dl>
         )}
 
-        {(exteriorColor || interiorColor) && (
-          <div className="mt-3 grid grid-cols-2 gap-3 border-b border-ivory/15 pb-3">
-            <ColorSpec label="Exterior" color={exteriorColor} />
-            <ColorSpec label="Interior" color={interiorColor} />
-          </div>
-        )}
-
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          <Link
-            href={href}
-            aria-label={`View vehicle: ${fullTitle}`}
-            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-ivory px-3 py-3 text-sm font-semibold text-navy transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
-          >
-            View vehicle
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+        <div className="mt-auto grid grid-cols-2 gap-2 pt-1">
           <WhatsAppButton
             vehicleId={vehicle.id}
             year={year}
@@ -166,11 +138,16 @@ export default function VehicleCard({ vehicle, priority = false, headingLevel: H
             trim={trim}
             stockNumber={getStockNumber(vehicle)}
             url={vehicleUrl(vehicle)}
-            className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-emerald-400/50 bg-emerald-400/10 px-3 py-2.5 text-sm font-semibold text-emerald-200 transition-colors hover:border-emerald-300/70 hover:bg-emerald-400/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0B27A] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0c1e33]"
+            label="WhatsApp"
+            className="btn-wa btn-sm"
           />
+          <Link href={href} aria-label={`View vehicle: ${fullTitle}`} className="btn-navy btn-sm">
+            Details
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
 
-        <div className="mt-3">
+        <div>
           <CompareCheckbox item={shortlistItem} />
         </div>
       </div>
