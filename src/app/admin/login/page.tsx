@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { LogIn, AlertCircle } from 'lucide-react'
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email'),
+  email: z.string().trim().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
 })
 
@@ -71,13 +71,14 @@ export default function AdminLoginPage() {
 
             <div>
               <label htmlFor="email" className="label">
-                Email
+                Username
               </label>
               <input
                 id="email"
-                type="email"
+                type="text"
+                autoComplete="username"
                 className="input"
-                placeholder="admin@dealer.com"
+                placeholder="admin"
                 {...register('email')}
               />
               {errors.email && (
