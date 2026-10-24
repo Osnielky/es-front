@@ -74,12 +74,11 @@ export default function TradeInPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Hero */}
-      <div className="bg-hero-gradient px-4 py-14 text-white text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand-300 mb-2">Trade-In</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
+      <div className="hero-band px-4 py-12 text-center sm:py-14">
+                <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
           Trade In Your Car in Naples, FL
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-brand-200 text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
           Get a fast, fair appraisal. Top market value applied instantly to your next vehicle.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -100,7 +99,7 @@ export default function TradeInPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="card p-6 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
                   <Icon className="h-7 w-7" />
                 </div>
                 <h3 className="font-bold text-gray-900">{title}</h3>

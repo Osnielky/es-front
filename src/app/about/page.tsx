@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight, HeartHandshake, MapPin, Phone, Shield, Star, Users } from 'lucide-react'
 import { buildBreadcrumbJsonLd, buildLocalBusinessJsonLd, LOCATION } from '@/lib/seo'
+import { DEALER } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -64,12 +65,11 @@ export default function AboutPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Hero */}
-      <div className="bg-hero-gradient px-4 py-14 text-white text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand-300 mb-2">About Us</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
+      <div className="hero-band px-4 py-12 text-center sm:py-14">
+                <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
           Naples&apos; Trusted Car Dealership
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-brand-200 text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
           Family-owned and community-driven. We have been helping Southwest Florida families find quality vehicles at honest prices for over 15 years.
         </p>
       </div>
@@ -125,8 +125,9 @@ export default function AboutPage() {
                   <Star className="h-5 w-5 text-brand-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-gray-900">Hours</p>
-                    <p className="text-sm text-gray-600">Mon – Sat: 9am – 7pm</p>
-                    <p className="text-sm text-gray-600">Sun: 11am – 5pm</p>
+                    {DEALER.hours.map((h) => (
+                      <p key={h.days} className="text-sm text-gray-600">{h.days}: {h.time}</p>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -153,7 +154,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {values.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="card p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded bg-brand-50 text-brand-600">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-bold text-gray-900">{title}</h3>
@@ -189,7 +190,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="mx-4 mb-16 overflow-hidden rounded-3xl bg-hero-gradient px-6 py-14 text-center text-white sm:mx-8">
+      <section className="mx-4 mb-14 overflow-hidden rounded-md bg-brand-600 px-6 py-12 text-center text-white sm:mx-8">
         <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Ready to Find Your Next Vehicle?</h2>
         <p className="mx-auto mt-3 max-w-xl text-brand-200">Browse our current inventory or get in touch — we are happy to help you find exactly what you need.</p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">

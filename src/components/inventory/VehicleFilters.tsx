@@ -2,162 +2,117 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import { useCallback, useState } from 'react'
-import { SlidersHorizontal, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { SlidersHorizontal, X } from 'lucide-react'
 
 interface Props {
   searchParams: Record<string, string | undefined>
+  makes: string[]
+  bodyStyles: string[]
 }
 
-const MAKES = ['BMW', 'Chevrolet', 'Ford', 'Honda', 'Hyundai', 'Kia', 'Mercedes-Benz', 'Nissan', 'Toyota']
-const BODY_STYLES = ['Sedan', 'SUV', 'Truck', 'Van', 'Coupe', 'Convertible', 'Hatchback', 'Wagon']
+const PRICE_STEPS = [15000, 20000, 25000, 30000, 40000, 50000, 75000]
+const MILES_STEPS = [25000, 50000, 75000, 100000, 150000]
+const CONDITIONS = [
+  { value: '', label: 'Any' },
+  { value: 'USED', label: 'Used' },
+  { value: 'CERTIFIED', label: 'Certified' },
+  { value: 'NEW', label: 'New' },
+]
 
-export default function VehicleFilters({ searchParams }: Props) {
+const FILTER_KEYS = ['make', 'bodyStyle', 'priceMax', 'yearMin', 'condition', 'mileageMax']
+
+export default function VehicleFilters({ searchParams, makes, bodyStyles }: Props) {
   const router = useRouter()
   const pathname = usePathname()
-  const [isOpen, setIsOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
-  const updateFilter = useCallback(
-    (key: string, value: string) => {
+  const thisYear = new Date().getFullYear()
+  const yearSteps = [thisYear - 2, thisYear - 4, thisYear - 7, thisYear - 10]
+
+  const update = useCallback(
+    (patch: Record<string, string>) => {
       const params = new URLSearchParams()
       Object.entries(searchParams).forEach(([k, v]) => {
-        if (v && k !== key && k !== 'page') params.set(k, v)
+        if (v && k !== 'page' && !(k in patch)) params.set(k, v)
       })
-      if (value) params.set(key, value)
-      router.push(`${pathname}?${params.toString()}`)
+      Object.entries(patch).forEach(([k, v]) => {
+        if (v) params.set(k, v)
+      })
+      const qs = params.toString()
+      router.push(qs ? `${pathname}?${qs}` : pathname)
     },
     [searchParams, router, pathname]
   )
 
-  const clearFilters = () => router.push(pathname)
+  const clearAll = () => update(Object.fromEntries(FILTER_KEYS.map((k) => [k, ''])))
+  const activeCount = FILTER_KEYS.filter((k) => searchParams[k]).length
 
-  const activeCount = Object.entries(searchParams).filter(
-    ([k, v]) => v && v !== '' && k !== 'page'
-  ).length
+  const chip = (key: string, value: string, label: string) => (
+    <button
+      key={`${key}-${value || 'any'}`}
+      type="button"
+      className="filter-chip"
+      aria-pressed={(searchParams[key] ?? '') === value}
+      onClick={() => update({ [key]: value })}
+    >
+      {label}
+    </button>
+  )
 
-  return (
-    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden mb-6 lg:mb-0">
-      {/* Header - clickable on mobile */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between border-b border-gray-100 px-5 py-4 lg:cursor-default"
-      >
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-brand-600" />
-          <span className="font-bold text-gray-900">Filters</span>
-          {activeCount > 0 && (
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white">
-              {activeCount}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {activeCount > 0 && (
-            <span
-              onClick={(e) => { e.stopPropagation(); clearFilters(); }}
-              className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-red-500 hover:bg-red-50 transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-              Clear all
-            </span>
-          )}
-          <span className="lg:hidden text-gray-400">
-            {isOpen ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-          </span>
-        </div>
-      </button>
-
-      {/* Filter content - collapsible on mobile, always visible on desktop */}
-      <div className={`${isOpen ? 'block' : 'hidden'} lg:block`}>
-        <div className="space-y-5 px-5 py-5">
-        {/* Condition */}
-        <div>
-          <label className="label">Condition</label>
-          <div className="flex flex-wrap gap-2">
-            {[
-              { value: '', label: 'All' },
-              { value: 'NEW', label: 'New' },
-              { value: 'USED', label: 'Used' },
-              { value: 'CERTIFIED', label: 'CPO' },
-            ].map(({ value, label }) => (
-              <button
-                key={value}
-                onClick={() => updateFilter('condition', value)}
-                className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all ${
-                  (searchParams.condition ?? '') === value
-                    ? 'border-brand-500 bg-brand-50 text-brand-700 shadow-sm'
-                    : 'border-gray-200 text-gray-600 hover:border-brand-300'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Make */}
-        <div>
-          <label className="label">Make</label>
-          <select
-            className="input"
-            value={searchParams.make ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateFilter('make', e.target.value)}
-          >
-            <option value="">All Makes</option>
-            {MAKES.map((m) => <option key={m} value={m}>{m}</option>)}
-          </select>
-        </div>
-
-        {/* Body Style */}
-        <div>
-          <label className="label">Body Style</label>
-          <select
-            className="input"
-            value={searchParams.bodyStyle ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateFilter('bodyStyle', e.target.value)}
-          >
-            <option value="">All Styles</option>
-            {BODY_STYLES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        {/* Max Price */}
-        <div>
-          <label className="label">Max Price</label>
-          <select
-            className="input"
-            value={searchParams.priceMax ?? ''}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateFilter('priceMax', e.target.value)}
-          >
-            <option value="">Any Price</option>
-            {[10000, 15000, 20000, 25000, 30000, 40000, 50000, 75000].map((p) => (
-              <option key={p} value={p}>${p.toLocaleString()}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Year Range */}
-        <div>
-          <label className="label">Year Range</label>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              className="input"
-              placeholder="From"
-              value={searchParams.yearMin ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateFilter('yearMin', e.target.value)}
-            />
-            <input
-              type="number"
-              className="input"
-              placeholder="To"
-              value={searchParams.yearMax ?? ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateFilter('yearMax', e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-      </div>
+  const group = (title: string, children: React.ReactNode) => (
+    <div key={title} className="border-t border-line pt-3">
+      <p className="mb-2 font-display text-lg font-bold">{title}</p>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
     </div>
   )
-}
 
+  const body = (
+    <div className="space-y-4">
+      {group('Body style', <>{chip('bodyStyle', '', 'All')}{bodyStyles.map((b) => chip('bodyStyle', b, b))}</>)}
+      {group('Max price', <>{chip('priceMax', '', 'Any')}{PRICE_STEPS.map((p) => chip('priceMax', String(p), `$${(p / 1000).toFixed(0)}k`))}</>)}
+      {group('Max miles', <>{chip('mileageMax', '', 'Any')}{MILES_STEPS.map((m) => chip('mileageMax', String(m), `${m / 1000}k`))}</>)}
+      {group('Make', <>{chip('make', '', 'All')}{makes.map((m) => chip('make', m, m))}</>)}
+      {group('Year', <>{chip('yearMin', '', 'Any')}{yearSteps.map((y) => chip('yearMin', String(y), `${y}+`))}</>)}
+      {group('Condition', <>{CONDITIONS.map((c) => chip('condition', c.value, c.label))}</>)}
+      {activeCount > 0 && (
+        <button type="button" onClick={clearAll} className="inline-flex items-center gap-1 text-sm font-semibold text-accent-500 hover:underline">
+          <X className="h-4 w-4" /> Clear all filters
+        </button>
+      )}
+    </div>
+  )
+
+  return (
+    <>
+      {/* Phone / tablet: a scrollable chip bar with a toggle for the full set */}
+      <div className="lg:hidden">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="filter-chip flex-none inline-flex items-center gap-1.5 font-semibold"
+            aria-pressed={open || activeCount > 0}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filters{activeCount > 0 ? ` (${activeCount})` : ''}
+          </button>
+          <span className="flex-none">{chip('priceMax', '25000', 'Under $25k')}</span>
+          <span className="flex-none">{chip('priceMax', '35000', 'Under $35k')}</span>
+          {bodyStyles.slice(0, 4).map((b) => <span key={b} className="flex-none">{chip('bodyStyle', b, b)}</span>)}
+          <span className="flex-none">{chip('mileageMax', '50000', 'Under 50k mi')}</span>
+        </div>
+        {open && <div className="card mb-5 p-4">{body}</div>}
+      </div>
+
+      {/* Desktop: sidebar */}
+      <aside className="sticky top-20 hidden lg:block" aria-label="Filters">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="font-display text-2xl font-bold">Filters</p>
+          {activeCount > 0 && <span className="pill bg-brand-600 text-white">{activeCount} active</span>}
+        </div>
+        {body}
+      </aside>
+    </>
+  )
+}

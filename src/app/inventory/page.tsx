@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { Search } from 'lucide-react'
-import { getVehicles } from '@/lib/data'
+import { getInventoryFacets, getVehicles, VEHICLE_SORTS, type VehicleSort } from '@/lib/data'
 import { buildBreadcrumbJsonLd, buildInventoryJsonLd, LOCATION } from '@/lib/seo'
 import VehicleCard from '@/components/inventory/VehicleCard'
 import VehicleFilters from '@/components/inventory/VehicleFilters'
+import SortSelect from '@/components/inventory/SortSelect'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -11,41 +13,47 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
 // Force dynamic rendering - requires database connection
 export const dynamic = 'force-dynamic'
 
+type SearchParams = {
+  make?: string
+  model?: string
+  bodyStyle?: string
+  yearMin?: string
+  yearMax?: string
+  priceMin?: string
+  priceMax?: string
+  mileageMax?: string
+  condition?: string
+  sort?: string
+  page?: string
+}
+
+interface Props {
+  searchParams: Promise<SearchParams>
+}
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
   const condition = params.condition
-  
-  let title = 'Cars for Sale in Naples, FL'
-  let description = `Browse our full inventory of new and used cars for sale in Naples, Florida. Find your perfect vehicle at ${DEALER_NAME}. Serving ${LOCATION.nearbyAreas.slice(0, 3).join(', ')}, and all of Southwest Florida.`
-  
+
+  let title = `Used Cars for Sale in ${LOCATION.city}, ${LOCATION.stateCode}`
+  let description = `Browse every vehicle on the lot at ${DEALER_NAME} in ${LOCATION.city}, Florida. Inspected, priced honestly, financing for every credit. Serving ${LOCATION.nearbyAreas.slice(0, 3).join(', ')}, and all of Southwest Florida.`
+
   if (condition === 'NEW') {
     title = 'New Cars for Sale in Naples, FL'
-    description = `Browse our selection of brand new cars for sale in Naples, Florida. Latest models with full warranty at ${DEALER_NAME}. Competitive pricing and easy financing available.`
-  } else if (condition === 'USED') {
-    title = 'Used Cars for Sale in Naples, FL'
-    description = `Quality used cars for sale in Naples, Florida. Inspected, affordable, and ready to drive. ${DEALER_NAME} offers the best selection of pre-owned vehicles in Collier County.`
+    description = `Browse our selection of brand new cars for sale in Naples, Florida at ${DEALER_NAME}.`
   } else if (condition === 'CERTIFIED') {
     title = 'Certified Pre-Owned Cars in Naples, FL'
-    description = `Certified pre-owned vehicles for sale in Naples, Florida. Extended warranty, low mileage, and peace of mind at ${DEALER_NAME}. Premium quality CPO cars.`
+    description = `Certified pre-owned vehicles for sale in Naples, Florida at ${DEALER_NAME}.`
+  } else if (params.bodyStyle) {
+    title = `Used ${params.bodyStyle}s for Sale in Naples, FL`
+  } else if (params.make) {
+    title = `Used ${params.make} for Sale in Naples, FL`
   }
-  
-  const keywords = [
-    'cars for sale Naples FL',
-    'buy car Naples Florida',
-    condition ? `${condition.toLowerCase()} cars Naples` : 'vehicles Naples FL',
-    params.make ? `${params.make} dealer Naples` : 'car dealership Naples',
-    'auto dealer Naples FL',
-    'Southwest Florida cars',
-    ...LOCATION.nearbyAreas.map(area => `cars for sale ${area}`),
-  ]
-  
+
   return {
     title,
     description,
-    keywords: keywords.join(', '),
-    alternates: {
-      canonical: `${SITE_URL}/inventory${condition ? `?condition=${condition}` : ''}`,
-    },
+    alternates: { canonical: `${SITE_URL}/inventory${condition ? `?condition=${condition}` : ''}` },
     openGraph: {
       title,
       description,
@@ -53,152 +61,128 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       type: 'website',
       images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: title }],
     },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
+    twitter: { card: 'summary_large_image', title, description },
   }
 }
 
-interface Props {
-  searchParams: Promise<{
-    make?: string
-    model?: string
-    yearMin?: string
-    yearMax?: string
-    priceMin?: string
-    priceMax?: string
-    condition?: string
-    page?: string
-  }>
-}
+const SORT_VALUES = VEHICLE_SORTS.map((s) => s.value)
 
 export default async function InventoryPage({ searchParams }: Props) {
   const params = await searchParams
-  const page = Number(params.page ?? 1)
+  const page = Math.max(1, Number(params.page ?? 1) || 1)
   const limit = 12
+  const sort: VehicleSort = SORT_VALUES.includes(params.sort as VehicleSort) ? (params.sort as VehicleSort) : 'newest'
 
   let vehicles: Awaited<ReturnType<typeof getVehicles>>['vehicles'] = []
   let total = 0
+  let makes: string[] = []
+  let bodyStyles: string[] = []
   try {
-    const result = await getVehicles({
-      make: params.make,
-      model: params.model,
-      condition: params.condition,
-      yearMin: params.yearMin ? Number(params.yearMin) : undefined,
-      yearMax: params.yearMax ? Number(params.yearMax) : undefined,
-      priceMin: params.priceMin ? Number(params.priceMin) : undefined,
-      priceMax: params.priceMax ? Number(params.priceMax) : undefined,
-      page,
-      limit,
-    })
+    const [result, facets] = await Promise.all([
+      getVehicles({
+        make: params.make,
+        model: params.model,
+        bodyStyle: params.bodyStyle,
+        condition: params.condition,
+        yearMin: params.yearMin ? Number(params.yearMin) : undefined,
+        yearMax: params.yearMax ? Number(params.yearMax) : undefined,
+        priceMin: params.priceMin ? Number(params.priceMin) : undefined,
+        priceMax: params.priceMax ? Number(params.priceMax) : undefined,
+        mileageMax: params.mileageMax ? Number(params.mileageMax) : undefined,
+        sort,
+        page,
+        limit,
+      }),
+      getInventoryFacets(),
+    ])
     vehicles = result.vehicles
     total = result.total
+    makes = facets.makes
+    bodyStyles = facets.bodyStyles
   } catch (error) {
     console.error('Inventory: failed to fetch vehicles', error)
   }
 
   const totalPages = Math.ceil(total / limit)
-  
-  // Build structured data
+
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: 'Home', url: '/' },
     { name: 'Inventory', url: '/inventory' },
   ])
   const inventoryJsonLd = buildInventoryJsonLd(vehicles)
-  
-  // SEO-friendly condition text
-  const conditionText = params.condition === 'NEW' ? 'New' : params.condition === 'USED' ? 'Used' : params.condition === 'CERTIFIED' ? 'Certified Pre-Owned' : 'All'
+
+  const heading = params.bodyStyle
+    ? `Used ${params.bodyStyle}s in ${LOCATION.city}`
+    : params.make
+    ? `Used ${params.make} in ${LOCATION.city}`
+    : params.condition === 'NEW'
+    ? `New cars in ${LOCATION.city}`
+    : params.condition === 'CERTIFIED'
+    ? `Certified pre-owned in ${LOCATION.city}`
+    : `Used cars for sale in ${LOCATION.city}`
+
+  // Pagination keeps every active filter
+  const pageHref = (p: number) => {
+    const q = new URLSearchParams()
+    Object.entries(params).forEach(([k, v]) => {
+      if (v && k !== 'page') q.set(k, v)
+    })
+    if (p > 1) q.set('page', String(p))
+    const qs = q.toString()
+    return qs ? `/inventory?${qs}` : '/inventory'
+  }
 
   return (
     <>
-      {/* Structured Data */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(inventoryJsonLd) }}
-      />
-      
-      <div className="min-h-screen bg-gray-50">
-        {/* Professional Header */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="mx-auto max-w-screen-2xl px-4 py-10 sm:py-14">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold text-brand-600 uppercase tracking-wider">
-                  Our Inventory
-                </p>
-                <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-                  {conditionText === 'All' ? 'Browse All Vehicles' : `${conditionText} Vehicles`}
-                </h1>
-                <p className="mt-2 text-gray-600 max-w-xl">
-                  Explore our selection of quality vehicles. Each car is thoroughly inspected and competitively priced.
-                </p>
-              </div>
-              
-              <div className="flex items-center gap-6 text-sm">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">{total}</p>
-                  <p className="text-gray-500">Available</p>
-                </div>
-                <div className="h-10 w-px bg-gray-200" />
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-brand-600">100%</p>
-                  <p className="text-gray-500">Inspected</p>
-                </div>
-              </div>
-            </div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(inventoryJsonLd) }} />
+
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="flex flex-wrap items-end justify-between gap-3 pb-4 pt-7">
+          <div>
+            <h1 className="font-display text-[32px] font-bold leading-none sm:text-[40px]">{heading}</h1>
+            <p className="mt-1.5 text-slate-500">
+              {total} {total === 1 ? 'vehicle' : 'vehicles'} on the lot. Prices exclude tax, tag and title.
+            </p>
           </div>
+          <SortSelect value={sort} options={VEHICLE_SORTS} />
         </div>
 
-        <div className="mx-auto max-w-screen-2xl px-4 py-8">
-          <div className="lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
-            {/* Filters sidebar */}
-            <aside>
-              <VehicleFilters searchParams={params} />
-            </aside>
+        <div className="grid gap-6 pb-12 lg:grid-cols-[250px_minmax(0,1fr)]">
+          <VehicleFilters searchParams={params} makes={makes} bodyStyles={bodyStyles} />
 
-            {/* Results */}
-            <div>
-              {vehicles.length === 0 ? (
-                <div className="card flex flex-col items-center justify-center py-20 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
-                    <Search className="h-8 w-8 text-gray-400" />
-                  </div>
-                  <h2 className="mt-4 text-lg font-bold text-gray-800">No vehicles found</h2>
-                  <p className="mt-1 text-sm text-gray-500">Try adjusting your filters to see more results.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                  {vehicles.map((vehicle) => (
-                    <VehicleCard key={vehicle.id} vehicle={vehicle} />
-                  ))}
-                </div>
-              )}
+          <div>
+            {vehicles.length === 0 ? (
+              <div className="card flex flex-col items-center justify-center px-6 py-16 text-center">
+                <Search className="h-9 w-9 text-slate-400" />
+                <h2 className="mt-3 font-display text-2xl font-bold">No vehicles match those filters</h2>
+                <p className="mt-1 max-w-[40ch] text-sm text-slate-500">Try a wider price or mileage range, or message us. We get new cars every week.</p>
+                <Link href="/inventory" className="btn-secondary btn-sm mt-5">Show every vehicle</Link>
+              </div>
+            ) : (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {vehicles.map((vehicle, i) => (
+                  <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 3} />
+                ))}
+              </div>
+            )}
 
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="mt-10 flex justify-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                    <a
-                      key={p}
-                      href={`/inventory?page=${p}`}
-                      className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
-                        p === page
-                          ? 'bg-brand-600 text-white shadow-md'
-                          : 'bg-white text-gray-600 border border-gray-200 hover:border-brand-300 hover:text-brand-700'
-                      }`}
-                    >
-                      {p}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
+            {totalPages > 1 && (
+              <nav className="mt-8 flex justify-center gap-1.5" aria-label="Pages">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <Link
+                    key={p}
+                    href={pageHref(p)}
+                    aria-current={p === page ? 'page' : undefined}
+                    className={`grid h-10 min-w-[40px] place-items-center rounded border font-semibold ${
+                      p === page ? 'border-brand-600 bg-brand-600 text-white' : 'border-line bg-white text-ink hover:border-ink'
+                    }`}
+                  >
+                    {p}
+                  </Link>
+                ))}
+              </nav>
+            )}
           </div>
         </div>
       </div>

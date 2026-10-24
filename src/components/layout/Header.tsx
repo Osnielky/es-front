@@ -1,69 +1,54 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Menu, X, Phone } from 'lucide-react'
-
-const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
-const DEALER_PHONE = process.env.NEXT_PUBLIC_DEALER_PHONE ?? ''
+import WhatsAppIcon from '@/components/icons/WhatsAppIcon'
+import { DEALER, telHref, whatsappUrl } from '@/lib/contact'
 
 const navLinks = [
-  { href: '/', label: 'Home' },
   { href: '/inventory', label: 'Inventory' },
   { href: '/financing', label: 'Financing' },
-  { href: '/trade-in', label: 'Trade-In' },
+  { href: '/trade-in', label: 'Sell or trade' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]
 
 export default function Header() {
   const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
 
-  const isHome = pathname === '/'
-  const transparent = isHome && !scrolled && !open
+  // Close the drawer on navigation
+  useEffect(() => setOpen(false), [pathname])
 
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', handler)
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`)
+  const waHref = whatsappUrl("Hi! I'm interested in one of your vehicles.")
 
   return (
-    <>
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        transparent
-          ? ''
-          : 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-200'
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
+    <header className="sticky top-0 z-40 border-b border-line bg-white">
+      <div className="mx-auto flex min-h-[60px] max-w-7xl items-center gap-4 px-4 sm:min-h-[66px]">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <img
-            src="/logo.png"
-            alt={DEALER_NAME}
-            className="h-20 w-auto"
-          />
+        <Link href="/" className="flex items-center gap-2.5" aria-label={`${DEALER.name} home`}>
+          <Image src="/logo.png" alt="" width={48} height={48} className="h-10 w-10 object-contain sm:h-11 sm:w-11" priority />
+          <span className="font-display text-xl font-extrabold leading-none tracking-wide sm:text-[22px]">
+            E<span className="text-accent-500">&amp;</span>S{' '}
+            <span className="font-semibold text-ink">Car Sales</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-1 sm:flex">
+        <nav className="ml-2 hidden items-center gap-1 lg:flex" aria-label="Main">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`rounded-lg px-4 py-2 text-xs font-bold uppercase tracking-widest transition-colors ${
-                transparent
-                  ? pathname === href
-                    ? 'bg-white/20 text-white'
-                    : 'text-white/80 hover:bg-white/10 hover:text-white'
-                  : pathname === href
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              aria-current={isActive(href) ? 'page' : undefined}
+              className={`border-b-2 px-3 py-2 text-[15px] font-semibold transition-colors ${
+                isActive(href)
+                  ? 'border-accent-500 text-ink'
+                  : 'border-transparent text-slate-500 hover:text-ink'
               }`}
             >
               {label}
@@ -71,87 +56,63 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 sm:flex">
-          {DEALER_PHONE && (
+        {/* Actions */}
+        <div className="ml-auto flex items-center gap-2">
+          {DEALER.phone && (
             <a
-              href={`tel:${DEALER_PHONE}`}
-              className={`flex items-center gap-1.5 text-sm font-semibold tracking-wide transition-colors ${
-                transparent ? 'text-white/90 hover:text-white' : 'text-gray-700 hover:text-brand-700'
-              }`}
+              href={telHref()}
+              className="inline-flex h-11 items-center gap-2 rounded border border-line px-3 font-display text-lg font-bold tracking-wide text-ink hover:border-ink sm:border-0 sm:px-2"
+              aria-label={`Call ${DEALER.phone}`}
             >
-              <Phone className="h-4 w-4" />
-              {DEALER_PHONE}
+              <Phone className="h-[18px] w-[18px]" />
+              <span className="hidden sm:inline">{DEALER.phone}</span>
             </a>
           )}
-          <Link
-            href="/admin/login"
-            className={`text-xs font-medium transition-colors ${
-              transparent ? 'text-white/70 hover:text-white' : 'text-gray-600 hover:text-gray-900'
-            }`}
+          <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-wa btn-sm hidden sm:inline-flex">
+            <WhatsAppIcon className="h-[18px] w-[18px]" />
+            WhatsApp
+          </a>
+          <button
+            className="flex h-11 w-11 items-center justify-center rounded border border-line text-ink hover:border-ink lg:hidden"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
           >
-            Admin
-          </Link>
-          <Link href="/contact" className="btn-primary py-2 px-5 text-xs font-bold uppercase tracking-widest">
-            Get a Quote
-          </Link>
+            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
-
-        {/* Mobile toggle */}
-        <button
-          className={`flex h-9 w-9 items-center justify-center rounded-lg sm:hidden transition-colors ${
-            transparent ? 'text-white hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'
-          }`}
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
       </div>
 
       {/* Mobile drawer */}
       {open && (
-        <div className="border-t border-gray-100 bg-white px-4 pb-5 pt-3 sm:hidden rounded-b-2xl shadow-lg">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              className={`flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
-                pathname === href
-                  ? 'bg-brand-50 text-brand-700'
-                  : 'text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
-          {DEALER_PHONE && (
-            <a
-              href={`tel:${DEALER_PHONE}`}
-              className="mt-1 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Phone className="h-4 w-4 text-brand-600" />
-              {DEALER_PHONE}
+        <div className="border-t border-line bg-white px-4 pb-5 pt-2 lg:hidden">
+          <nav aria-label="Mobile">
+            {navLinks.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`flex items-center border-b border-slate-100 py-3 font-display text-xl font-bold ${
+                  isActive(href) ? 'text-accent-500' : 'text-ink'
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-wa">
+              <WhatsAppIcon className="h-[18px] w-[18px]" />
+              WhatsApp
             </a>
-          )}
-          <Link
-            href="/admin/login"
-            onClick={() => setOpen(false)}
-            className="mt-1 flex items-center rounded-xl px-4 py-3 text-xs font-medium text-gray-500 hover:bg-gray-50"
-          >
-            Admin Login
-          </Link>
-          <Link
-            href="/contact"
-            onClick={() => setOpen(false)}
-            className="btn-primary mt-3 w-full justify-center"
-          >
-            Get a Quote
-          </Link>
+            {DEALER.phone && (
+              <a href={telHref()} className="btn-secondary">
+                <Phone className="h-[18px] w-[18px]" />
+                Call
+              </a>
+            )}
+          </div>
         </div>
       )}
     </header>
-    {!isHome && <div className="h-[90px] sm:h-[108px]" />}
-    </>
   )
 }

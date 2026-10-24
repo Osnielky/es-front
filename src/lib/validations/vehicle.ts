@@ -9,6 +9,8 @@ export const vehicleFilterSchema = z.object({
   priceMax: z.coerce.number().optional(),
   condition: z.enum(['NEW', 'USED', 'CERTIFIED']).optional(),
   bodyStyle: z.string().optional(),
+  mileageMax: z.coerce.number().optional(),
+  sort: z.enum(['newest', 'price_asc', 'price_desc', 'miles', 'year']).optional(),
   page: z.coerce.number().default(1),
   limit: z.coerce.number().default(12),
 })

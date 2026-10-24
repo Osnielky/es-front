@@ -1,5 +1,11 @@
 import type { Config } from 'tailwindcss'
 
+/**
+ * Brand tokens come from the E&S shield logo: navy, red, white.
+ * - `brand`  = navy scale (primary surfaces, nav, headings)
+ * - `accent` = red scale (price tags and the single primary action)
+ * - `wa`     = WhatsApp green (semantic, used only for the WhatsApp action)
+ */
 const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,35 +16,43 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50:  '#f0f4ff',
-          100: '#e0eaff',
-          200: '#c2d4ff',
-          300: '#93b0ff',
-          400: '#5e85ff',
-          500: '#3358f4',
-          600: '#1f3ee8',
-          700: '#1a30cc',
-          800: '#1c2da6',
-          900: '#1a2a80',
-          950: '#111a50',
+          50:  '#EEF2FA',
+          100: '#D9E1F2',
+          200: '#B9C4E0',
+          300: '#8E9FC9',
+          400: '#5F75AE',
+          500: '#3A5290',
+          600: '#15295A',
+          700: '#112149',
+          800: '#0C1A3D',
+          900: '#08122B',
+          950: '#050B1C',
         },
         accent: {
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea6c0a',
+          400: '#E63946',
+          500: '#C1121F',
+          600: '#A50E19',
         },
+        wa: {
+          500: '#1FAF54',
+          600: '#17883F',
+        },
+        paper: '#F3F5F9',
+        ink: '#131B2E',
+        line: '#D7DCE6',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-barlow)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-barlow-condensed)', 'Arial Narrow', 'sans-serif'],
       },
       backgroundImage: {
-        'hero-gradient': 'linear-gradient(135deg, #111a50 0%, #1a2a80 40%, #1f3ee8 100%)',
+        'hero-gradient': 'linear-gradient(180deg, #15295A 0%, #0C1A3D 100%)',
         'card-shine': 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%)',
       },
       boxShadow: {
-        'glow': '0 0 24px rgba(33, 62, 232, 0.25)',
-        'glow-accent': '0 0 24px rgba(249, 115, 22, 0.3)',
-        'card-hover': '0 20px 40px rgba(0,0,0,0.12)',
+        'glow': '0 10px 30px -12px rgba(193, 18, 31, 0.45)',
+        'glow-accent': '0 10px 30px -12px rgba(193, 18, 31, 0.45)',
+        'card-hover': '0 20px 40px -24px rgba(12, 26, 61, 0.35)',
       },
       animation: {
         'fade-up': 'fadeUp 0.5s ease-out forwards',

@@ -84,12 +84,11 @@ export default function FinancingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* Hero */}
-      <div className="bg-hero-gradient px-4 py-14 text-white text-center">
-        <p className="text-sm font-semibold uppercase tracking-widest text-brand-300 mb-2">Auto Financing</p>
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
+      <div className="hero-band px-4 py-12 text-center sm:py-14">
+                <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl">
           Car Financing in Naples, FL
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-brand-200 text-lg">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
           All credit situations welcome. Get pre-approved in minutes and drive home today.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -110,7 +109,7 @@ export default function FinancingPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {benefits.map(({ icon: Icon, title, desc }) => (
               <div key={title} className="card p-6 text-center">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-brand-50 text-brand-600">
                   <Icon className="h-7 w-7" />
                 </div>
                 <h3 className="font-bold text-gray-900">{title}</h3>
@@ -134,7 +133,7 @@ export default function FinancingPage() {
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-600 px-3 py-0.5 text-xs font-bold text-white">
                   Step {i + 1}
                 </span>
-                <div className="mx-auto mt-3 mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                <div className="mx-auto mt-3 mb-4 flex h-12 w-12 items-center justify-center rounded bg-brand-50 text-brand-600">
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-bold text-gray-900">{title}</h3>

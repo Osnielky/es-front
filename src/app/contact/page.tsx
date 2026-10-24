@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Phone, MapPin, Mail, Clock } from 'lucide-react'
 import LeadForm from '@/components/leads/LeadForm'
 import { buildLocalBusinessJsonLd, buildFAQJsonLd, buildBreadcrumbJsonLd, LOCATION } from '@/lib/seo'
+import { DEALER } from '@/lib/contact'
 
 const DEALER_NAME = process.env.NEXT_PUBLIC_DEALER_NAME ?? 'E&S Car Sales'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
@@ -63,7 +64,7 @@ export default function ContactPage() {
 
       <div className="min-h-screen bg-gray-50">
         {/* Page header */}
-        <div className="bg-hero-gradient px-4 py-14 text-white text-center">
+        <div className="hero-band px-4 py-12 text-center sm:py-14">
           <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Contact {DEALER_NAME}</h1>
           <p className="mt-3 text-brand-200">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
         </div>
@@ -100,11 +101,11 @@ export default function ContactPage() {
                 icon: Clock,
                 color: 'bg-amber-50 text-amber-600',
                 title: 'Hours',
-                content: 'Mon–Sat: 9am – 7pm\nSun: 11am – 5pm',
+                content: DEALER.hours.map((h) => `${h.days}: ${h.time}`).join('\n'),
               },
             ].map(({ icon: Icon, color, title, content, href }) => (
               <div key={title} className="card flex items-start gap-4 p-5">
-                <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl ${color}`}>
+                <div className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded ${color}`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>
