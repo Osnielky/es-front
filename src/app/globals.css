@@ -10,8 +10,8 @@
   }
   @media (min-width: 640px) {
     :root {
-      --header-h: 66px;
-      --header-space: 66px;
+      --header-h: 68px;
+      --header-space: 68px;
     }
   }
 
@@ -40,12 +40,12 @@
   }
 
   h1, h2, h3 {
-    @apply font-display font-bold leading-[1.05];
+    @apply font-display font-bold leading-[1.05] tracking-[-0.01em];
     text-wrap: balance;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-accent-500 ring-offset-2 ring-offset-paper;
+    @apply outline-none ring-2 ring-brand-600 ring-offset-2 ring-offset-paper;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -62,43 +62,65 @@
   }
 }
 
+/* ── Backdrop: soft sky + gold glows fixed behind the page, so frosted cards always have something to blur ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 85% 0%, rgb(190 215 240 / 0.75), transparent 65%),
+    radial-gradient(45% 40% at 0% 35%, rgb(241 227 190 / 0.6), transparent 65%),
+    radial-gradient(55% 45% at 60% 100%, rgb(205 225 245 / 0.55), transparent 65%),
+    linear-gradient(180deg, #FFFFFF 0%, #F5F7FB 60%, #F2F5FA 100%);
+}
+
+/* Page transition: template.tsx remounts this wrapper on every navigation */
+.page-enter {
+  animation: page-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
 @layer components {
   /* ── Buttons ─────────────────────────────────────────────── */
   .btn {
-    @apply inline-flex min-h-[46px] items-center justify-center gap-2 whitespace-nowrap rounded border border-transparent px-5
-      font-display text-lg font-bold tracking-wide transition-colors duration-150 active:translate-y-px
-      disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex min-h-[48px] items-center justify-center gap-2 whitespace-nowrap rounded-xl border border-transparent px-5
+      font-display text-base font-bold transition-all duration-200 ease-out
+      hover:-translate-y-px hover:shadow-md active:translate-y-0 active:shadow-none
+      disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none;
   }
-  .btn-primary {
-    @apply btn bg-accent-500 text-white hover:bg-accent-600;
-  }
+  .btn-primary,
   .btn-navy {
-    @apply btn bg-brand-600 text-white hover:bg-brand-800;
+    @apply btn bg-brand-600 text-white shadow-glow hover:bg-brand-700;
   }
   .btn-wa {
     @apply btn bg-wa-500 text-white hover:bg-wa-600;
   }
   .btn-secondary {
-    @apply btn border-line bg-white text-ink hover:border-ink;
+    @apply btn border-brand-600/25 bg-white/80 text-brand-600 backdrop-blur hover:border-brand-600 hover:bg-white;
   }
   .btn-ghost-white {
     @apply btn border-white/40 text-white hover:bg-white/10;
   }
+  .btn-gold {
+    @apply btn bg-accent-500 text-white hover:bg-accent-600;
+  }
   .btn-sm {
-    @apply min-h-[40px] px-4 text-base;
+    @apply min-h-[42px] rounded-lg px-4 text-[15px];
   }
 
-  /* ── Surfaces ────────────────────────────────────────────── */
-  .card {
-    @apply rounded-md border border-line bg-white;
-  }
-  .card-hover {
-    @apply card transition-colors hover:border-brand-600;
-  }
-  /* Kept for components written against the old glass theme: now a plain raised surface */
+  /* ── Surfaces: frosted white cards ───────────────────────── */
+  .card,
   .glass,
   .glass-strong {
-    @apply border border-line bg-white;
+    @apply rounded-2xl border border-white/70 bg-white/80 shadow-panel backdrop-blur-xl;
+  }
+  .card-hover {
+    @apply card transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white hover:shadow-card-hover;
   }
   .theme-glass {
     @apply text-ink;
@@ -110,34 +132,47 @@
   /* ── Forms ───────────────────────────────────────────────── */
   /* text-base on phones: iOS Safari zooms into inputs below 16px */
   .input {
-    @apply block w-full rounded border border-line bg-white px-3.5 py-2.5 text-base text-ink placeholder:text-slate-400
-      transition-colors focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100;
+    @apply block w-full rounded-xl border border-line bg-white/90 px-3.5 py-2.5 text-base text-ink placeholder:text-slate-400
+      transition-[border-color,box-shadow] duration-150 focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100;
   }
   .label {
     @apply mb-1 block text-sm font-semibold text-slate-600;
   }
 
-  /* ── Badges / chips ──────────────────────────────────────── */
+  /* ── Labels / badges / chips ─────────────────────────────── */
+  .eyebrow {
+    @apply inline-flex items-center gap-3 text-[13px] font-semibold uppercase tracking-[0.18em] text-accent-600;
+  }
+  .eyebrow::after {
+    content: '';
+    @apply h-0.5 w-12 rounded-full bg-accent-400;
+  }
+  .highlight {
+    @apply text-accent-500;
+  }
+  .icon-tile {
+    @apply flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-accent-50 text-accent-600;
+  }
   .badge {
-    @apply inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-xs font-semibold;
+    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold;
   }
   .badge-new {
     @apply badge bg-emerald-600 text-white;
   }
   .badge-used {
-    @apply badge bg-accent-500 text-white;
-  }
-  .badge-certified {
     @apply badge bg-brand-600 text-white;
   }
+  .badge-certified {
+    @apply badge bg-accent-500 text-white;
+  }
   .pill {
-    @apply inline-flex items-center rounded-sm bg-slate-100 px-2 py-1 text-xs font-semibold text-ink;
+    @apply inline-flex items-center rounded-md bg-accent-50 px-2 py-1 text-xs font-semibold text-accent-700;
   }
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-sm bg-brand-800/85 px-2.5 py-1 text-xs font-semibold text-white;
+    @apply inline-flex items-center gap-1.5 rounded-lg bg-brand-800/80 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur;
   }
   .filter-chip {
-    @apply rounded-full border border-line bg-white px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-brand-600
+    @apply rounded-full border border-line bg-white/80 px-3.5 py-1.5 text-sm font-medium text-ink transition-all duration-150 hover:border-brand-600 hover:bg-white
       aria-pressed:border-brand-600 aria-pressed:bg-brand-600 aria-pressed:text-white;
   }
 
@@ -155,22 +190,18 @@
 
   /* ── Type ────────────────────────────────────────────────── */
   .section-title {
-    @apply font-display text-3xl font-bold text-ink sm:text-4xl;
+    @apply font-display text-3xl font-extrabold text-brand-600 sm:text-[40px];
   }
   .section-sub {
-    @apply mt-1 text-slate-500;
+    @apply mt-2 text-slate-500;
   }
   .price {
-    @apply font-display font-extrabold leading-none text-accent-500 tabular-nums;
+    @apply font-display font-extrabold leading-none text-brand-600 tabular-nums;
   }
 
-  /* ── Hero band (shared by secondary pages) ───────────────── */
+  /* ── Hero band: light frosted strip at the top of a page ─── */
   .hero-band {
-    @apply relative bg-brand-600 text-white;
-  }
-  .hero-band::after {
-    content: '';
-    @apply absolute inset-x-0 bottom-0 h-1.5 bg-accent-500;
+    @apply relative border-b border-white/70 bg-white/55 text-ink backdrop-blur-xl;
   }
 
   /* ── Vehicle detail page (VDP) ───────────────────────────── */
@@ -178,39 +209,59 @@
     @apply text-ink;
   }
   .vdp-panel {
-    @apply rounded-panel border border-line bg-white;
+    @apply card;
   }
-  /* Small section label above a heading */
   .vdp-eyebrow {
-    @apply text-sm font-semibold text-accent-500;
+    @apply eyebrow;
   }
   .vdp-heading {
-    @apply font-display text-[1.75rem] font-bold leading-tight text-ink sm:text-[2rem];
+    @apply font-display text-[1.75rem] font-extrabold leading-tight text-brand-600 sm:text-[2rem];
   }
   .vdp-icon-btn {
-    @apply inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded border border-line bg-white px-3 text-sm font-semibold text-ink transition-colors duration-150
-      hover:border-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+    @apply inline-flex h-11 min-w-11 items-center justify-center gap-2 rounded-xl border border-line bg-white/80 px-3 text-sm font-semibold text-ink backdrop-blur transition-all duration-150
+      hover:border-brand-600 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
   }
   .vdp-btn {
-    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded px-5 font-display text-lg font-bold tracking-wide transition-colors duration-150
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper disabled:cursor-not-allowed disabled:opacity-60;
+    @apply btn text-base;
   }
   .vdp-btn-primary {
-    @apply vdp-btn bg-brand-600 text-white hover:bg-brand-800;
+    @apply vdp-btn bg-brand-600 text-white shadow-glow hover:bg-brand-700;
   }
   .vdp-btn-outline {
-    @apply vdp-btn border border-line bg-white text-ink hover:border-ink;
+    @apply vdp-btn border-brand-600/25 bg-white/80 text-brand-600 hover:border-brand-600 hover:bg-white;
   }
   .vdp-input {
-    @apply block w-full rounded border border-line bg-white px-3.5 py-2.5 text-base text-ink placeholder:text-slate-400 transition-colors duration-150
-      focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-100 aria-[invalid=true]:border-accent-500;
+    @apply input;
   }
   .vdp-label {
-    @apply mb-1 block text-sm font-semibold text-slate-600;
+    @apply label;
   }
   .vdp-error {
-    @apply mt-1.5 text-sm text-accent-600;
+    @apply mt-1.5 text-sm text-red-600;
   }
+
+  /* ── Admin + login glass pieces ──────────────────────────── */
+  .admin-bar {
+    @apply sticky z-40 border-b border-white/70 bg-white/70 backdrop-blur-xl;
+  }
+  .glass-card {
+    @apply card;
+  }
+  .glass-label {
+    @apply label;
+  }
+  .glass-input {
+    @apply input;
+  }
+}
+
+/* Admin pages were written against plain grey backgrounds; let the backdrop show through instead */
+.admin-glass .bg-gray-50 {
+  background-color: transparent;
+}
+.admin-glass table thead tr.bg-gray-50,
+.admin-glass .rounded-xl.bg-gray-50 {
+  background-color: rgb(255 255 255 / 0.55);
 }
 
 /* Keep page content (incl. footer) clear of fixed bottom bars: the VDP mobile CTA bar and the compare tray */
@@ -236,8 +287,8 @@ body:has(.sticky-cta:not(.lg\:hidden):not(.md\:hidden)) {
   width: 1.25rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 3px solid #c1121f;
-  box-shadow: 0 1px 4px rgba(12, 26, 61, 0.3);
+  border: 3px solid #1b2d5b;
+  box-shadow: 0 1px 4px rgba(23, 32, 54, 0.3);
   cursor: pointer;
 }
 .range-thumb::-moz-range-thumb {
@@ -246,12 +297,12 @@ body:has(.sticky-cta:not(.lg\:hidden):not(.md\:hidden)) {
   width: 1.25rem;
   border-radius: 9999px;
   background: #ffffff;
-  border: 3px solid #c1121f;
-  box-shadow: 0 1px 4px rgba(12, 26, 61, 0.3);
+  border: 3px solid #1b2d5b;
+  box-shadow: 0 1px 4px rgba(23, 32, 54, 0.3);
   cursor: pointer;
 }
 .range-thumb:focus-visible::-webkit-slider-thumb {
-  outline: 3px solid rgb(193 18 31 / 0.4);
+  outline: 3px solid rgb(27 45 91 / 0.35);
   outline-offset: 2px;
 }
 
@@ -267,13 +318,15 @@ body:has(.sticky-cta:not(.lg\:hidden):not(.md\:hidden)) {
   color: inherit;
 }
 .vdp-dialog::backdrop {
-  background: rgb(12 26 61 / 0.55);
+  background: rgb(23 32 54 / 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
 }
 .vdp-dialog[open] {
-  animation: vdp-dialog-in 200ms ease-out;
+  animation: vdp-dialog-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .vdp-dialog[open]::backdrop {
-  animation: vdp-fade-in 200ms ease-out;
+  animation: vdp-fade-in 220ms ease-out;
 }
 @media (max-width: 767px) {
   .vdp-dialog {
@@ -289,7 +342,7 @@ body:has(.sticky-cta:not(.lg\:hidden):not(.md\:hidden)) {
   }
 }
 @keyframes vdp-dialog-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
   to { opacity: 1; transform: none; }
 }
 @keyframes vdp-sheet-in {

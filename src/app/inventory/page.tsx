@@ -188,25 +188,26 @@ export default async function InventoryPage({ searchParams }: Props) {
         <section className="hero-band">
           <div className="relative mx-auto max-w-site px-4 pb-8 pt-5 sm:pb-9">
             <nav aria-label="Breadcrumb">
-              <ol className="flex items-center gap-2 text-sm text-brand-200">
-                <li><Link href="/" className="hover:text-white">Home</Link></li>
+              <ol className="flex items-center gap-2 text-sm text-slate-500">
+                <li><Link href="/" className="hover:text-brand-600">Home</Link></li>
                 <li aria-hidden="true">/</li>
-                <li className="font-semibold text-white" aria-current="page">Inventory</li>
+                <li className="font-semibold text-ink" aria-current="page">Inventory</li>
               </ol>
             </nav>
 
             <div className="mt-3 flex flex-col gap-4 lg:max-w-3xl">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <h1 className="font-display text-[40px] font-bold leading-none text-white sm:text-[52px]">Used {conditionWord}cars for sale in {LOCATION.city}</h1>
-                  <p className="mt-2 text-lg text-brand-200">
+                  <p className="eyebrow">Inventory</p>
+                  <h1 className="mt-3 font-display text-[40px] font-extrabold leading-none text-brand-600 sm:text-[52px]">Used {conditionWord}cars for sale <span className="highlight">in {LOCATION.city}</span></h1>
+                  <p className="mt-3 text-lg text-slate-500">
                     {total} {total === 1 ? 'vehicle' : 'vehicles'} on the lot. Prices exclude tax, tag and title.
                   </p>
                 </div>
                 <SavedCarsMenu />
               </div>
 
-              <form action="/inventory" method="get" role="search" className="flex overflow-hidden rounded bg-white focus-within:ring-2 focus-within:ring-accent-500">
+              <form action="/inventory" method="get" role="search" className="card flex overflow-hidden !rounded-xl p-0 focus-within:ring-2 focus-within:ring-brand-600">
                 {carried.map(([k, v]) => <input key={k} type="hidden" name={k} value={v} />)}
                 <label htmlFor="inventory-search" className="sr-only">Search by make, model, or keyword</label>
                 <div className="relative flex-1">
@@ -220,7 +221,7 @@ export default async function InventoryPage({ searchParams }: Props) {
                     className="h-full w-full bg-transparent py-3.5 pl-12 pr-3 text-base text-ink placeholder-slate-400 focus:outline-none"
                   />
                 </div>
-                <button type="submit" className="bg-accent-500 px-6 font-display text-lg font-bold tracking-wide text-white hover:bg-accent-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:px-9">
+                <button type="submit" className="m-1.5 rounded-lg bg-brand-600 px-6 font-display text-base font-bold text-white transition-colors hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white sm:px-8">
                   Search
                 </button>
               </form>
@@ -228,7 +229,7 @@ export default async function InventoryPage({ searchParams }: Props) {
               {/* One-tap filters for the most common choices; tapping an active one clears it */}
               {(facets.bodyStyles.length > 0 || facets.makes.length > 0) && (
                 <nav aria-label="Quick filters" className="mt-2">
-                  <p className="text-sm text-brand-200">Quick picks</p>
+                  <p className="text-sm font-semibold text-slate-500">Quick picks</p>
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {[
                       ...facets.bodyStyles.slice(0, 6).map((b) => ({ key: 'bodyStyle', value: b.name, count: b.count })),
@@ -240,12 +241,12 @@ export default async function InventoryPage({ searchParams }: Props) {
                           <Link
                             href={inventoryHref(params, { [key]: active ? undefined : value, ...(key === 'make' ? { model: undefined } : {}), page: undefined })}
                             scroll={false}
-                            className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                              active ? 'border-white bg-white text-ink' : 'border-white/30 text-white hover:border-white hover:bg-white/10'
+                            className={`inline-flex min-h-10 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 ${
+                              active ? 'border-brand-600 bg-brand-600 text-white' : 'border-line bg-white/80 text-ink hover:border-brand-600 hover:bg-white'
                             }`}
                           >
                             {value}
-                            <span className={active ? 'text-slate-400' : 'text-brand-200'}>{count}</span>
+                            <span className={active ? 'text-brand-200' : 'text-slate-400'}>{count}</span>
                             {active && <span className="sr-only">(selected, select again to remove)</span>}
                           </Link>
                         </li>
@@ -274,9 +275,9 @@ export default async function InventoryPage({ searchParams }: Props) {
             <div>
               {/* Toolbar: from md it sticks under the header so count, active filters, sort and view stay in reach
                   while browsing (on phones it would take too much of the screen) */}
-              <div className="z-20 mb-6 rounded-md border border-line bg-white px-4 py-3 md:sticky md:top-[calc(var(--header-h)+0.5rem)]">
+              <div className="card z-20 mb-6 px-4 py-3 md:sticky md:top-[calc(var(--header-h)+0.5rem)]">
               <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-                <h2 className="font-display text-2xl font-bold text-ink" aria-live="polite">
+                <h2 className="font-display text-2xl font-extrabold text-brand-600" aria-live="polite">
                   {total} {total === 1 ? 'vehicle' : 'vehicles'} available
                   {q && <span className="font-medium text-slate-500"> for &ldquo;{q}&rdquo;</span>}
                 </h2>

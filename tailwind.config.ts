@@ -1,9 +1,10 @@
 import type { Config } from 'tailwindcss'
 
 /**
- * Brand tokens come from the E&S shield logo: navy, red, white.
- * - `brand`  = navy scale (primary surfaces, nav, headings)
- * - `accent` = red scale (price tags and the single primary action)
+ * Theme: light and airy. White frosted cards over a soft sky/gold backdrop, navy for headings and
+ * buttons, gold for accents (eyebrows, icons, highlighted words). WhatsApp keeps its own green.
+ * - `brand`  = navy scale
+ * - `accent` = gold scale (600+ is readable as small text on white)
  * - `wa`     = WhatsApp green (semantic, used only for the WhatsApp action)
  * - `paper` / `ink` / `line` = page background, text, hairlines
  */
@@ -23,36 +24,40 @@ const config: Config = {
           300: '#8E9FC9',
           400: '#5F75AE',
           500: '#3A5290',
-          600: '#15295A',
-          700: '#112149',
-          800: '#0C1A3D',
-          900: '#08122B',
+          600: '#1B2D5B',
+          700: '#15254B',
+          800: '#0F1B3A',
+          900: '#0A122B',
           950: '#050B1C',
         },
-        // Alias kept for the few places that still say `navy`
         navy: {
           50:  '#EEF2FA',
           100: '#D9E1F2',
           200: '#B9C4E0',
-          DEFAULT: '#15295A',
-          800: '#0C1A3D',
+          DEFAULT: '#1B2D5B',
+          800: '#0F1B3A',
         },
         accent: {
-          400: '#E63946',
-          500: '#C1121F',
-          600: '#A50E19',
+          50:  '#FBF7EC',
+          100: '#F4EAD0',
+          200: '#EAD9A8',
+          300: '#DEC37A',
+          400: '#D1AD57',
+          500: '#C19A3E',
+          600: '#9A7A2C',
+          700: '#775E20',
         },
         wa: {
           500: '#1FAF54',
           600: '#17883F',
         },
-        paper: '#F3F5F9',
+        paper: '#F5F7FB',
         ivory: '#FFFFFF',
         ink: {
-          DEFAULT: '#131B2E',
+          DEFAULT: '#172036',
           muted: '#5C6579',
         },
-        line: '#D7DCE6',
+        line: '#E1E6EF',
       },
       screens: {
         // VDP two-column breakpoint (gallery + sections left, sticky contact panel right)
@@ -60,24 +65,24 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-barlow)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-barlow-condensed)', 'Arial Narrow', 'sans-serif'],
+        display: ['var(--font-barlow-display)', 'var(--font-barlow)', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
-        panel: '8px',
+        panel: '16px',
       },
       maxWidth: {
         // Shared page width for the header and inventory pages (1536px, 1760px from 1800px screens); see --site-max
         site: 'var(--site-max)',
       },
       backgroundImage: {
-        'hero-gradient': 'linear-gradient(180deg, #15295A 0%, #0C1A3D 100%)',
+        'hero-gradient': 'linear-gradient(180deg, #1B2D5B 0%, #0F1B3A 100%)',
         'card-shine': 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%)',
       },
       boxShadow: {
-        'glow': '0 10px 30px -12px rgba(193, 18, 31, 0.45)',
-        'glow-accent': '0 10px 30px -12px rgba(193, 18, 31, 0.45)',
-        'card-hover': '0 20px 40px -24px rgba(12, 26, 61, 0.35)',
-        panel: '0 1px 2px rgba(20,36,59,0.04), 0 8px 24px -12px rgba(20,36,59,0.12)',
+        'glow': '0 12px 30px -12px rgba(27, 45, 91, 0.45)',
+        'glow-accent': '0 12px 30px -12px rgba(193, 154, 62, 0.45)',
+        'card-hover': '0 24px 48px -24px rgba(23, 32, 54, 0.28)',
+        panel: '0 1px 2px rgba(23,32,54,0.04), 0 12px 32px -16px rgba(23,32,54,0.18)',
       },
       animation: {
         'fade-up': 'fadeUp 0.5s ease-out forwards',

@@ -75,16 +75,16 @@ export default function TradeInPage() {
 
       <div className="theme-glass">
         {/* Hero */}
-        <div className="hero-band px-4 py-12 text-center sm:py-14">
-          <h1 className="font-display text-4xl font-bold sm:text-6xl">
+        <div className="hero-band px-4 py-12 text-center sm:py-16">
+          <h1 className="font-display text-4xl font-extrabold text-brand-600 sm:text-6xl">
             Trade In Your Car in Naples, FL
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
             Get an appraisal and apply the value toward your next vehicle.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#appraise" className="btn-primary px-8 py-3.5">Get My Trade-In Value</a>
-            <a href={TEL_HREF} className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">
+            <a href="#appraise" className="btn-primary px-8">Get My Trade-In Value</a>
+            <a href={TEL_HREF} className="btn-secondary px-8">
               <Phone className="h-4 w-4" /> Call {DEALER_PHONE}
             </a>
           </div>
@@ -100,7 +100,7 @@ export default function TradeInPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {benefits.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6 text-center">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-slate-100 text-accent-500">
+                  <div className="icon-tile mx-auto mb-4 h-14 w-14">
                     <Icon className="h-7 w-7" />
                   </div>
                   <h3 className="font-bold text-ink">{title}</h3>

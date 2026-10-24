@@ -217,7 +217,7 @@ export default function EditVehiclePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 sticky top-[var(--header-h)] z-40">
+      <div className="admin-bar top-[var(--header-h)]">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -227,13 +227,13 @@ export default function EditVehiclePage() {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Edit Vehicle</h1>
+              <h1 className="font-display text-2xl font-extrabold text-brand-600">Edit Vehicle</h1>
               <p className="text-sm text-gray-500">Update vehicle details</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            className="btn-secondary btn-sm"
           >
             <LogOut className="h-4 w-4" />
             Logout

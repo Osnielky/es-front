@@ -17,7 +17,7 @@ export function SaveCarButton({ item }: { item: ShortlistItem }) {
       onClick={() => toggle(item)}
       aria-pressed={saved}
       aria-label={saved ? `Remove ${item.title} from saved cars` : `Save ${item.title}`}
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/95 shadow-md  transition-transform hover:scale-105 hover:bg-white/95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
+      className="flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/85 shadow-md backdrop-blur transition-transform hover:scale-105 hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper"
     >
       <Heart className={`h-5 w-5 ${saved ? 'fill-accent-500 text-accent-500' : 'text-ink'}`} />
     </button>
@@ -65,7 +65,7 @@ export function CompareTray() {
   if (items.length === 0) return null
   const href = `/inventory/compare?ids=${items.map((i) => i.id).join(',')}`
   return (
-    <div className="sticky-cta fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 px-4 py-3 text-ink shadow-[0_-8px_24px_rgba(12,26,61,0.12)] ">
+    <div className="sticky-cta fixed inset-x-0 bottom-0 z-40 border-t border-white/70 bg-white/80 px-4 py-3 text-ink shadow-[0_-8px_24px_rgba(23,32,54,0.12)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-site flex-wrap items-center gap-3">
         <GitCompareArrows className="hidden h-5 w-5 text-accent-500 sm:block" aria-hidden="true" />
         <ul className="flex flex-1 flex-wrap gap-2">
@@ -126,7 +126,7 @@ export function SavedCarsMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-md border border-line bg-white/95 p-3 text-ink shadow-xl ">
+        <div className="card absolute right-0 z-30 mt-2 w-80 max-w-[calc(100vw-2rem)] p-3 text-ink">
           {items.length === 0 ? (
             <p className="px-2 py-4 text-center text-sm text-slate-500">
               Tap the <Heart className="inline h-4 w-4 text-ink" aria-label="heart" /> on any car to save it here.

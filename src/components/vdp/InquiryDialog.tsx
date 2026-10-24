@@ -88,7 +88,7 @@ export default function InquiryDialog({ vehicle, intent, onClose }: Props) {
       // Backdrop click: the dialog element itself is the target only outside the panel
       onClick={(e) => e.target === e.currentTarget && ref.current?.close()}
     >
-      <div data-initial-focus tabIndex={-1} className="flex max-h-[inherit] flex-col overflow-hidden rounded-t-panel border border-line bg-white text-ink shadow-2xl outline-none focus-visible:ring-0 md:rounded-panel">
+      <div data-initial-focus tabIndex={-1} className="flex max-h-[inherit] flex-col overflow-hidden rounded-t-panel border border-white/70 bg-white/90 text-ink shadow-2xl outline-none backdrop-blur-xl focus-visible:ring-0 md:rounded-panel">
         <div className="flex items-start justify-between gap-4 border-b border-line px-5 pb-4 pt-5 sm:px-6">
           <div className="min-w-0">
             <h2 id="inquiry-title" className="text-xl font-semibold text-ink">{TITLES[active].title}</h2>

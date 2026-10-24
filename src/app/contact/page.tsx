@@ -62,9 +62,9 @@ export default function ContactPage() {
 
       <div className="theme-glass min-h-screen">
         {/* Page header */}
-        <div className="hero-band px-4 py-12 text-center sm:py-14">
-          <h1 className="font-display text-4xl font-bold sm:text-5xl">Contact {DEALER_NAME}</h1>
-          <p className="mt-3 text-brand-200">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
+        <div className="hero-band px-4 py-12 text-center sm:py-16">
+          <h1 className="font-display text-4xl font-extrabold text-brand-600 sm:text-5xl">Contact {DEALER_NAME}</h1>
+          <p className="mt-3 text-slate-500">Your trusted car dealership in Naples, Florida. We&apos;re here to help.</p>
         </div>
 
         <div className="mx-auto max-w-5xl px-4 py-14">
@@ -99,7 +99,7 @@ export default function ContactPage() {
               },
             ].map(({ icon: Icon, title, content, href }) => (
               <div key={title} className="card flex items-start gap-4 p-5">
-                <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded bg-slate-100 text-accent-500">
+                <div className="icon-tile h-11 w-11">
                   <Icon className="h-5 w-5" />
                 </div>
                 <div>

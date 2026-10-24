@@ -57,7 +57,7 @@ export default function SectionNav({ sections }: { sections: SectionLink[] }) {
     <nav
       ref={navRef}
       aria-label="Vehicle sections"
-      className="sticky top-[var(--header-h)] z-20 -mx-4 border-b border-line bg-white/95 px-4  sm:-mx-6 sm:px-6 desk:mx-0 desk:px-0"
+      className="sticky top-[var(--header-h)] z-20 -mx-4 border-b border-white/70 bg-white/80 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 desk:mx-0 desk:px-0"
     >
       <ul ref={listRef} className="no-scrollbar flex gap-1 overflow-x-auto">
         {sections.map(({ id, label }) => (

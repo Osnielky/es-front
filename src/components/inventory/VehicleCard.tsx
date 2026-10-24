@@ -89,7 +89,7 @@ export default function VehicleCard({ vehicle, priority = false, headingLevel: H
             {subtitle && <p className="mt-0.5 truncate text-sm text-slate-500">{subtitle}</p>}
           </div>
           {cleanTitle && (
-            <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-sm bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
+            <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
               Clean title
             </span>
@@ -110,7 +110,7 @@ export default function VehicleCard({ vehicle, priority = false, headingLevel: H
           {estMonthly > 0 && (
             <div className="text-right">
               <p className="font-display text-xl font-bold leading-none text-ink tabular-nums">${estMonthly.toLocaleString('en-US')}/mo<sup className="text-slate-400">*</sup></p>
-              <p className="mt-1 text-xs text-slate-500">est. payment</p>
+              <p className="mt-1 text-xs text-slate-500">est. per month</p>
             </div>
           )}
         </div>

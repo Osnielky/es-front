@@ -13,7 +13,7 @@ export default function MobileActionBar() {
 
   return (
     <div
-      className={`sticky-cta fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white px-4 pt-2.5 shadow-[0_-8px_24px_rgba(12,26,61,0.12)] transition-transform duration-200 md:hidden ${
+      className={`sticky-cta fixed inset-x-0 bottom-0 z-40 border-t border-white/70 bg-white/85 px-4 pt-2.5 backdrop-blur-xl shadow-[0_-8px_24px_rgba(12,26,61,0.12)] transition-transform duration-200 md:hidden ${
         overlayOpen ? 'translate-y-full' : ''
       }`}
       style={{ paddingBottom: 'max(0.625rem, env(safe-area-inset-bottom))' }}

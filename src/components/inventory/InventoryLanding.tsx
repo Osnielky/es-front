@@ -36,14 +36,14 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
         <header className="hero-band">
           <div className="mx-auto max-w-site px-4 pb-8 pt-5 sm:pb-9">
             <nav aria-label="Breadcrumb">
-              <ol className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap text-sm text-brand-200">
+              <ol className="flex items-center gap-1.5 overflow-x-auto whitespace-nowrap text-sm text-slate-500">
                 {breadcrumbs.map((crumb, i) => (
                   <li key={crumb.url} className="flex items-center gap-1.5">
                     {i === breadcrumbs.length - 1 ? (
-                      <span className="font-semibold text-white" aria-current="page">{crumb.name}</span>
+                      <span className="font-semibold text-ink" aria-current="page">{crumb.name}</span>
                     ) : (
                       <>
-                        <Link href={crumb.url} className="transition-colors hover:text-white">{crumb.name}</Link>
+                        <Link href={crumb.url} className="transition-colors hover:text-brand-600">{crumb.name}</Link>
                         <span aria-hidden="true">/</span>
                       </>
                     )}
@@ -51,9 +51,9 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
                 ))}
               </ol>
             </nav>
-            <h1 className="mt-3 font-display text-[40px] font-bold leading-none sm:text-[52px]">{h1}</h1>
-            <p className="mt-3 max-w-3xl text-brand-200">{intro}</p>
-            <p className="mt-2 text-sm text-brand-300">{LOCATION.city}, {LOCATION.stateCode}</p>
+            <p className="eyebrow mt-4">{LOCATION.city}, {LOCATION.stateCode}</p>
+            <h1 className="mt-3 font-display text-[40px] font-extrabold leading-none text-brand-600 sm:text-[52px]">{h1}</h1>
+            <p className="mt-3 max-w-3xl text-slate-500">{intro}</p>
           </div>
         </header>
 
@@ -69,7 +69,7 @@ export default function InventoryLanding({ h1, intro, vehicles, breadcrumbs, rel
             .filter((group) => group.links.length > 0)
             .map((group) => (
               <section key={group.heading} className="mt-10 border-t border-line pt-8">
-                <h2 className="font-display text-2xl font-bold text-ink">{group.heading}</h2>
+                <h2 className="font-display text-2xl font-extrabold text-brand-600">{group.heading}</h2>
                 <ul className="mt-3 flex flex-wrap gap-2">
                   {group.links.map((link) => (
                     <li key={link.href}>

@@ -14,7 +14,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   // Brand navy, so the mobile browser chrome matches the header
-  themeColor: '#15295A',
+  themeColor: '#FFFFFF',
 }
 
 export const metadata: Metadata = {
@@ -113,7 +113,7 @@ export default function RootLayout({
   return (
     // Browser extensions (e.g. LanguageTool's data-lt-installed) add attributes to <html> before React hydrates.
     // This only ignores attribute differences on <html> itself; mismatches inside the page are still reported.
-    <html lang="en" className={`${sans.variable} ${display.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${sans.variable} ${display.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1">{children}</main>

@@ -33,14 +33,14 @@ export default function Header() {
   const waHref = whatsappHref("Hi! I'm interested in one of your vehicles.")
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-white">
+    <header className="sticky top-0 z-50 border-b border-white/70 bg-white/80 shadow-[0_8px_30px_-20px_rgba(23,32,54,0.25)] backdrop-blur-xl">
       <div className="mx-auto flex h-[var(--header-h)] max-w-site items-center gap-4 px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 rounded" aria-label={`${DEALER_NAME} home`}>
           <Image src="/logo.png" alt="" width={48} height={48} sizes="48px" priority className="h-10 w-10 object-contain sm:h-11 sm:w-11" />
           <span className="font-display text-xl font-extrabold leading-none tracking-wide sm:text-[22px]">
             E<span className="text-accent-500">&amp;</span>S{' '}
-            <span className="font-semibold text-ink">Car Sales</span>
+            <span className="font-semibold text-brand-600">Car Sales</span>
           </span>
         </Link>
 
@@ -52,7 +52,7 @@ export default function Header() {
               href={href}
               aria-current={isActive(href) ? 'page' : undefined}
               className={`border-b-2 px-3 py-2 text-[15px] font-semibold transition-colors ${
-                isActive(href) ? 'border-accent-500 text-ink' : 'border-transparent text-slate-500 hover:text-ink'
+                isActive(href) ? 'border-accent-500 text-brand-600' : 'border-transparent text-slate-500 hover:text-brand-600'
               }`}
             >
               {label}
@@ -65,7 +65,7 @@ export default function Header() {
           {DEALER_PHONE && (
             <a
               href={TEL_HREF}
-              className="inline-flex h-11 items-center gap-2 rounded border border-line px-3 font-display text-lg font-bold tracking-wide text-ink hover:border-ink sm:border-0 sm:px-2"
+              className="inline-flex h-11 items-center gap-2 rounded-xl border border-line px-3 font-display text-lg font-bold text-brand-600 transition-colors hover:border-brand-600 sm:border-0 sm:px-2"
               aria-label={`Call ${DEALER_PHONE}`}
             >
               <Phone className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -77,7 +77,7 @@ export default function Header() {
             WhatsApp
           </a>
           <button
-            className="flex h-11 w-11 items-center justify-center rounded border border-line text-ink hover:border-ink lg:hidden"
+            className="flex h-11 w-11 items-center justify-center rounded-xl border border-line text-brand-600 transition-colors hover:border-brand-600 lg:hidden"
             onClick={() => setOpen(!open)}
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
@@ -89,7 +89,7 @@ export default function Header() {
 
       {/* Mobile drawer */}
       {open && (
-        <div className="border-t border-line bg-white px-4 pb-5 pt-2 lg:hidden">
+        <div className="border-t border-white/70 bg-white/90 px-4 pb-5 pt-2 backdrop-blur-xl lg:hidden">
           <nav aria-label="Mobile">
             {navLinks.map(({ href, label }) => (
               <Link
@@ -97,7 +97,7 @@ export default function Header() {
                 href={href}
                 aria-current={isActive(href) ? 'page' : undefined}
                 className={`flex items-center border-b border-slate-100 py-3 font-display text-xl font-bold ${
-                  isActive(href) ? 'text-accent-500' : 'text-ink'
+                  isActive(href) ? 'text-accent-600' : 'text-brand-600'
                 }`}
               >
                 {label}

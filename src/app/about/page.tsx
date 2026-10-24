@@ -56,11 +56,11 @@ export default function AboutPage() {
 
       <div className="theme-glass">
         {/* Hero */}
-        <div className="hero-band px-4 py-12 text-center sm:py-14">
-          <h1 className="font-display text-4xl font-bold sm:text-6xl">
+        <div className="hero-band px-4 py-12 text-center sm:py-16">
+          <h1 className="font-display text-4xl font-extrabold text-brand-600 sm:text-6xl">
             Naples&apos; Trusted Car Dealership
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-brand-200">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">
             A Naples dealership helping Southwest Florida drivers find quality used vehicles at honest prices.
           </p>
         </div>
@@ -134,7 +134,7 @@ export default function AboutPage() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {values.map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="card p-6">
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-accent-500">
+                  <div className="icon-tile mb-4">
                     <Icon className="h-6 w-6" />
                   </div>
                   <h3 className="font-bold text-ink">{title}</h3>
@@ -170,14 +170,14 @@ export default function AboutPage() {
         </section>
 
         {/* CTA */}
-        <section className="mx-4 mb-16 overflow-hidden glass rounded-md px-6 py-14 text-center text-ink sm:mx-8">
-          <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Ready to Find Your Next Vehicle?</h2>
+        <section className="card mx-4 mb-16 overflow-hidden px-6 py-14 text-center sm:mx-8">
+          <h2 className="font-display text-3xl font-extrabold text-brand-600 sm:text-4xl">Ready to Find Your Next Vehicle?</h2>
           <p className="mx-auto mt-3 max-w-xl text-slate-500">Browse our current inventory or get in touch — we are happy to help you find exactly what you need.</p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/inventory" className="btn-primary px-8 py-3.5">
+            <Link href="/inventory" className="btn-primary px-8">
               Browse Inventory <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/contact" className="btn-ghost-white px-8 py-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-500 focus-visible:ring-offset-2 focus-visible:ring-offset-paper">Contact Us</Link>
+            <Link href="/contact" className="btn-secondary px-8">Contact Us</Link>
           </div>
         </section>
       </div>
